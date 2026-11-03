@@ -173,9 +173,11 @@ function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) 
 }
 
 /* Lucide glyphs used by menu items. */
-export type IconName = 'close' | 'bookmark' | 'share' | 'user' | 'library' | 'wallet' | 'logout' | 'help'
+export type IconName = 'flag' | 'check' | 'close' | 'bookmark' | 'share' | 'user' | 'library' | 'wallet' | 'logout' | 'help'
 const ICONS: Record<IconName, string[]> = {
   close: ['M18 6 6 18', 'M6 6l12 12'],
+  flag: ['M4 22V4', 'M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1'],
+  check: ['M5 12.5l4.5 4.5L19 7.5'],
   bookmark: ['M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z'],
   share: ['M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8', 'M16 6l-4-4-4 4', 'M12 2v13'],
   user: ['M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2', 'M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z'],

@@ -86,10 +86,10 @@ export default function Home() {
           <h1 className="hero__title">{hero.name}</h1>
           <p className="hero__blurb">{hero.blurb}</p>
           <div className="hero__actions">
-            <button className="btn-white">
+            <Link href={`/watch/${hero.id}`} className="btn-white">
               <PlayGlyph />
               Watch Now
-            </button>
+            </Link>
             <button className="btn-dark" onClick={() => toast('Added to Saved for later')}>
               <img src={icons.plus} alt="" width={20} height={20} />
               Watch later

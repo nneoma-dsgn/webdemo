@@ -98,6 +98,7 @@ export function ContinueCard({ t, accessHours, progress, ep, onRemove }: { t: Ti
 
   return (
     <Tile
+      to={`/watch/${t.id}${ep ? `?ep=${encodeURIComponent(ep)}` : ''}`}
       className="card cw"
       onContextMenu={(e) => {
         e.preventDefault()

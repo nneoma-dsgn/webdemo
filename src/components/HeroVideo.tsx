@@ -10,6 +10,11 @@ export type YTPlayer = {
   unloadModule?: (m: string) => void
   loadVideoById: (o: { videoId: string; startSeconds?: number; endSeconds?: number }) => void
   getCurrentTime: () => number
+  getDuration?: () => number
+  seekTo?: (seconds: number, allowSeekAhead: boolean) => void
+  setVolume?: (v: number) => void
+  setPlaybackRate?: (r: number) => void
+  isMuted?: () => boolean
   mute: () => void
   unMute: () => void
   playVideo: () => void
@@ -18,7 +23,7 @@ export type YTPlayer = {
 }
 declare global {
   interface Window {
-    YT?: { Player: new (el: HTMLElement, opts: object) => YTPlayer; PlayerState: { PLAYING: number; ENDED: number } }
+    YT?: { Player: new (el: HTMLElement, opts: object) => YTPlayer; PlayerState: { PLAYING: number; ENDED: number; PAUSED: number; BUFFERING: number } }
     onYouTubeIframeAPIReady?: () => void
   }
 }

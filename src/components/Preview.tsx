@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { backdropSm, featured, studios, titles, trailers } from '../data/catalog'
 import { loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
 import { useMenu } from './Menu'
@@ -57,6 +58,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
   const clip = trailers[open.id]
   const tint = featured.find((f) => f.id === open.id)?.tint ?? '#6b6b6b'
   const { toast, open: openMenu } = useMenu()
+  const router = useRouter()
   const mount = useRef<HTMLDivElement>(null)
   const player = useRef<YTPlayer | null>(null)
   const ready = useRef(false)
@@ -151,7 +153,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
         </p>
         <p className="pv__blurb">{t.blurb}</p>
         <div className="pv__actions">
-          <button className="pv__watch">
+          <button className="pv__watch" onClick={() => router.push(`/watch/${t.id}`)}>
             <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden>
               <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
             </svg>

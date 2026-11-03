@@ -2851,3 +2851,401 @@ body.spot-focus .page--welcome .cta-wrap {
 .hero--carousel .hero__dots {
   gap: 0;
 }
+
+/* ---------- Video player ---------- */
+
+.vp {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #000;
+  color: var(--text-100);
+  overflow: hidden;
+  cursor: default;
+}
+
+.vp--idle {
+  cursor: none;
+}
+
+/* Contained 16:9 frame, rendered at 3x and scaled down so YouTube's overlays shrink with it. */
+.vp__video {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(100vw, 177.78vh);
+  height: min(56.25vw, 100vh);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.vp__video.is-on {
+  opacity: 1;
+}
+
+.vp__video iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  height: 300%;
+  /* Net zoom 1.08 inside the frame crops YouTube's title bar and corner logo. */
+  transform: translate(-50%, -50%) scale(0.36);
+  border: 0;
+}
+
+.vp__still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.5;
+}
+
+.vp__surface {
+  position: absolute;
+  inset: 0;
+  cursor: inherit;
+}
+
+.vp__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.vp__loading-title {
+  position: absolute;
+  top: calc(clamp(18px, 3vh, 32px) + 60px);
+  left: var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vp__loading-title span {
+  font-size: clamp(16px, 1.4vw, 22px);
+  font-weight: 600;
+  color: var(--text-200);
+}
+
+.vp__loading-title strong {
+  font-size: clamp(26px, 2.6vw, 44px);
+  font-weight: 700;
+  letter-spacing: var(--tracking);
+}
+
+.vp__buffer {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  pointer-events: none;
+}
+
+.vp__unavailable {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.vp__unavailable strong {
+  font-size: 22px;
+}
+
+.vp__unavailable span {
+  color: var(--text-300);
+}
+
+/* Chrome: top bar, centre controls, bottom bar. All fade together when idle. */
+.vp__top,
+.vp__center,
+.vp__bottom {
+  transition: opacity 0.35s ease;
+}
+
+.vp--idle .vp__top,
+.vp--idle .vp__center,
+.vp--idle .vp__bottom {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.vp__top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(18px, 3vh, 32px) var(--gutter) 60px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+}
+
+.vp__top-right {
+  display: flex;
+  gap: 8px;
+}
+
+.vp__icon {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 6px;
+  border-radius: 50%;
+  color: var(--text-100);
+  transition: background 0.2s, transform 0.15s;
+}
+
+.vp__icon:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.vp__icon:active {
+  transform: scale(0.94);
+}
+
+.vp__icon.is-on {
+  color: var(--accent);
+}
+
+.vp__speed span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.vp__center {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: max-content;
+  height: max-content;
+  display: flex;
+  align-items: center;
+  gap: clamp(28px, 5vw, 64px);
+}
+
+.vp__skip,
+.vp__play {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-100);
+  transition: background 0.2s, transform 0.2s var(--ease);
+}
+
+.vp__skip {
+  width: 60px;
+  height: 60px;
+}
+
+.vp__play {
+  width: 84px;
+  height: 84px;
+}
+
+.vp__skip:hover,
+.vp__play:hover {
+  background: rgba(0, 0, 0, 0.6);
+  transform: scale(1.06);
+}
+
+.vp__bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 80px var(--gutter) clamp(18px, 3vh, 30px);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+}
+
+/* Scrubber: Circo red, knob grows on hover. */
+.vp__scrub input,
+.vp__volume input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 16px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.vp__scrub input::-webkit-slider-runnable-track,
+.vp__volume input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--accent) var(--p), rgba(255, 255, 255, 0.3) var(--p));
+}
+
+.vp__volume input::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, var(--text-100) var(--p), rgba(255, 255, 255, 0.3) var(--p));
+}
+
+.vp__scrub input::-moz-range-track,
+.vp__volume input::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.vp__scrub input::-moz-range-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.vp__volume input::-moz-range-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text-100);
+}
+
+.vp__scrub input::-webkit-slider-thumb,
+.vp__volume input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 0;
+  transform: scale(0.85);
+  transition: transform 0.15s;
+}
+
+.vp__volume input::-webkit-slider-thumb {
+  background: var(--text-100);
+}
+
+.vp__scrub input::-moz-range-thumb,
+.vp__volume input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.vp__volume input::-moz-range-thumb {
+  background: var(--text-100);
+}
+
+.vp__scrub:hover input::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.vp__scrub:hover input::-webkit-slider-runnable-track {
+  height: 6px;
+}
+
+.vp__scrub:hover input::-webkit-slider-thumb {
+  margin-top: -4px;
+}
+
+.vp__times {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-200);
+  font-variant-numeric: tabular-nums;
+}
+
+.vp__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.vp__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vp__title span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-200);
+}
+
+.vp__title strong {
+  font-size: clamp(18px, 1.5vw, 24px);
+  font-weight: 700;
+  letter-spacing: var(--tracking);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vp__tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+
+/* Volume slider slides out on hover. */
+.vp__volume {
+  display: flex;
+  align-items: center;
+}
+
+.vp__volume input {
+  width: 0;
+  opacity: 0;
+  transition: width 0.25s var(--ease), opacity 0.2s, margin 0.25s var(--ease);
+}
+
+.vp__volume:hover input,
+.vp__volume:focus-within input {
+  width: 96px;
+  opacity: 1;
+  margin: 0 10px 0 2px;
+}
+
+@media (max-width: 767px) {
+  .vp__skip {
+    width: 48px;
+    height: 48px;
+  }
+
+  .vp__play {
+    width: 68px;
+    height: 68px;
+  }
+
+  .vp__volume input {
+    display: none;
+  }
+}
+
+/* Loading: only the back arrow, title and spinner (Netflix-style). */
+.vp--loading .vp__top-right,
+.vp--loading .vp__bottom {
+  display: none;
+}
+
+.vp--loading .vp__top {
+  background: none;
+}
