@@ -1,0 +1,47 @@
+/* Circo design tokens, mirrored from the Figma variables (Revised Feed & Navigation). */
+:root {
+  /* Backgrounds */
+  --bg-primary: #040404; /* Dark Mode BG/Primary Dark - 100 */
+  --bg-200: #1a1a1a; /* Dark Mode BG/Dark - 200 */
+  --bg-400: #353535; /* Dark Mode BG/Dark - 400 */
+  --bg-light: #ffffff; /* Light Mode BG/Primary Light - 100 */
+
+  /* Text */
+  --text-100: #ffffff;
+  --text-200: #e0e0e0;
+  --text-300: #b0b0b0;
+  --text-tertiary: #aaabb0;
+  --text-on-light: #1b1b1b;
+
+  /* Strokes */
+  --stroke-default: #262626;
+  --stroke-strong: #353535;
+  --stroke-subtle: rgba(255, 255, 255, 0.1);
+
+  /* Brand */
+  --accent: #ff004f;
+
+  /* Glass (pills and chips over artwork) */
+  --glass-strong: rgba(224, 224, 228, 0.3);
+  --glass-soft: rgba(255, 255, 255, 0.1);
+  --glass-dark: rgba(53, 53, 53, 0.4);
+  --chip-dark: rgba(26, 26, 26, 0.7);
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+
+  /* Type: SF Pro on Apple platforms, Inter elsewhere. Figma tracking is -3%. */
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', Inter, system-ui, sans-serif;
+  --tracking: -0.03em;
+
+  /* Layout */
+  --gutter: clamp(16px, 4vw, 60px);
+  --nav-h: 72px;
+  --poster-w: clamp(140px, 12.5vw, 220px);
+  --landscape-w: clamp(260px, 22vw, 400px);
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
