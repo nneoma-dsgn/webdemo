@@ -77,7 +77,6 @@ export default function Home() {
                 key={c.id}
                 t={titles[c.id]}
                 accessHours={c.accessHours}
-                left={c.left}
                 progress={c.progress}
                 ep={c.ep}
                 onRemove={() => {

@@ -2567,11 +2567,8 @@ body.spot-focus .page--welcome .cta-wrap {
 /* ---------- Continue Watching card ---------- */
 
 .cw {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: block;
   width: var(--landscape-w);
-  padding-bottom: 6px;
 }
 
 .cw:hover {
@@ -2609,7 +2606,7 @@ body.spot-focus .page--welcome .cta-wrap {
 .cw__shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0) 30%), linear-gradient(to top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0) 25%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0) 30%), linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.35) 30%, rgba(0, 0, 0, 0) 55%);
   transition: background-color 0.3s;
 }
 
@@ -2647,8 +2644,8 @@ body.spot-focus .page--welcome .cta-wrap {
   margin: auto;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -2661,7 +2658,7 @@ body.spot-focus .page--welcome .cta-wrap {
 }
 
 .cw__play svg {
-  margin-left: 2px;
+  margin-left: 3px;
 }
 
 .cw:hover .cw__play,
@@ -2670,13 +2667,37 @@ body.spot-focus .page--welcome .cta-wrap {
   transform: none;
 }
 
-/* Progress line along the bottom edge of the art. */
-.cw__progress {
+/* Episode, title and progress line on the art. */
+.cw__info {
   position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 10px;
+  left: 14px;
+  right: 14px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cw__ep {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cw__title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cw__progress {
   height: 4px;
+  margin-top: 8px;
   border-radius: 2px;
   background: rgba(255, 255, 255, 0.28);
   overflow: hidden;
@@ -2687,28 +2708,4 @@ body.spot-focus .page--welcome .cta-wrap {
   height: 100%;
   border-radius: 2px;
   background: var(--text-100);
-}
-
-.cw__text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 0 2px;
-  min-width: 0;
-}
-
-.cw__text strong {
-  font-size: 16px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cw__text span {
-  font-size: 13px;
-  color: var(--text-300);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }

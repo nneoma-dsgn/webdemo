@@ -81,9 +81,9 @@ export function accessLeft(hours: number) {
   return n(Math.floor(days / 30), 'month')
 }
 
-/* Continue Watching card (Apple TV "Up Next" style): 16:9 art with the time-left chip and a
-   progress line along its bottom edge; title and episode / time left sit underneath. */
-export function ContinueCard({ t, accessHours, left, progress, ep, onRemove }: { t: Title; accessHours: number; left: string; progress: number; ep?: string; onRemove?: () => void }) {
+/* Continue Watching card (Apple TV "Up Next" style): 16:9 art with the access chip; the episode,
+   title and progress line sit on the art. The chip is the only "left" on the card. */
+export function ContinueCard({ t, accessHours, progress, ep, onRemove }: { t: Title; accessHours: number; progress: number; ep?: string; onRemove?: () => void }) {
   const { open, toast } = useMenu()
   const pct = Math.round(progress * 100)
   const menu = (anchor: HTMLElement | { x: number; y: number }) =>
@@ -126,17 +126,18 @@ export function ContinueCard({ t, accessHours, left, progress, ep, onRemove }: {
           <img src={icons.more} alt="" width={24} height={24} />
         </button>
         <span className="cw__play" aria-hidden>
-          <svg width="15" height="15" viewBox="0 0 20 20">
+          <svg width="20" height="20" viewBox="0 0 20 20">
             <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
           </svg>
         </span>
-        <span className="cw__progress" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={`${pct}% watched`}>
-          <span style={{ width: `${pct}%` }} />
-        </span>
-      </div>
-      <div className="cw__text">
-        <strong>{t.name}</strong>
-        <span>{ep ? `${ep} · ${left}` : left}</span>
+        {/* Apple TV style: episode and title sit on the art, above the progress line. */}
+        <div className="cw__info">
+          {ep && <span className="cw__ep">{ep}</span>}
+          <strong className="cw__title">{t.name}</strong>
+          <span className="cw__progress" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={`${pct}% watched`}>
+            <span style={{ width: `${pct}%` }} />
+          </span>
+        </div>
       </div>
     </Tile>
   )
