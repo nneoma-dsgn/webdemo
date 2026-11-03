@@ -2816,8 +2816,17 @@ body.spot-focus .page--welcome .cta-wrap {
   height: 8px;
   border-radius: 4px;
   background: var(--text-100);
-  transform-origin: left;
-  animation: dot-fill linear forwards;
+  /* Grows in width from a full dot so both ends stay round (scaling would squash them). */
+  animation: dot-grow linear forwards;
+}
+
+@keyframes dot-grow {
+  from {
+    width: 8px;
+  }
+  to {
+    width: 32px;
+  }
 }
 
 @keyframes dot-fill {
