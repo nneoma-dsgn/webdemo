@@ -2655,7 +2655,6 @@ body.spot-focus .page--welcome .cta-wrap {
   height: 56px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: var(--text-100);
@@ -3034,7 +3033,7 @@ body.spot-focus .page--welcome .cta-wrap {
   height: max-content;
   display: flex;
   align-items: center;
-  gap: clamp(28px, 5vw, 64px);
+  gap: clamp(20px, 3vw, 40px);
 }
 
 .vp__skip,
@@ -3043,7 +3042,6 @@ body.spot-focus .page--welcome .cta-wrap {
   place-items: center;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.38);
-  border: 1px solid rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--text-100);
