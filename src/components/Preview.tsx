@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import { featured, studios, titles, trailers } from '../data/catalog'
+import { backdropSm, featured, studios, titles, trailers } from '../data/catalog'
 import { loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
 import { useMenu } from './Menu'
 
@@ -11,8 +11,9 @@ type Ctx = { hover: (id: string, el: HTMLElement) => void; leave: () => void }
 const PreviewCtx = createContext<Ctx | null>(null)
 export const usePreview = () => useContext(PreviewCtx)
 
-const OPEN_DELAY_MS = 500
-type Open = { id: string; x: number; y: number; w: number; ox: number; oy: number }
+const OPEN_DELAY_MS = 450
+// `shown` flips after the delay; the card mounts hidden right away so the trailer starts loading early.
+type Open = { id: string; x: number; y: number; w: number; ox: number; oy: number; shown: boolean }
 
 export function PreviewProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<Open | null>(null)
@@ -23,15 +24,16 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
     if (window.matchMedia('(hover: none)').matches) return
     window.clearTimeout(closeT.current)
     window.clearTimeout(openT.current)
-    openT.current = window.setTimeout(() => {
+    {
       const r = el.getBoundingClientRect()
       const w = Math.max(340, r.width * 2)
       const h = (w * 9) / 16 + 170
       const x = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12)
       const vy = Math.min(Math.max(12, r.top + r.height / 2 - h / 2), window.innerHeight - h - 12)
       // Stored in page coordinates so the card scrolls with the page, anchored to its poster.
-      setOpen({ id, x: x + window.scrollX, y: vy + window.scrollY, w, ox: r.left + r.width / 2 - x, oy: r.top + r.height / 2 - vy })
-    }, OPEN_DELAY_MS)
+      setOpen({ id, x: x + window.scrollX, y: vy + window.scrollY, w, ox: r.left + r.width / 2 - x, oy: r.top + r.height / 2 - vy, shown: false })
+    }
+    openT.current = window.setTimeout(() => setOpen((o) => (o && o.id === id ? { ...o, shown: true } : o)), OPEN_DELAY_MS)
   }, [])
 
   const leave = useCallback(() => {
@@ -76,8 +78,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
         events: {
           onReady: (e: { target: YTPlayer }) => {
             ready.current = true
-            // autoplay+mute starts it; an extra playVideo() makes YouTube flash its play icon.
-            e.target.mute()
+            // Starts muted via playerVars; any API call here makes YouTube flash its play/pause icon.
           },
           onError: () => setStalled(true),
           onStateChange: (e: { data: number }) => {
@@ -85,8 +86,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
               window.clearTimeout(reveal)
               window.clearTimeout(stall)
               // Hidden until YouTube's start overlays fade; they're large in a small frame.
-              reveal = window.setTimeout(() => setPlaying(true), REVEAL_DELAY_MS + 1400)
-              player.current?.unloadModule?.('captions')
+              reveal = window.setTimeout(() => setPlaying(true), REVEAL_DELAY_MS)
             }
             if (e.data === YT.PlayerState.ENDED) setPlaying(false)
           },
@@ -104,7 +104,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
 
   return (
     <div
-      className="pv"
+      className={`pv${open.shown ? ' is-shown' : ''}`}
       style={{ left: open.x, top: open.y, width: open.w, transformOrigin: `${open.ox}px ${open.oy}px`, ['--tint' as string]: tint }}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
@@ -113,13 +113,13 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
     >
       <div className={`pv__media${playing ? ' is-playing' : ''}`}>
         {/* Loading base: a dark blur of the art, not the thumbnail itself. */}
-        <img className="pv__blur" src={t.still} alt="" />
+        <img className="pv__blur" src={backdropSm(t.id)} alt="" />
         {clip && (
           <div className="pv__video" aria-hidden>
             <div ref={mount} />
           </div>
         )}
-        {stalled && !playing && <img className="pv__still" src={t.still} alt="" />}
+        {stalled && !playing && <img className="pv__still" src={backdropSm(t.id)} alt="" />}
         {playing && (
           <button
             className="pv__sound"

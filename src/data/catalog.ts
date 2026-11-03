@@ -4,6 +4,8 @@ const a = (file: string) => `/assets/${file}`
 /* Preview artwork from TMDB (posters w500, backdrops w1280). Placeholder for the real catalogue. */
 const poster = (id: string) => `/media/${id}-poster.jpg`
 const backdrop = (id: string) => `/media/${id}-backdrop.jpg`
+/* 640px copy for small surfaces (hover preview), so it shows instantly. */
+export const backdropSm = (id: string) => `/media/${id}-backdrop-sm.jpg`
 
 export type Title = {
   id: string

@@ -90,7 +90,6 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
         events: {
           onReady: (e: { target: YTPlayer }) => {
             ready.current = true
-            e.target.mute()
             // Buffer the first clip while the user is still scrolling towards the section.
             const first = itemsRef.current[0]
             ;(e.target as unknown as { cueVideoById: (o: object) => void }).cueVideoById({ videoId: first.videoId, startSeconds: first.start, endSeconds: first.end })
@@ -100,11 +99,6 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
               // Reveal as soon as frames are flowing so picture and sound start together.
               window.clearTimeout(revealTimer)
               revealTimer = window.setTimeout(() => setPlaying(true), REVEAL_DELAY_MS)
-              // Keep YouTube's own captions off; viewers who want them can open the title.
-              const yt = player.current as unknown as { unloadModule?: (m: string) => void; setOption?: (m: string, k: string, v: object) => void } | null
-              yt?.setOption?.('captions', 'track', {})
-              yt?.unloadModule?.('captions')
-              yt?.unloadModule?.('cc')
             }
             if (e.data === YT.PlayerState.ENDED) {
               window.clearTimeout(revealTimer)
