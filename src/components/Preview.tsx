@@ -56,7 +56,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
   const t = titles[open.id]
   const clip = trailers[open.id]
   const tint = featured.find((f) => f.id === open.id)?.tint ?? '#6b6b6b'
-  const { toast } = useMenu()
+  const { toast, open: openMenu } = useMenu()
   const mount = useRef<HTMLDivElement>(null)
   const player = useRef<YTPlayer | null>(null)
   const ready = useRef(false)
@@ -167,6 +167,14 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               {saved ? <path d="M5 12.5l4.5 4.5L19 7.5" /> : <path d="M12 5v14M5 12h14" />}
+            </svg>
+          </button>
+          {/* The poster's ⋯ menu is covered by this card, so it lives here while previewing. */}
+          <button className="pv__round" aria-label={`More options for ${t.name}`} onClick={(e) => openMenu(e.currentTarget, t.name)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <circle cx="5" cy="12" r="1.8" />
+              <circle cx="12" cy="12" r="1.8" />
+              <circle cx="19" cy="12" r="1.8" />
             </svg>
           </button>
         </div>
