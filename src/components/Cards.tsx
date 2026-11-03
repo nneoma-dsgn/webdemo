@@ -81,8 +81,8 @@ export function accessLeft(hours: number) {
   return n(Math.floor(days / 30), 'month')
 }
 
-/* Continue Watching card: the art fills the card; a frosted bar carries a play button ringed
-   by progress, the title, episode and time left. The expiry chip warns when access is short. */
+/* Continue Watching card (Apple TV "Up Next" style): 16:9 art with the expiry chip and a
+   progress line along its bottom edge; title and episode / time left sit underneath. */
 export function ContinueCard({ t, accessHours, left, progress, ep, onRemove }: { t: Title; accessHours: number; left: string; progress: number; ep?: string; onRemove?: () => void }) {
   const { open, toast } = useMenu()
   const pct = Math.round(progress * 100)
@@ -97,10 +97,6 @@ export function ContinueCard({ t, accessHours, left, progress, ep, onRemove }: {
       ],
     })
 
-  // Ring geometry for the progress circle around the play button.
-  const R = 21
-  const C = 2 * Math.PI * R
-
   return (
     <Tile
       className="card cw"
@@ -109,42 +105,39 @@ export function ContinueCard({ t, accessHours, left, progress, ep, onRemove }: {
         menu({ x: e.clientX, y: e.clientY })
       }}
     >
-      <img className="cw__art" src={t.still} alt="" loading="lazy" />
-      <div className="cw__shade" />
-      <span className={`cw__chip${urgent ? ' cw__chip--urgent' : ''}`}>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 7v5l3 2" />
-        </svg>
-        {accessLeft(accessHours)}
-      </span>
-      <button
-        className="card__more cw__more"
-        aria-label={`More options for ${t.name}`}
-        onClick={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          menu(e.currentTarget)
-        }}
-      >
-        <img src={icons.more} alt="" width={24} height={24} />
-      </button>
-      <div className="cw__bar">
-        <span className="cw__ring" aria-label={`${pct}% watched`}>
-          <svg width="50" height="50" viewBox="0 0 50 50" aria-hidden>
-            <circle cx="25" cy="25" r={R} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="3" />
-            <circle cx="25" cy="25" r={R} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - progress)} transform="rotate(-90 25 25)" />
+      <div className="cw__media">
+        <img className="cw__art" src={t.still} alt="" loading="lazy" />
+        <div className="cw__shade" />
+        <span className={`cw__chip${urgent ? ' cw__chip--urgent' : ''}`}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
           </svg>
-          <span className="cw__play">
-            <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden>
-              <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
-            </svg>
-          </span>
+          {accessLeft(accessHours)}
         </span>
-        <span className="cw__text">
-          <strong>{t.name}</strong>
-          <span>{ep ? `${ep} · ${left}` : left}</span>
+        <button
+          className="card__more cw__more"
+          aria-label={`More options for ${t.name}`}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            menu(e.currentTarget)
+          }}
+        >
+          <img src={icons.more} alt="" width={24} height={24} />
+        </button>
+        <span className="cw__play" aria-hidden>
+          <svg width="18" height="18" viewBox="0 0 20 20">
+            <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
+          </svg>
         </span>
+        <span className="cw__progress" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={`${pct}% watched`}>
+          <span style={{ width: `${pct}%` }} />
+        </span>
+      </div>
+      <div className="cw__text">
+        <strong>{t.name}</strong>
+        <span>{ep ? `${ep} · ${left}` : left}</span>
       </div>
     </Tile>
   )
