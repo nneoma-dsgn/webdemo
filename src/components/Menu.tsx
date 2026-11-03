@@ -30,8 +30,6 @@ function titleMenu(name: string, toast: (m: string) => void): MenuSpec {
     header: <span className="dd__title">{name}</span>,
     items: [
       { id: 'later', label: 'Watch later', icon: 'bookmark', onSelect: () => toast('Added to Saved for later') },
-      { id: 'download', label: 'Download', icon: 'download', onSelect: () => toast('Download started') },
-      { kind: 'separator', id: 's1' },
       { id: 'share', label: 'Share', icon: 'share', onSelect: () => toast('Link copied') },
     ],
   }
@@ -175,10 +173,9 @@ function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) 
 }
 
 /* Lucide glyphs used by menu items. */
-export type IconName = 'bookmark' | 'download' | 'share' | 'user' | 'library' | 'wallet' | 'logout' | 'help'
+export type IconName = 'bookmark' | 'share' | 'user' | 'library' | 'wallet' | 'logout' | 'help'
 const ICONS: Record<IconName, string[]> = {
   bookmark: ['M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z'],
-  download: ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12 15V3'],
   share: ['M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8', 'M16 6l-4-4-4 4', 'M12 2v13'],
   user: ['M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2', 'M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z'],
   library: ['M16 6l4 14', 'M12 6v14', 'M8 8v12', 'M4 4v16'],
