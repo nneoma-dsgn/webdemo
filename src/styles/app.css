@@ -375,7 +375,7 @@ main {
 /* ---------- Hero ---------- */
 
 .hero {
-  --hero-bottom: clamp(72px, 7vw, 112px);
+  --hero-bottom: clamp(88px, 8.5vw, 132px);
   position: relative;
   height: min(100vh, 66vw);
   min-height: 600px;
