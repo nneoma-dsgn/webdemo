@@ -186,9 +186,9 @@ export const feeds: Record<'shows' | 'series', Feed> = {
     mustSee: ['squid', 'severance', 'lastofus', 'shanty', 'bear', 'bloodsisters', 'moneyheist', 'wednesday'],
     continueWatching: [
       { id: 'silo', accessHours: 72, progress: 0.6, ep: 'S1 · E4' },
-      { id: 'bloodsisters', accessHours: 11, progress: 0.3, ep: 'S1 · E2' },
+      { id: 'bloodsisters', accessHours: 11, progress: 0.3, ep: 'EP 2' },
       { id: 'bear', accessHours: 7200, progress: 0.8, ep: 'S2 · E7' },
-      { id: 'shanty', accessHours: 144, progress: 0.15, ep: 'S1 · E5' },
+      { id: 'shanty', accessHours: 144, progress: 0.15, ep: 'EP 5' },
       { id: 'moneyheist', accessHours: 21, progress: 0.45, ep: 'S3 · E1' },
     ],
     middle: { id: 'binge', title: 'Binge-worthy', items: ['moneyheist', 'bridgerton', 'lastofus', 'shanty', 'severance', 'bloodsisters', 'squid'] },

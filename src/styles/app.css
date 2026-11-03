@@ -2568,7 +2568,7 @@ body.spot-focus .page--welcome .cta-wrap {
 
 .cw {
   display: block;
-  width: var(--landscape-w);
+  width: calc(var(--landscape-w) * 1.15);
 }
 
 .cw:hover {
