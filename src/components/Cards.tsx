@@ -81,18 +81,17 @@ export function accessLeft(hours: number) {
   return n(Math.floor(days / 30), 'month')
 }
 
-/* Continue Watching card (Apple TV "Up Next" style): 16:9 art with the expiry chip and a
+/* Continue Watching card (Apple TV "Up Next" style): 16:9 art with the time-left chip and a
    progress line along its bottom edge; title and episode / time left sit underneath. */
 export function ContinueCard({ t, accessHours, left, progress, ep, onRemove }: { t: Title; accessHours: number; left: string; progress: number; ep?: string; onRemove?: () => void }) {
   const { open, toast } = useMenu()
   const pct = Math.round(progress * 100)
-  const urgent = accessHours < 24
   const menu = (anchor: HTMLElement | { x: number; y: number }) =>
     open(anchor, {
       label: `${t.name} options`,
       header: <span className="dd__title">{t.name}</span>,
       items: [
-        { id: 'remove', label: 'Remove from Continue Watching', icon: 'close', onSelect: () => onRemove?.() },
+        { id: 'remove', label: 'Remove', icon: 'close', onSelect: () => onRemove?.() },
         { id: 'share', label: 'Share', icon: 'share', onSelect: () => toast('Link copied') },
       ],
     })
@@ -108,7 +107,7 @@ export function ContinueCard({ t, accessHours, left, progress, ep, onRemove }: {
       <div className="cw__media">
         <img className="cw__art" src={t.still} alt="" loading="lazy" />
         <div className="cw__shade" />
-        <span className={`cw__chip${urgent ? ' cw__chip--urgent' : ''}`}>
+        <span className="cw__chip">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <circle cx="12" cy="12" r="9" />
             <path d="M12 7v5l3 2" />

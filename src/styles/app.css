@@ -2634,12 +2634,6 @@ body.spot-focus .page--welcome .cta-wrap {
   font-weight: 600;
 }
 
-/* Less than a day of access left. */
-.cw__chip--urgent {
-  background: rgba(206, 144, 70, 0.24);
-  border-color: rgba(255, 190, 110, 0.45);
-  color: #ffc98a;
-}
 
 .cw__more {
   top: 8px;
