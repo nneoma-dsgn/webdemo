@@ -14,6 +14,7 @@ export default function Home() {
   const tab = params.get('tab') === 'series' ? 'series' : 'shows'
   const { toast } = useMenu()
   const [reminders, setReminders] = useState<Set<string>>(new Set())
+  const [removed, setRemoved] = useState<Set<string>>(new Set())
   // Shows and Series are separate feeds, each with its own hero trailer and shelves.
   const feed = feeds[tab]
   const hero = titles[feed.hero.id]
@@ -69,9 +70,22 @@ export default function Home() {
         </Shelf>
 
         <Shelf title="Continue Watching">
-          {feed.continueWatching.map((c) => (
-            <ContinueCard key={c.id} t={titles[c.id]} tag={c.tag} left={c.left} progress={c.progress} />
-          ))}
+          {feed.continueWatching
+            .filter((c) => !removed.has(c.id))
+            .map((c) => (
+              <ContinueCard
+                key={c.id}
+                t={titles[c.id]}
+                tag={c.tag}
+                left={c.left}
+                progress={c.progress}
+                ep={c.ep}
+                onRemove={() => {
+                  setRemoved((r) => new Set(r).add(c.id))
+                  toast(`Removed ${titles[c.id].name} from Continue Watching`)
+                }}
+              />
+            ))}
         </Shelf>
 
         <Shelf title={feed.middle.title} to={`/browse/${feed.middle.id === 'nollywood' ? 'nollywood' : 'all'}`}>

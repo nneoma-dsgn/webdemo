@@ -69,24 +69,78 @@ export function PosterCard({ t, grid, to, menu = true }: { t: Title; grid?: bool
   )
 }
 
-/* "CW card": 280 x 179 landscape with availability tag, meta and progress. */
-export function ContinueCard({ t, tag, left, progress }: { t: Title; tag: string; left: string; progress: number }) {
-  const onContext = useContextMenu(t.name)
+/* Continue Watching card: the art fills the card; a frosted bar carries a play button ringed
+   by progress, the title, episode and time left. The expiry chip warns when access is short. */
+export function ContinueCard({ t, tag, left, progress, ep, onRemove }: { t: Title; tag: string; left: string; progress: number; ep?: string; onRemove?: () => void }) {
+  const { open, toast } = useMenu()
+  const pct = Math.round(progress * 100)
+  const urgent = /hr|min/i.test(tag)
+  const lifetime = /lifetime/i.test(tag)
+  const menu = (anchor: HTMLElement | { x: number; y: number }) =>
+    open(anchor, {
+      label: `${t.name} options`,
+      header: <span className="dd__title">{t.name}</span>,
+      items: [
+        { id: 'remove', label: 'Remove from Continue Watching', icon: 'close', onSelect: () => onRemove?.() },
+        { id: 'share', label: 'Share', icon: 'share', onSelect: () => toast('Link copied') },
+      ],
+    })
+
+  // Ring geometry for the progress circle around the play button.
+  const R = 21
+  const C = 2 * Math.PI * R
+
   return (
-    <Tile className="card landscape" onContextMenu={onContext}>
-      <img src={t.still} alt="" loading="lazy" />
-      <div className="landscape__fade" />
-      <span className="chip">{tag}</span>
-      <span className="landscape__play" aria-hidden>
-        <img src={icons.play} alt="" width={20} height={20} />
+    <Tile
+      className="card cw"
+      onContextMenu={(e) => {
+        e.preventDefault()
+        menu({ x: e.clientX, y: e.clientY })
+      }}
+    >
+      <img className="cw__art" src={t.still} alt="" loading="lazy" />
+      <div className="cw__shade" />
+      <span className={`cw__chip${urgent ? ' cw__chip--urgent' : ''}`}>
+        {lifetime ? (
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z" />
+          </svg>
+        ) : (
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+          </svg>
+        )}
+        {lifetime ? 'Lifetime' : `${tag} left`}
       </span>
-      <div className="landscape__meta">
-        <strong>{t.name}</strong> · {left}
+      <button
+        className="card__more cw__more"
+        aria-label={`More options for ${t.name}`}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          menu(e.currentTarget)
+        }}
+      >
+        <img src={icons.more} alt="" width={24} height={24} />
+      </button>
+      <div className="cw__bar">
+        <span className="cw__ring" aria-label={`${pct}% watched`}>
+          <svg width="50" height="50" viewBox="0 0 50 50" aria-hidden>
+            <circle cx="25" cy="25" r={R} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="3" />
+            <circle cx="25" cy="25" r={R} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - progress)} transform="rotate(-90 25 25)" />
+          </svg>
+          <span className="cw__play">
+            <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden>
+              <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
+            </svg>
+          </span>
+        </span>
+        <span className="cw__text">
+          <strong>{t.name}</strong>
+          <span>{ep ? `${ep} · ${left}` : left}</span>
+        </span>
       </div>
-      <div className="progress" aria-label={`${Math.round(progress * 100)}% watched`}>
-        <div className="progress__fill" style={{ width: `${progress * 100}%` }} />
-      </div>
-      <MoreButton name={t.name} />
     </Tile>
   )
 }

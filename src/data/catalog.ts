@@ -97,11 +97,11 @@ export const nollywood: Shelf = { id: 'nollywood', title: 'Nollywood Hits', item
 export const all: Shelf = { id: 'all', title: 'All', items: seeds.map((s) => s[0]) }
 
 export const continueWatching = [
-  { id: 'silo', tag: '3 days', left: '52m left', progress: 0.6 },
-  { id: 'bloodsisters', tag: '24 hrs', left: '38m left', progress: 0.3 },
-  { id: 'bear', tag: 'Lifetime', left: '6m left', progress: 0.8 },
-  { id: 'shanty', tag: '3 days', left: '1h 10m left', progress: 0.15 },
-  { id: 'moneyheist', tag: '24 hrs', left: '44m left', progress: 0.45 },
+  { id: 'silo', tag: '3 days', left: '52m left', progress: 0.6, ep: 'S1 · E4' },
+  { id: 'bloodsisters', tag: '24 hrs', left: '38m left', progress: 0.3, ep: 'S1 · E2' },
+  { id: 'bear', tag: 'Lifetime', left: '6m left', progress: 0.8, ep: 'S2 · E7' },
+  { id: 'shanty', tag: '3 days', left: '1h 10m left', progress: 0.15, ep: 'S1 · E5' },
+  { id: 'moneyheist', tag: '24 hrs', left: '44m left', progress: 0.45, ep: 'S3 · E1' },
 ]
 
 export const comingSoon: { id: string; when: string; label?: string[] }[] = [
@@ -159,7 +159,7 @@ export const featured: TheaterItem[] = [
 export type Feed = {
   hero: { id: string; videoId: string; start: number; end: number }
   mustSee: string[]
-  continueWatching: { id: string; tag: string; left: string; progress: number }[]
+  continueWatching: { id: string; tag: string; left: string; progress: number; ep?: string }[]
   middle: Shelf
   coming: { id: string; when: string; label?: string[] }[]
   all: string[]
@@ -192,11 +192,11 @@ export const feeds: Record<'shows' | 'series', Feed> = {
     hero: { id: 'silo', videoId: 'BLBvbMtjyAQ', start: 6, end: 147 },
     mustSee: ['squid', 'severance', 'lastofus', 'shanty', 'bear', 'bloodsisters', 'moneyheist', 'wednesday'],
     continueWatching: [
-      { id: 'silo', tag: '3 days', left: '52m left', progress: 0.6 },
-      { id: 'bloodsisters', tag: '24 hrs', left: '38m left', progress: 0.3 },
-      { id: 'bear', tag: 'Lifetime', left: '6m left', progress: 0.8 },
-      { id: 'shanty', tag: '3 days', left: '1h 10m left', progress: 0.15 },
-      { id: 'moneyheist', tag: '24 hrs', left: '44m left', progress: 0.45 },
+      { id: 'silo', tag: '3 days', left: '52m left', progress: 0.6, ep: 'S1 · E4' },
+      { id: 'bloodsisters', tag: '24 hrs', left: '38m left', progress: 0.3, ep: 'S1 · E2' },
+      { id: 'bear', tag: 'Lifetime', left: '6m left', progress: 0.8, ep: 'S2 · E7' },
+      { id: 'shanty', tag: '3 days', left: '1h 10m left', progress: 0.15, ep: 'S1 · E5' },
+      { id: 'moneyheist', tag: '24 hrs', left: '44m left', progress: 0.45, ep: 'S3 · E1' },
     ],
     middle: { id: 'binge', title: 'Binge-worthy', items: ['moneyheist', 'bridgerton', 'lastofus', 'shanty', 'severance', 'bloodsisters', 'squid'] },
     coming: [

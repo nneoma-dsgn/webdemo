@@ -628,82 +628,14 @@ a.shelf__head:hover .shelf__chevron {
 
 
 
-.landscape {
-  width: var(--landscape-w);
-  aspect-ratio: 280 / 179;
-  overflow: hidden;
-  background: var(--bg-200);
-}
 
-.landscape > img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 
-.landscape__fade {
-  position: absolute;
-  inset: auto 0 0;
-  height: 44%;
-  background: linear-gradient(to bottom, rgba(4, 4, 4, 0), rgba(4, 4, 4, 0.8));
-}
 
-.landscape__meta {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 24px;
-  font-size: 16px;
-  line-height: 16px;
-  color: var(--text-300);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
-.landscape__meta strong {
-  color: var(--text-100);
-  font-weight: 600;
-}
 
-.landscape__play {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 56px;
-  height: 56px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-full);
-  background: var(--glass-dark);
-  backdrop-filter: blur(6px);
-  opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 0.25s, transform 0.25s var(--ease);
-}
 
-.landscape:hover .landscape__play {
-  opacity: 1;
-  transform: none;
-}
 
-.progress {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  height: 3px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.2);
-}
 
-.progress__fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--text-100);
-}
 
 .coming {
   width: var(--poster-w);
@@ -2629,5 +2561,152 @@ body.spot-focus .page--welcome .cta-wrap {
 @media (prefers-reduced-motion: reduce) {
   .dd {
     animation: none;
+  }
+}
+
+/* ---------- Continue Watching card ---------- */
+
+.cw {
+  position: relative;
+  width: var(--landscape-w);
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--bg-200);
+  isolation: isolate;
+}
+
+.cw__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease);
+}
+
+.cw:hover .cw__art {
+  transform: scale(1.06);
+}
+
+.cw__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 45%), linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 28%);
+}
+
+.cw__chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--radius-full);
+  background: rgba(10, 10, 10, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* A day or less of access left. */
+.cw__chip--urgent {
+  background: rgba(206, 144, 70, 0.22);
+  border-color: rgba(255, 190, 110, 0.45);
+  color: #ffc98a;
+}
+
+.cw__more {
+  top: 10px;
+  right: 10px;
+}
+
+/* Frosted bottom bar: progress-ring play button + title. */
+.cw__bar {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 14px 7px 7px;
+  border-radius: 16px;
+  background: rgba(14, 14, 14, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+}
+
+.cw__ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  flex: none;
+  color: var(--text-100);
+}
+
+.cw__ring > svg {
+  position: absolute;
+  inset: 0;
+}
+
+.cw__ring > svg circle:last-child {
+  transition: stroke 0.25s;
+}
+
+.cw__play {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text-100);
+  transition: background 0.25s, color 0.25s, transform 0.25s var(--ease);
+}
+
+.cw__play svg {
+  margin-left: 2px;
+}
+
+.cw:hover .cw__play {
+  background: var(--bg-light);
+  color: var(--text-on-light);
+  transform: scale(1.06);
+}
+
+.cw__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.cw__text strong {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cw__text span {
+  font-size: 13px;
+  color: var(--text-200);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 767px) {
+  .cw__text strong {
+    font-size: 15px;
   }
 }
