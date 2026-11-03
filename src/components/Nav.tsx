@@ -136,7 +136,7 @@ function AccountMenu() {
         // Library, Wallet and Help aren't built yet; they confirm instead of navigating.
         { id: 'library', label: 'Library', icon: 'library', onSelect: () => toast('Library is coming soon') },
         { id: 'wallet', label: 'Wallet', icon: 'wallet', onSelect: () => toast('Wallet is coming soon') },
-        { id: 'help', label: 'Help', icon: 'help', onSelect: () => toast('Help centre is coming soon') },
+        { id: 'help', label: 'Get Help', icon: 'help', onSelect: () => toast('Help centre is coming soon') },
         { kind: 'separator', id: 's1' },
         {
           id: 'signout',
