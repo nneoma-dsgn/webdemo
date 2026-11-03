@@ -72,16 +72,6 @@ export default function Home() {
         <button className="hero__play" aria-label={`Play ${hero.name}`}>
           <img src={icons.play} alt="" width={20} height={20} />
         </button>
-        <button className="hero__nav hero__nav--prev" onClick={() => go(-1)} aria-label="Previous title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-        </button>
-        <button className="hero__nav hero__nav--next" onClick={() => go(1)} aria-label="Next title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        </button>
         <div className="hero__dots" role="tablist" aria-label="Featured titles">
           {feed.heroes.map((h, i) => (
             <button key={h.id} role="tab" aria-selected={i === slide % n} aria-label={titles[h.id].name} className={i === slide % n ? 'is-on' : ''} onClick={() => setSlide(i)}>
