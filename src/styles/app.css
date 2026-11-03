@@ -2733,8 +2733,10 @@ body.spot-focus .page--welcome .cta-wrap {
 .hero .hero__blurb,
 .page--welcome .hero__blurb {
   max-width: none;
-  font-size: clamp(16px, 1.3vw, 22px);
-  line-height: 1.45;
+  font-size: clamp(14px, 1.05vw, 17px);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-100);
   text-wrap: balance;
 }
 
@@ -2752,5 +2754,140 @@ body.spot-focus .page--welcome .cta-wrap {
   .hero .hero__blurb,
   .page--welcome .hero__blurb {
     font-size: 15px;
+  }
+}
+
+/* ---------- Signed-in hero: inset rounded card with a carousel (Netflix-style) ---------- */
+
+.page--home:not(.page--welcome) .hero {
+  --hero-bottom: clamp(48px, 5vw, 72px);
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 16 / 7.4;
+  max-height: calc(100vh - var(--nav-h) - 80px);
+  margin: calc(var(--nav-h) + 4px) var(--gutter) 0;
+  border-radius: 24px;
+  isolation: isolate;
+}
+
+.page--home:not(.page--welcome) .hero__scrim {
+  background:
+    linear-gradient(to right, rgba(4, 4, 4, 0.82) 0%, rgba(4, 4, 4, 0.45) 32%, rgba(4, 4, 4, 0) 58%),
+    linear-gradient(to top, rgba(4, 4, 4, 0.55) 0%, rgba(4, 4, 4, 0) 40%);
+}
+
+.page--home:not(.page--welcome) .hero__content {
+  left: clamp(28px, 3.4vw, 56px);
+  animation: hero-copy 0.6s var(--ease) both;
+}
+
+@keyframes hero-copy {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.page--home:not(.page--welcome) .hero-video__sound {
+  right: clamp(28px, 3.4vw, 56px);
+}
+
+.page--home:not(.page--welcome) .shelves {
+  margin-top: 36px;
+}
+
+/* Prev / next, shown on hover at the card's edges. */
+.hero__nav {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.25s, background 0.2s;
+}
+
+.hero__nav--prev {
+  left: 14px;
+}
+
+.hero__nav--next {
+  right: 14px;
+}
+
+.hero:hover .hero__nav,
+.hero__nav:focus-visible {
+  opacity: 1;
+}
+
+.hero__nav:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+/* Slide pager: the active pill fills over the slide's duration. */
+.hero__dots {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.hero__dots button {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  transition: width 0.3s var(--ease), background 0.2s;
+}
+
+.hero__dots button.is-on {
+  width: 32px;
+}
+
+.hero__dots button:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.hero__dots span {
+  position: absolute;
+  inset: 0;
+  background: var(--text-100);
+  transform-origin: left;
+  animation: dot-fill linear forwards;
+}
+
+@keyframes dot-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@media (max-width: 767px) {
+  .page--home:not(.page--welcome) .hero {
+    aspect-ratio: 430 / 550;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .hero__nav {
+    display: none;
+  }
+
+  .page--home:not(.page--welcome) .shelves {
+    margin-top: 125px;
   }
 }

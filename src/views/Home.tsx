@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { feeds, icons, titles } from '../data/catalog'
@@ -15,9 +15,21 @@ export default function Home() {
   const { toast } = useMenu()
   const [reminders, setReminders] = useState<Set<string>>(new Set())
   const [removed, setRemoved] = useState<Set<string>>(new Set())
-  // Shows and Series are separate feeds, each with its own hero trailer and shelves.
+  // Shows and Series are separate feeds, each with its own hero carousel and shelves.
   const feed = feeds[tab]
-  const hero = titles[feed.hero.id]
+  const [slide, setSlide] = useState(0)
+  useEffect(() => setSlide(0), [tab])
+  const n = feed.heroes.length
+  const clip = feed.heroes[slide % n]
+  const hero = titles[clip.id]
+  const go = (d: number) => setSlide((i) => (i + d + n) % n)
+
+  // Each slide plays its clip, then hands over; if video can't start, rotate on a timer.
+  useEffect(() => {
+    const t = window.setTimeout(() => go(1), (clip.end - clip.start + 6) * 1000)
+    return () => window.clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slide, tab])
 
   const remind = (id: string) =>
     setReminders((prev) => {
@@ -32,8 +44,8 @@ export default function Home() {
 
   return (
     <div className="page page--home">
-      <section className="hero" aria-label={`Featured: ${hero.name}`}>
-        <HeroVideo key={tab} videoId={feed.hero.videoId} still={hero.still} start={feed.hero.start} end={feed.hero.end} />
+      <section className="hero hero--carousel" aria-roledescription="carousel" aria-label={`Featured: ${hero.name}`}>
+        <HeroVideo key={`${tab}-${clip.id}`} videoId={clip.videoId} still={hero.still} start={clip.start} end={clip.end} onEnded={() => go(1)} />
         <div className="hero__scrim" />
         <div className="hero__tabs" role="tablist" aria-label="Browse">
           <Link href="/" role="tab" aria-selected={tab === 'shows'} className={`pill${tab === 'shows' ? ' pill--on' : ''}`}>
@@ -43,7 +55,7 @@ export default function Home() {
             Series
           </Link>
         </div>
-        <div className="hero__content">
+        <div className="hero__content" key={hero.id}>
           <h1 className="hero__title">{hero.name}</h1>
           <p className="hero__blurb">{hero.blurb}</p>
           <div className="hero__actions">
@@ -60,6 +72,23 @@ export default function Home() {
         <button className="hero__play" aria-label={`Play ${hero.name}`}>
           <img src={icons.play} alt="" width={20} height={20} />
         </button>
+        <button className="hero__nav hero__nav--prev" onClick={() => go(-1)} aria-label="Previous title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+        </button>
+        <button className="hero__nav hero__nav--next" onClick={() => go(1)} aria-label="Next title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+        <div className="hero__dots" role="tablist" aria-label="Featured titles">
+          {feed.heroes.map((h, i) => (
+            <button key={h.id} role="tab" aria-selected={i === slide % n} aria-label={titles[h.id].name} className={i === slide % n ? 'is-on' : ''} onClick={() => setSlide(i)}>
+              {i === slide % n && <span key={`${tab}-${slide}`} style={{ animationDuration: `${clip.end - clip.start + 6}s` }} />}
+            </button>
+          ))}
+        </div>
       </section>
 
       <div className="shelves">

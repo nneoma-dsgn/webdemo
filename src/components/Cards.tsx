@@ -126,7 +126,7 @@ export function ContinueCard({ t, accessHours, progress, ep, onRemove }: { t: Ti
           <img src={icons.more} alt="" width={24} height={24} />
         </button>
         <span className="cw__play" aria-hidden>
-          <svg width="20" height="20" viewBox="0 0 20 20">
+          <svg width="26" height="26" viewBox="0 0 20 20">
             <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
           </svg>
         </span>

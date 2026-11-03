@@ -149,7 +149,8 @@ export const featured: TheaterItem[] = [
 
 /* Home feeds: the Shows and Series tabs each get their own hero and shelves. */
 export type Feed = {
-  hero: { id: string; videoId: string; start: number; end: number }
+  /* Hero carousel: featured titles with a clip each (rotates on the signed-in home). */
+  heroes: { id: string; videoId: string; start: number; end: number }[]
   mustSee: string[]
   /* accessHours: time left on the access the user bought (24 hrs, 1 day, 7 days, 1 month or 1 year). */
   continueWatching: { id: string; accessHours: number; progress: number; ep?: string }[]
@@ -163,7 +164,12 @@ const ofKind = (k: Title['kind']) => seeds.filter((s) => s[2] === k).map((s) => 
 export const feeds: Record<'shows' | 'series', Feed> = {
   shows: {
     // King of Boys trailer: 6s to 52s skips the studio logo and the cast cards.
-    hero: { id: 'kob', videoId: 'cF-FQLKaUCk', start: 6, end: 52 },
+    heroes: [
+      { id: 'kob', videoId: 'cF-FQLKaUCk', start: 6, end: 40 },
+      { id: 'tribe', videoId: 'pEUZVfeCU94', start: 15, end: 50 },
+      { id: 'anikulapo', videoId: 'rXIKrHPaB-o', start: 25, end: 60 },
+      { id: 'dune', videoId: 'U2Qp5pL3ovA', start: 40, end: 75 },
+    ],
     mustSee: ['tribe', 'anikulapo', 'dune', 'gangs', 'oppenheimer', 'jagun', 'lionheart', 'wedding'],
     continueWatching: [
       { id: 'tribe', accessHours: 17, progress: 0.55 },
@@ -182,7 +188,12 @@ export const feeds: Record<'shows' | 'series', Feed> = {
   },
   series: {
     // Silo Season 3 trailer: 6s to 147s skips the Apple TV intro and end cards.
-    hero: { id: 'silo', videoId: 'BLBvbMtjyAQ', start: 6, end: 147 },
+    heroes: [
+      { id: 'silo', videoId: 'BLBvbMtjyAQ', start: 20, end: 55 },
+      { id: 'squid', videoId: 'Ed1sGgHUo88', start: 30, end: 65 },
+      { id: 'severance', videoId: '_UXKlYvLGJY', start: 25, end: 60 },
+      { id: 'lastofus', videoId: 'wk5vOCcASHg', start: 20, end: 55 },
+    ],
     mustSee: ['squid', 'severance', 'lastofus', 'shanty', 'bear', 'bloodsisters', 'moneyheist', 'wednesday'],
     continueWatching: [
       { id: 'silo', accessHours: 72, progress: 0.6, ep: 'S1 · E4' },

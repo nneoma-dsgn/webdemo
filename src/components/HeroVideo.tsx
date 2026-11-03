@@ -46,7 +46,9 @@ export function loadApi() {
   return apiPromise
 }
 
-export function HeroVideo({ videoId, still, start = 0, end }: { videoId: string; still: string; start?: number; end?: number }) {
+export function HeroVideo({ videoId, still, start = 0, end, onEnded }: { videoId: string; still: string; start?: number; end?: number; onEnded?: () => void }) {
+  const endedRef = useRef(onEnded)
+  endedRef.current = onEnded
   const mount = useRef<HTMLDivElement>(null)
   const wrap = useRef<HTMLDivElement>(null)
   const player = useRef<YTPlayer | null>(null)
@@ -80,6 +82,7 @@ export function HeroVideo({ videoId, still, start = 0, end }: { videoId: string;
             if (e.data === YT.PlayerState.ENDED) {
               window.clearTimeout(revealTimer)
               setPlaying(false)
+              endedRef.current?.()
             }
           },
         },
