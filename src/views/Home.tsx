@@ -76,7 +76,7 @@ export default function Home() {
               <ContinueCard
                 key={c.id}
                 t={titles[c.id]}
-                tag={c.tag}
+                accessHours={c.accessHours}
                 left={c.left}
                 progress={c.progress}
                 ep={c.ep}

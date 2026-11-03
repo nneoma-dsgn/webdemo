@@ -37,7 +37,7 @@ const FAQS = [
   },
   {
     q: 'How does paying work?',
-    a: 'Load your Circo wallet in Naira and unlock what you want to watch: a single show, a full series or a whole studio. Access can be for 24 hours, a few days or lifetime, and it is always shown before you pay.',
+    a: 'Load your Circo wallet in Naira and unlock what you want to watch: a single show, a full series or a whole studio. Access lasts 24 hours, 7 days, 1 month or 1 year from when you buy, and the time left always shows on the title.',
   },
   {
     q: 'Where can I watch?',

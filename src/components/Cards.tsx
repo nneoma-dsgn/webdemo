@@ -69,13 +69,24 @@ export function PosterCard({ t, grid, to, menu = true }: { t: Title; grid?: bool
   )
 }
 
+/* Time left on bought access, as the chip reads it: under a day in hours, then days,
+   weeks and months. */
+export function accessLeft(hours: number) {
+  const n = (v: number, unit: string) => `${v} ${unit}${v === 1 ? '' : 's'} left`
+  if (hours < 1) return n(Math.max(1, Math.round(hours * 60)), 'min')
+  if (hours < 24) return n(Math.floor(hours), 'hr')
+  const days = Math.floor(hours / 24)
+  if (days < 14) return n(days, 'day')
+  if (days < 60) return n(Math.floor(days / 7), 'week')
+  return n(Math.floor(days / 30), 'month')
+}
+
 /* Continue Watching card: the art fills the card; a frosted bar carries a play button ringed
    by progress, the title, episode and time left. The expiry chip warns when access is short. */
-export function ContinueCard({ t, tag, left, progress, ep, onRemove }: { t: Title; tag: string; left: string; progress: number; ep?: string; onRemove?: () => void }) {
+export function ContinueCard({ t, accessHours, left, progress, ep, onRemove }: { t: Title; accessHours: number; left: string; progress: number; ep?: string; onRemove?: () => void }) {
   const { open, toast } = useMenu()
   const pct = Math.round(progress * 100)
-  const urgent = /hr|min/i.test(tag)
-  const lifetime = /lifetime/i.test(tag)
+  const urgent = accessHours < 24
   const menu = (anchor: HTMLElement | { x: number; y: number }) =>
     open(anchor, {
       label: `${t.name} options`,
@@ -101,17 +112,11 @@ export function ContinueCard({ t, tag, left, progress, ep, onRemove }: { t: Titl
       <img className="cw__art" src={t.still} alt="" loading="lazy" />
       <div className="cw__shade" />
       <span className={`cw__chip${urgent ? ' cw__chip--urgent' : ''}`}>
-        {lifetime ? (
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z" />
-          </svg>
-        ) : (
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <circle cx="12" cy="12" r="9" />
-            <path d="M12 7v5l3 2" />
-          </svg>
-        )}
-        {lifetime ? 'Lifetime' : `${tag} left`}
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+        {accessLeft(accessHours)}
       </span>
       <button
         className="card__more cw__more"
