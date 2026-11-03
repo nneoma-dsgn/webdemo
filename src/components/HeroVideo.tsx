@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef, useState } from 'react'
 
 /* Netflix-style hero trailer: the still shows first, the muted trailer fades in once it

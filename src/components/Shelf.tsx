@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { icons } from '../data/catalog'
 
 /* "Discovery shelf": heading with chevron plus a horizontal rail.
@@ -37,7 +39,7 @@ export function Shelf({ title, to, tag, backdrop, children }: { title: string; t
     <section className={`shelf${backdrop ? ' shelf--backdrop' : ''}`}>
       {backdrop}
       {to ? (
-        <Link to={to} className="shelf__head">
+        <Link href={to} className="shelf__head">
           {heading}
         </Link>
       ) : (

@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { feeds, icons, titles } from '../data/catalog'
 import { ComingCard, ContinueCard, PosterCard } from '../components/Cards'
 import { Shelf } from '../components/Shelf'
@@ -7,7 +10,7 @@ import { useMenu } from '../components/Menu'
 import { HeroVideo } from '../components/HeroVideo'
 
 export default function Home() {
-  const [params] = useSearchParams()
+  const params = useSearchParams()
   const tab = params.get('tab') === 'series' ? 'series' : 'shows'
   const { toast } = useMenu()
   const [reminders, setReminders] = useState<Set<string>>(new Set())
@@ -32,10 +35,10 @@ export default function Home() {
         <HeroVideo key={tab} videoId={feed.hero.videoId} still={hero.still} start={feed.hero.start} end={feed.hero.end} />
         <div className="hero__scrim" />
         <div className="hero__tabs" role="tablist" aria-label="Browse">
-          <Link to="/" role="tab" aria-selected={tab === 'shows'} className={`pill${tab === 'shows' ? ' pill--on' : ''}`}>
+          <Link href="/" role="tab" aria-selected={tab === 'shows'} className={`pill${tab === 'shows' ? ' pill--on' : ''}`}>
             Shows
           </Link>
-          <Link to="/?tab=series" role="tab" aria-selected={tab === 'series'} className={`pill${tab === 'series' ? ' pill--on' : ''}`}>
+          <Link href="/?tab=series" role="tab" aria-selected={tab === 'series'} className={`pill${tab === 'series' ? ' pill--on' : ''}`}>
             Series
           </Link>
         </div>

@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { backdropSm, featured, studios, titles, trailers } from '../data/catalog'
 import { loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
@@ -76,7 +78,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
         videoId: clip.videoId,
         playerVars: { autoplay: 1, mute: 1, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, iv_load_policy: 3, cc_load_policy: 0, start: clip.start, end: clip.end },
         events: {
-          onReady: (e: { target: YTPlayer }) => {
+          onReady: () => {
             ready.current = true
             // Starts muted via playerVars; any API call here makes YouTube flash its play/pause icon.
           },

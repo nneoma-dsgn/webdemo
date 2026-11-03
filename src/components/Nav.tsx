@@ -1,5 +1,8 @@
+'use client'
+
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { signOut } from '../auth'
 import { icons } from '../data/catalog'
 import { useMenu } from './Menu'
@@ -8,8 +11,8 @@ import { useMenu } from './Menu'
    hero and turns solid once the page scrolls. */
 export function TopNav() {
   const [solid, setSolid] = useState(false)
-  const { pathname } = useLocation()
-  const [params] = useSearchParams()
+  const pathname = usePathname()
+  const params = useSearchParams()
   const tab = params.get('tab') ?? 'shows'
   const { toast } = useMenu()
 
@@ -24,15 +27,15 @@ export function TopNav() {
 
   return (
     <header className={`topnav${solid ? ' topnav--solid' : ''}`}>
-      <Link to="/" className="wordmark" aria-label="Circo home">
+      <Link href="/" className="wordmark" aria-label="Circo home">
         <img src="/assets/logo-circo.png" alt="Circo" width={92} height={35} />
       </Link>
       <SegNav active={home ? tab : null} />
       <div className="topnav__right">
         <div className="capsule">
-          <NavLink to="/search" className="capsule__btn" aria-label="Search">
+          <Link href="/search" className={`capsule__btn${pathname === '/search' ? ' active' : ''}`} aria-label="Search">
             <CapsuleIcon name="search" />
-          </NavLink>
+          </Link>
           <button className="capsule__btn" aria-label="Cast to device" onClick={() => toast('Looking for devices nearby')}>
             <CapsuleIcon name="cast" />
           </button>
@@ -46,19 +49,20 @@ export function TopNav() {
 
 /* Phones: the floating "Navigation pill" from the mobile design. */
 export function MobileNav() {
+  const pathname = usePathname()
   return (
     <nav className="mobilenav" aria-label="Primary">
       <div className="mobilenav__pill">
-        <NavLink to="/" end className="mobilenav__item" aria-label="Home">
+        <Link href="/" className={`mobilenav__item${pathname === '/' ? ' active' : ''}`} aria-label="Home">
           <img src={icons.house} alt="" width={28} height={28} />
-        </NavLink>
+        </Link>
         {/* Library: kept in the pill, unlinked for now. */}
         <button type="button" className="mobilenav__item" aria-label="Library">
           <img src={icons.library} alt="" width={28} height={28} />
         </button>
-        <NavLink to="/search" className="mobilenav__item" aria-label="Search">
+        <Link href="/search" className={`mobilenav__item${pathname === '/search' ? ' active' : ''}`} aria-label="Search">
           <img src={icons.search} alt="" width={28} height={28} />
-        </NavLink>
+        </Link>
       </div>
     </nav>
   )
@@ -104,10 +108,10 @@ function SegNav({ active }: { active: string | null }) {
   return (
     <nav className="seg" ref={wrap} aria-label="Primary">
       <span className="seg__pill" aria-hidden style={pill ? { transform: `translateX(${pill.x}px)`, width: pill.w, opacity: 1 } : { opacity: 0 }} />
-      <Link to="/" className={`seg__tab${active === 'shows' ? ' is-active' : ''}`}>
+      <Link href="/" className={`seg__tab${active === 'shows' ? ' is-active' : ''}`}>
         Shows
       </Link>
-      <Link to="/?tab=series" className={`seg__tab${active === 'series' ? ' is-active' : ''}`}>
+      <Link href="/?tab=series" className={`seg__tab${active === 'series' ? ' is-active' : ''}`}>
         Series
       </Link>
     </nav>
@@ -116,7 +120,7 @@ function SegNav({ active }: { active: string | null }) {
 
 function AccountMenu() {
   const [open, setOpen] = useState(false)
-  const navigate = useNavigate()
+  const router = useRouter()
 
   useEffect(() => {
     if (!open) return
@@ -140,7 +144,7 @@ function AccountMenu() {
       </button>
       {open && (
         <div className="menu account__menu" role="menu">
-          <button role="menuitem" className="menu__item" onClick={() => navigate('/studio/velvet')}>
+          <button role="menuitem" className="menu__item" onClick={() => router.push('/studio/velvet')}>
             Profile
           </button>
           <button
@@ -148,7 +152,7 @@ function AccountMenu() {
             className="menu__item"
             onClick={() => {
               signOut()
-              navigate('/welcome', { replace: true })
+              router.replace('/welcome')
             }}
           >
             Sign out

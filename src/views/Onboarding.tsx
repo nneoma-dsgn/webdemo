@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { USERNAME_MIN, getSession, signOut, updateSession, usernameHasBadChars, usernameTaken } from '../auth'
 import { useMenu } from '../components/Menu'
 import { icons } from '../data/catalog'
@@ -29,7 +31,7 @@ const MAX_PICKS = 5
    Netflix-style chrome: a step counter on every step. Back on step 1 returns to the SSO
    choice, dropping the half-created session so that screen is reachable again. */
 export default function Onboarding() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const { toast } = useMenu()
   const [step, setStep] = useState<Step>('username')
   const [username, setUsername] = useState('')
@@ -40,13 +42,13 @@ export default function Onboarding() {
   const back = () => {
     if (i > 0) return setStep(STEPS[i - 1])
     signOut()
-    navigate('/signup', { replace: true })
+    router.replace('/signup')
   }
 
   const finish = (interests: string[]) => {
     updateSession({ username, gender: gender ?? undefined, interests, onboarded: true })
     toast(`Welcome to Circo, @${username}`)
-    navigate('/', { replace: true })
+    router.replace('/')
   }
 
   return (

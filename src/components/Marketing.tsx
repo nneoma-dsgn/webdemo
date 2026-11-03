@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 /* Fades and lifts its content in the first time it scrolls into view (Apple TV-style). */
 export function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) {
@@ -109,7 +111,7 @@ export function FinalCta({ posters }: { posters: string[] }) {
           <div className="cta-banner__copy">
             <img src="/assets/logo-circo.png" alt="Circo" width={104} height={40} />
             <h2>Stories worth seeing.</h2>
-            <Link to="/signup" className="btn-white">
+            <Link href="/signup" className="btn-white">
               Sign Up to watch
             </Link>
           </div>

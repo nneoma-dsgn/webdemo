@@ -1,5 +1,8 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { comingSoon, featured, mustSee, nollywood, titles } from '../data/catalog'
 import { ComingCard, PosterCard } from '../components/Cards'
 import { Shelf } from '../components/Shelf'
@@ -10,7 +13,8 @@ import { Faq, FinalCta, Footer, Reveal } from '../components/Marketing'
 /* Web version of the signed-out "Circo · Discover" screen (SSO SIGN UP - USER).
    The hero carries the Sign Up / Log In actions, so the header is just the logo. */
 export default function Welcome() {
-  const navigate = useNavigate()
+  const router = useRouter()
+  const navigate = (to: string) => router.push(to)
   const [solid, setSolid] = useState(false)
   const hero = titles.tribe
 
@@ -23,7 +27,7 @@ export default function Welcome() {
   return (
     <div className="page page--home page--welcome">
       <header className={`topnav${solid ? ' topnav--solid' : ''}`}>
-        <Link to="/welcome" className="wordmark" aria-label="Circo">
+        <Link href="/welcome" className="wordmark" aria-label="Circo">
           <img src="/assets/logo-circo.png" alt="Circo" width={92} height={35} />
         </Link>
       </header>

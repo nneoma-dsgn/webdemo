@@ -1,4 +1,6 @@
-import { useParams } from 'react-router-dom'
+'use client'
+
+import { useParams } from 'next/navigation'
 import { all, comingSoon, mustSee, studios, titles } from '../data/catalog'
 import { ComingCard, PosterCard } from '../components/Cards'
 import { Shelf } from '../components/Shelf'
@@ -7,7 +9,8 @@ import { useState } from 'react'
 
 /* Web version of the mobile "PROFILE" (studio page). */
 export default function Studio() {
-  const { id = 'velvet' } = useParams()
+  const params = useParams<{ id: string }>()
+  const id = params?.id ?? 'velvet'
   const s = studios[id] ?? studios.velvet
   const [reminders, setReminders] = useState<Set<string>>(new Set())
 

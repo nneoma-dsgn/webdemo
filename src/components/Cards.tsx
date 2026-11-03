@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
 import { icons, studios, titles, type Title } from '../data/catalog'
 import { useMenu } from './Menu'
 import { usePreview } from './Preview'
@@ -8,7 +10,7 @@ import { usePreview } from './Preview'
 function Tile({ to, children, ...rest }: { to?: string; children: React.ReactNode } & React.HTMLAttributes<HTMLElement>) {
   if (to)
     return (
-      <Link to={to} {...rest}>
+      <Link href={to} {...rest}>
         {children}
       </Link>
     )
@@ -124,7 +126,7 @@ export function StudioRow({ id, note }: { id: string; note?: string }) {
         <span className="studio-row__name">{s.name}</span>
         {note && <span className="studio-row__note">{note}</span>}
       </div>
-      <Link to={`/studio/${s.id}`} className="btn-white btn-white--sm">
+      <Link href={`/studio/${s.id}`} className="btn-white btn-white--sm">
         See More
       </Link>
     </div>

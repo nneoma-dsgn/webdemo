@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { browseGrid, icons, searchResults, titles } from '../data/catalog'
 import { PosterCard, StudioRow } from '../components/Cards'

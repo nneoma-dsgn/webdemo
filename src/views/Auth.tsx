@@ -1,5 +1,8 @@
+'use client'
+
 import { useMemo, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { saveSession, type Provider } from '../auth'
 import { browseGrid, icons, titles } from '../data/catalog'
 
@@ -7,8 +10,7 @@ import { browseGrid, icons, titles } from '../data/catalog'
 /* Web version of the "Worth Seeing" SSO screen. One screen serves Sign Up and Log In:
    new accounts continue to onboarding, returning accounts go straight to Home. */
 export default function Auth({ mode }: { mode: 'signup' | 'login' }) {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const router = useRouter()
   const [busy, setBusy] = useState<Provider | null>(null)
   const [phone, setPhone] = useState(false)
   const [chooser, setChooser] = useState(false)
@@ -21,12 +23,11 @@ export default function Auth({ mode }: { mode: 'signup' | 'login' }) {
     window.setTimeout(() => {
       if (mode === 'signup') {
         saveSession({ provider, onboarded: false })
-        navigate('/onboarding', { replace: true })
+        router.replace('/onboarding')
       } else {
         // Prototype: a returning account that already finished onboarding.
         saveSession({ provider, username: 'abeltesfaye', onboarded: true })
-        const from = (location.state as { from?: string } | null)?.from
-        navigate(from ?? '/', { replace: true })
+        router.replace('/')
       }
     }, provider === 'google' ? 500 : 1200)
   }
@@ -37,7 +38,7 @@ export default function Auth({ mode }: { mode: 'signup' | 'login' }) {
       {chooser && <GoogleChooser onPick={() => go('google')} onClose={() => setChooser(false)} />}
       <div className="login__panel">
         <header className="login__head">
-          <Link to="/welcome" aria-label="Back to Circo">
+          <Link href="/welcome" aria-label="Back to Circo">
             <img className="login__logo" src="/assets/logo-circo.png" alt="Circo" width={92} height={35} />
           </Link>
         </header>

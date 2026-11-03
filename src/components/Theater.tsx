@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
 
@@ -85,14 +87,15 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
     loadApi().then(() => {
       if (cancelled || !mount.current || !window.YT) return
       const YT = window.YT
+      // Created with the first clip so YouTube has a video to initialise around (an empty
+      // player can stall before onReady) and starts buffering it before the user arrives.
+      const first = itemsRef.current[0]
       player.current = new YT.Player(mount.current, {
-        playerVars: { autoplay: 0, mute: 1, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, iv_load_policy: 3, cc_load_policy: 0, cc_lang_pref: 'none' },
+        videoId: first.videoId,
+        playerVars: { start: first.start, end: first.end, autoplay: 0, mute: 1, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, iv_load_policy: 3, cc_load_policy: 0, cc_lang_pref: 'none' },
         events: {
-          onReady: (e: { target: YTPlayer }) => {
+          onReady: () => {
             ready.current = true
-            // Buffer the first clip while the user is still scrolling towards the section.
-            const first = itemsRef.current[0]
-            ;(e.target as unknown as { cueVideoById: (o: object) => void }).cueVideoById({ videoId: first.videoId, startSeconds: first.start, endSeconds: first.end })
           },
           onStateChange: (e: { data: number }) => {
             if (e.data === YT.PlayerState.PLAYING) {
@@ -126,10 +129,10 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
       if (ready.current) player.current?.pauseVideo()
       return
     }
-    let tries = 0
     const start = () => {
       if (!ready.current || !player.current) {
-        if (tries++ < 40) t = window.setTimeout(start, 150)
+        // Keep waiting for the player while this clip is still the active one.
+        t = window.setTimeout(start, 150)
         return
       }
       player.current.loadVideoById({ videoId: it.videoId, startSeconds: it.start, endSeconds: it.end })

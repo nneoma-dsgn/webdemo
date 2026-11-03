@@ -1,11 +1,14 @@
-import { useParams } from 'react-router-dom'
+'use client'
+
+import { useParams } from 'next/navigation'
 import { browseGrid, shelves, titles } from '../data/catalog'
 import { PosterCard } from '../components/Cards'
 import { BackButton } from '../components/Nav'
 
 /* "See all" grid behind each shelf chevron (Must See, Coming to Circo, All). */
 export default function Browse() {
-  const { shelf = 'all' } = useParams()
+  const params = useParams<{ shelf: string }>()
+  const shelf = params?.shelf ?? 'all'
   const s = shelves[shelf] ?? shelves.all
   const items = [...s.items, ...browseGrid].slice(0, 18)
 
