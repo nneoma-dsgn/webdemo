@@ -136,14 +136,14 @@ function AccountMenu() {
         </div>
       ),
       items: [
-        { id: 'profile', label: 'Profile', icon: 'user', onSelect: () => router.push('/studio/velvet') },
-        // Wallet and Help aren't built yet; they confirm instead of navigating.
+        // Library, Wallet and Help aren't built yet; they confirm instead of navigating.
+        { id: 'library', label: 'Library', icon: 'library', onSelect: () => toast('Library is coming soon') },
         { id: 'wallet', label: 'Wallet', icon: 'wallet', hint: '₦50,000', onSelect: () => toast('Wallet is coming soon') },
         { id: 'help', label: 'Help', icon: 'help', onSelect: () => toast('Help centre is coming soon') },
         { kind: 'separator', id: 's1' },
         {
           id: 'signout',
-          label: 'Sign out',
+          label: 'Sign Out',
           icon: 'logout',
           danger: true,
           onSelect: () => {
