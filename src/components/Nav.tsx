@@ -129,10 +129,7 @@ function AccountMenu() {
       header: (
         <div className="dd__user">
           <img src={icons.avatar} alt="" />
-          <div>
-            <strong>@{name}</strong>
-            <span>Circo member</span>
-          </div>
+          <strong>{name}</strong>
         </div>
       ),
       items: [
