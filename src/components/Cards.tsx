@@ -161,8 +161,14 @@ export function ComingCard({ t, when, label, reminded, onRemind, to }: { t: Titl
         </div>
       </Tile>
       <p className="coming__when">{when}</p>
-      <button className={`btn-outline${reminded ? ' is-on' : ''}`} onClick={onRemind} aria-pressed={reminded}>
-        <img src={icons.bellPlus} alt="" width={14} height={14} />
+      <button className={`btn-remind${reminded ? ' is-on' : ''}`} onClick={onRemind} aria-pressed={reminded}>
+        {reminded ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        ) : (
+          <img src={icons.bellPlus} alt="" width={14} height={14} />
+        )}
         {reminded ? 'Reminder set' : 'Remind me'}
       </button>
     </div>

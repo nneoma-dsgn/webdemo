@@ -105,27 +105,34 @@ main {
   transform: scale(0.97);
 }
 
-.btn-outline {
+/* Remind me: filled dark grey by default; once set it becomes an outline with a check. */
+.btn-remind {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   width: 100%;
   height: 38px;
-  border: 1px solid var(--stroke-strong);
   border-radius: var(--radius-sm);
+  background: var(--bg-400);
+  border: 1px solid transparent;
   font-size: 12px;
   font-weight: 500;
   line-height: 19px;
   transition: background 0.2s, border-color 0.2s;
 }
 
-.btn-outline:hover {
-  background: var(--bg-200);
+.btn-remind:hover {
+  background: #424242;
 }
 
-.btn-outline.is-on {
-  border-color: var(--accent);
+.btn-remind.is-on {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.btn-remind.is-on:hover {
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .icon-btn {
