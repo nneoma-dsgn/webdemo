@@ -235,12 +235,6 @@ main {
   position: relative;
 }
 
-.menu.account__menu {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  width: 180px;
-}
 
 /* Segmented tab switcher and the right-hand capsule share one frosted material. */
 .seg,
@@ -299,15 +293,15 @@ main {
 
 
 .capsule {
-  gap: 6px;
-  padding: 4px 4px 4px 8px;
+  gap: 10px;
+  padding: 4px 4px 4px 10px;
 }
 
 .capsule__btn {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   color: rgba(255, 255, 255, 0.85);
   transition: background 0.2s, color 0.2s;
@@ -321,8 +315,8 @@ main {
 
 .capsule__sep {
   width: 1px;
-  height: 20px;
-  margin: 0 4px;
+  height: 22px;
+  margin: 0 2px;
   background: rgba(255, 255, 255, 0.14);
 }
 
@@ -1192,49 +1186,10 @@ a.shelf__head:hover .shelf__chevron {
 
 /* ---------- Menu + toast ---------- */
 
-.menu {
-  position: fixed;
-  z-index: 200;
-  width: 220px;
-  padding: 6px;
-  border-radius: var(--radius-md);
-  background: rgba(32, 32, 32, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--stroke-subtle);
-  box-shadow: var(--shadow-card);
-  animation: pop 0.15s var(--ease);
-}
 
-.menu__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  text-align: left;
-}
 
-.menu__item + .menu__item {
-  border-top: 1px solid var(--stroke-default);
-  border-radius: 0;
-}
 
-.menu__item:hover,
-.menu__item:focus-visible {
-  background: var(--glass-soft);
-  border-radius: var(--radius-sm);
-  outline: 0;
-}
 
-@keyframes pop {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-}
 
 .toast {
   position: fixed;
@@ -2545,6 +2500,134 @@ body.spot-focus .page--welcome .cta-wrap {
   }
 
   .pv__still {
+    animation: none;
+  }
+}
+
+/* ---------- Dropdown (shared by every menu) ---------- */
+
+.dd {
+  position: fixed;
+  z-index: 250;
+  padding: 6px;
+  border-radius: 18px;
+  background: rgba(28, 28, 30, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 60px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  animation: dd-in 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes dd-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-4px);
+  }
+}
+
+.dd__header {
+  padding: 10px 12px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dd__title {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-300);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dd__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dd__user img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dd__user strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.dd__user span {
+  font-size: 12px;
+  color: var(--text-300);
+}
+
+.dd__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  color: var(--text-100);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dd__item:hover,
+.dd__item:focus-visible {
+  background: rgba(255, 255, 255, 0.09);
+  outline: 0;
+}
+
+.dd__item:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.dd__icon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  color: var(--text-200);
+  flex: none;
+}
+
+.dd__label {
+  flex: 1;
+}
+
+.dd__hint {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-300);
+  font-variant-numeric: tabular-nums;
+}
+
+.dd__item--danger,
+.dd__item--danger .dd__icon {
+  color: #ff6b6b;
+}
+
+.dd__item--danger:hover,
+.dd__item--danger:focus-visible {
+  background: rgba(255, 75, 75, 0.12);
+}
+
+.dd__sep {
+  height: 1px;
+  margin: 6px 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dd {
     animation: none;
   }
 }

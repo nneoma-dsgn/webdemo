@@ -63,7 +63,8 @@ export function PosterCard({ t, grid, to, menu = true }: { t: Title; grid?: bool
       <div className="poster__art">
         <img src={t.poster} alt={t.name} loading="lazy" />
       </div>
-      {menu && <MoreButton name={t.name} />}
+      {/* Previewing posters carry their ⋯ in the preview card instead. */}
+      {menu && !preview && <MoreButton name={t.name} />}
     </Tile>
   )
 }

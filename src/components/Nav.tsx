@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { signOut } from '../auth'
+import { getSession, signOut } from '../auth'
 import { icons } from '../data/catalog'
 import { useMenu } from './Menu'
 
@@ -71,7 +71,7 @@ export function MobileNav() {
 /* Search and cast drawn at the same size, weight and colour (Lucide paths). */
 function CapsuleIcon({ name }: { name: 'search' | 'cast' }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       {name === 'search' ? (
         <>
           <circle cx="10.5" cy="10.5" r="7.5" />
@@ -119,46 +119,47 @@ function SegNav({ active }: { active: string | null }) {
 }
 
 function AccountMenu() {
-  const [open, setOpen] = useState(false)
   const router = useRouter()
+  const { open, toast } = useMenu()
 
-  useEffect(() => {
-    if (!open) return
-    const close = () => setOpen(false)
-    window.addEventListener('click', close)
-    return () => window.removeEventListener('click', close)
-  }, [open])
+  const show = (el: HTMLElement) => {
+    const name = getSession()?.username ?? 'you'
+    open(el, {
+      label: 'Account',
+      header: (
+        <div className="dd__user">
+          <img src={icons.avatar} alt="" />
+          <div>
+            <strong>@{name}</strong>
+            <span>Circo member</span>
+          </div>
+        </div>
+      ),
+      items: [
+        { id: 'profile', label: 'Profile', icon: 'user', onSelect: () => router.push('/studio/velvet') },
+        // Wallet and Help aren't built yet; they confirm instead of navigating.
+        { id: 'wallet', label: 'Wallet', icon: 'wallet', hint: '₦50,000', onSelect: () => toast('Wallet is coming soon') },
+        { id: 'help', label: 'Help', icon: 'help', onSelect: () => toast('Help centre is coming soon') },
+        { kind: 'separator', id: 's1' },
+        {
+          id: 'signout',
+          label: 'Sign out',
+          icon: 'logout',
+          danger: true,
+          onSelect: () => {
+            signOut()
+            router.replace('/welcome')
+          },
+        },
+      ],
+    })
+  }
 
   return (
     <div className="account">
-      <button
-        className="avatar"
-        aria-label="Account"
-        aria-expanded={open}
-        onClick={(e) => {
-          e.stopPropagation()
-          setOpen((o) => !o)
-        }}
-      >
+      <button className="avatar" aria-label="Account" aria-haspopup="menu" onClick={(e) => show(e.currentTarget)}>
         <img src={icons.avatar} alt="" />
       </button>
-      {open && (
-        <div className="menu account__menu" role="menu">
-          <button role="menuitem" className="menu__item" onClick={() => router.push('/studio/velvet')}>
-            Profile
-          </button>
-          <button
-            role="menuitem"
-            className="menu__item"
-            onClick={() => {
-              signOut()
-              router.replace('/welcome')
-            }}
-          >
-            Sign out
-          </button>
-        </div>
-      )}
     </div>
   )
 }

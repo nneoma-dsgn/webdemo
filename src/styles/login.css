@@ -854,7 +854,7 @@
   /* A low maroon horizon glowing up from the bottom centre, with a faint
      vignette so the edges settle into near-black. */
   --circo-wash:
-    radial-gradient(ellipse 130% 105% at 50% 115%, rgba(155, 26, 50, 0.32) 0%, rgba(140, 24, 46, 0.22) 25%, rgba(120, 20, 40, 0.12) 48%, rgba(105, 16, 36, 0.05) 68%, rgba(105, 16, 36, 0) 85%),
+    radial-gradient(ellipse 130% 105% at 50% 115%, rgba(155, 26, 50, 0.24) 0%, rgba(140, 24, 46, 0.16) 25%, rgba(120, 20, 40, 0.09) 48%, rgba(105, 16, 36, 0.035) 68%, rgba(105, 16, 36, 0) 85%),
     radial-gradient(ellipse 120% 90% at 50% 40%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.35) 100%),
     #141414;
 }
