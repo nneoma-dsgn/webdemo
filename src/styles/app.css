@@ -375,7 +375,7 @@ main {
 /* ---------- Hero ---------- */
 
 .hero {
-  --hero-bottom: clamp(110px, 10vw, 150px);
+  --hero-bottom: clamp(72px, 7vw, 112px);
   position: relative;
   height: min(100vh, 66vw);
   min-height: 600px;
@@ -2733,7 +2733,7 @@ body.spot-focus .page--welcome .cta-wrap {
 .hero .hero__blurb,
 .page--welcome .hero__blurb {
   max-width: none;
-  font-size: clamp(14px, 1.05vw, 17px);
+  font-size: clamp(16px, 1.35vw, 22px);
   font-weight: 600;
   line-height: 1.5;
   color: var(--text-100);
@@ -2775,34 +2775,46 @@ body.spot-focus .page--welcome .cta-wrap {
   position: absolute;
   z-index: 2;
   left: 50%;
-  /* Centred on the button row (buttons are 48px tall). */
-  bottom: calc(var(--hero-bottom) + 20px);
+  /* Centred on the button row (buttons are 48px tall; dot targets are 28px). */
+  bottom: calc(var(--hero-bottom) + 10px);
   transform: translateX(-50%);
   display: flex;
   gap: 6px;
 }
 
 .hero__dots button {
+  /* Padded click target; the dot itself is drawn by ::before. */
   position: relative;
+  display: grid;
+  place-items: center;
+  padding: 10px 3px;
+}
+
+.hero__dots button::before {
+  content: '';
+  display: block;
   width: 8px;
   height: 8px;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.35);
-  overflow: hidden;
   transition: width 0.3s var(--ease), background 0.2s;
 }
 
-.hero__dots button.is-on {
+.hero__dots button.is-on::before {
   width: 32px;
 }
 
-.hero__dots button:hover {
+.hero__dots button:hover::before {
   background: rgba(255, 255, 255, 0.6);
 }
 
 .hero__dots span {
   position: absolute;
-  inset: 0;
+  top: 10px;
+  left: 3px;
+  width: 32px;
+  height: 8px;
+  border-radius: 4px;
   background: var(--text-100);
   transform-origin: left;
   animation: dot-fill linear forwards;
@@ -2815,3 +2827,18 @@ body.spot-focus .page--welcome .cta-wrap {
 }
 
 
+
+/* Carousel hero: draggable, and keyboard-focusable for arrow keys. */
+.hero--carousel {
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.hero--carousel:focus-visible {
+  outline: 2px solid var(--text-100);
+  outline-offset: -4px;
+}
+
+.hero--carousel .hero__dots {
+  gap: 0;
+}

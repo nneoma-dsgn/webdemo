@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { feeds, icons, titles } from '../data/catalog'
@@ -24,6 +24,33 @@ export default function Home() {
   const hero = titles[clip.id]
   const go = (d: number) => setSlide((i) => (i + d + n) % n)
 
+  // Switch slides by dragging/swiping the hero, trackpad side-swipes, or the arrow keys.
+  const drag = useRef<{ x: number; y: number } | null>(null)
+  const wheelLock = useRef(0)
+  const swipe = {
+    onPointerDown: (e: React.PointerEvent) => {
+      if ((e.target as HTMLElement).closest('button, a')) return
+      drag.current = { x: e.clientX, y: e.clientY }
+    },
+    onPointerUp: (e: React.PointerEvent) => {
+      const d = drag.current
+      drag.current = null
+      if (!d) return
+      const dx = e.clientX - d.x
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(e.clientY - d.y)) go(dx < 0 ? 1 : -1)
+    },
+    onPointerCancel: () => (drag.current = null),
+    onWheel: (e: React.WheelEvent) => {
+      if (Math.abs(e.deltaX) < 30 || Math.abs(e.deltaX) < Math.abs(e.deltaY) || Date.now() < wheelLock.current) return
+      wheelLock.current = Date.now() + 700
+      go(e.deltaX > 0 ? 1 : -1)
+    },
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === 'ArrowRight') go(1)
+      if (e.key === 'ArrowLeft') go(-1)
+    },
+  }
+
   // Each slide plays its clip, then hands over; if video can't start, rotate on a timer.
   useEffect(() => {
     const t = window.setTimeout(() => go(1), (clip.end - clip.start + 6) * 1000)
@@ -44,7 +71,7 @@ export default function Home() {
 
   return (
     <div className="page page--home">
-      <section className="hero hero--carousel" aria-roledescription="carousel" aria-label={`Featured: ${hero.name}`}>
+      <section className="hero hero--carousel" aria-roledescription="carousel" aria-label={`Featured: ${hero.name}`} tabIndex={0} {...swipe}>
         <HeroVideo key={`${tab}-${clip.id}`} videoId={clip.videoId} still={hero.still} start={clip.start} end={clip.end} onEnded={() => go(1)} />
         <div className="hero__scrim" />
         <div className="hero__tabs" role="tablist" aria-label="Browse">
