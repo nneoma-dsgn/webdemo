@@ -2716,3 +2716,41 @@ body.spot-focus .page--welcome .cta-wrap {
   border-radius: 2px;
   background: var(--text-100);
 }
+
+/* Hero copy measure, Netflix-style: a column about a third of the screen wide, so the
+   description stays at a comfortable line length; type one step up. Both heroes. */
+.hero .hero__content,
+.page--welcome .hero__content {
+  width: clamp(360px, 36vw, 640px);
+  max-width: calc(100% - 2 * var(--gutter));
+}
+
+.hero .hero__title,
+.page--welcome .hero__title {
+  font-size: clamp(30px, 2.8vw, 48px);
+}
+
+.hero .hero__blurb,
+.page--welcome .hero__blurb {
+  max-width: none;
+  font-size: clamp(16px, 1.3vw, 22px);
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+@media (max-width: 767px) {
+  .hero .hero__content,
+  .page--welcome .hero__content {
+    width: auto;
+  }
+
+  .hero .hero__title,
+  .page--welcome .hero__title {
+    font-size: 26px;
+  }
+
+  .hero .hero__blurb,
+  .page--welcome .hero__blurb {
+    font-size: 15px;
+  }
+}
