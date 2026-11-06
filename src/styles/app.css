@@ -1133,26 +1133,28 @@ a.shelf__head:hover .shelf__chevron {
 .toast {
   position: fixed;
   z-index: 400;
-  top: 20px;
+  top: 24px;
   left: 50%;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   max-width: calc(100% - 32px);
-  padding: 14px 24px 14px 14px;
-  border-radius: var(--radius-full);
-  background: var(--bg-light);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  color: var(--text-on-light);
-  font-size: 16px;
-  font-weight: 600;
+  padding: 12px 18px 12px 14px;
+  border-radius: 14px;
+  background: rgba(28, 28, 30, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 60px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
   line-height: 1.3;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, -140%) scale(0.92);
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  transform: translate(-50%, -16px) scale(0.97);
+  transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s ease;
 }
 
 .toast--on {
@@ -1160,27 +1162,21 @@ a.shelf__head:hover .shelf__chevron {
   transform: translate(-50%, 0) scale(1);
 }
 
-/* Check badge pops in just after the pill lands. */
+/* Small check that draws itself once the toast lands. */
 .toast__icon {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: var(--accent);
+  background: rgba(255, 255, 255, 0.12);
   flex: none;
-  transform: scale(0);
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s;
-}
-
-.toast--on .toast__icon {
-  transform: scale(1);
 }
 
 .toast__icon svg {
   stroke-dasharray: 16;
   stroke-dashoffset: 16;
-  transition: stroke-dashoffset 0.3s ease 0.35s;
+  transition: stroke-dashoffset 0.3s ease 0.15s;
 }
 
 .toast--on .toast__icon svg {
@@ -1375,7 +1371,7 @@ a.shelf__head:hover .shelf__chevron {
   }
 
   .toast {
-    top: 14px;
+    top: calc(14px + env(safe-area-inset-top));
   }
 }
 
@@ -2863,7 +2859,8 @@ body.spot-focus .page--welcome .cta-wrap {
   cursor: default;
 }
 
-.vp--idle {
+/* Cursor hides only when the mouse has rested, not when controls were tapped away. */
+.vp--rest {
   cursor: none;
 }
 
@@ -2994,6 +2991,7 @@ body.spot-focus .page--welcome .cta-wrap {
 
 .vp__top-right {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
@@ -3172,19 +3170,22 @@ body.spot-focus .page--welcome .cta-wrap {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  margin-top: 10px;
+  margin-top: 18px;
 }
 
 .vp__title {
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  gap: 12px;
   min-width: 0;
 }
 
 .vp__title span {
-  font-size: 13px;
-  font-weight: 600;
+  flex: none;
+  font-size: clamp(14px, 1.1vw, 17px);
+  font-weight: 500;
   color: var(--text-200);
+  white-space: nowrap;
 }
 
 .vp__title strong {
@@ -3238,6 +3239,96 @@ body.spot-focus .page--welcome .cta-wrap {
   }
 }
 
+/* Next episode: a small glass preview above the button on hover. */
+.vp__next {
+  position: relative;
+  display: flex;
+}
+
+.vp__next-card {
+  position: absolute;
+  right: -8px;
+  bottom: calc(100% + 14px);
+  width: 360px;
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 55%, rgba(255, 255, 255, 0.06)), rgba(16, 16, 19, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 20px 50px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(32px) saturate(1.8);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.25s var(--ease);
+}
+
+.vp__next:hover .vp__next-card,
+.vp__next:focus-within .vp__next-card {
+  opacity: 1;
+  transform: none;
+}
+
+.vp__next-kicker {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-300);
+}
+
+.vp__next-body {
+  display: flex;
+  gap: 12px;
+}
+
+.vp__next-body img {
+  flex: none;
+  width: 128px;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.vp__next-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vp__next-text strong {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vp__next-mins {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-300);
+}
+
+.vp__next-text p {
+  display: -webkit-box;
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-200);
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (hover: none), (max-width: 767px) {
+  .vp__next-card {
+    display: none;
+  }
+}
+
 /* Loading: only the back arrow, title and spinner (Netflix-style). */
 .vp--loading .vp__top-right,
 .vp--loading .vp__bottom {
@@ -3246,4 +3337,1831 @@ body.spot-focus .page--welcome .cta-wrap {
 
 .vp--loading .vp__top {
   background: none;
+}
+
+/* Series: Info / Episodes tabs and panels under the scrubber. */
+.vp__tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.vp__tabs button {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-200);
+  transition: background 0.2s, color 0.2s;
+}
+
+.vp__tabs button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text-100);
+}
+
+.vp__tabs button.is-on {
+  background: var(--bg-light);
+  color: var(--text-on-light);
+}
+
+.vp__panel {
+  margin-top: 18px;
+  animation: hero-copy 0.35s var(--ease) both;
+}
+
+.vp__info {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 40px;
+  padding: 32px 36px;
+  border-radius: 28px;
+  /* Dark base under the sheen: the video behind isn't always blurred, so the panel carries its own. */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 55%, rgba(255, 255, 255, 0.06)), rgba(16, 16, 19, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 20px 50px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(32px) saturate(1.8);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+}
+
+.vp__info-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vp__info-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-300);
+}
+
+.vp__info-title {
+  margin: 10px 0 0;
+  font-size: clamp(24px, 2.2vw, 32px);
+  font-weight: 700;
+  letter-spacing: var(--tracking);
+}
+
+.vp__info-blurb {
+  max-width: 640px;
+  margin: 10px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.65;
+  color: var(--text-100);
+}
+
+.vp__info-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.vp__info-actions svg {
+  width: 16px;
+  height: 16px;
+}
+
+.vp__info-round {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--text-100);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.vp__info-round:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.vp__info-round.is-on {
+  background: var(--bg-light);
+  border-color: var(--bg-light);
+  color: var(--text-on-light);
+}
+
+/* Studio: one compact row, level with the buttons. */
+.vp__studio {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 260px;
+  padding: 8px 10px 8px 8px;
+  border-radius: 100px;
+  text-align: left;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 60%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.vp__studio:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08) 60%);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.vp__studio img {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: contain;
+  background: #000;
+}
+
+.vp__studio-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.vp__studio-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-300);
+}
+
+.vp__studio-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-100);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vp__studio-go {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: var(--text-100);
+}
+
+.vp__studio-go svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s var(--ease);
+}
+
+.vp__studio:hover .vp__studio-go svg {
+  transform: translateX(2px);
+}
+
+@media (max-width: 767px) {
+  .vp__info {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 24px;
+  }
+}
+
+.vp__episodes {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+
+.vp__episodes::-webkit-scrollbar {
+  display: none;
+}
+
+.vp__ep {
+  flex: 0 0 clamp(200px, 17vw, 260px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.vp__ep-art {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition: outline-color 0.2s;
+}
+
+.vp__ep-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease);
+}
+
+.vp__ep:hover .vp__ep-art img {
+  transform: scale(1.05);
+}
+
+.vp__ep.is-current .vp__ep-art {
+  outline-color: var(--text-100);
+}
+
+.vp__ep-now {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 10px 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-100);
+}
+
+.vp__ep-play {
+  width: 9px;
+  height: 11px;
+  fill: #fff;
+}
+
+.vp__ep-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-300);
+}
+
+.vp__ep strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vp__ep-mins {
+  font-size: 12px;
+  color: var(--text-300);
+}
+
+@media (max-width: 767px) {
+  .vp__info {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Panel open: centre controls step aside, the bottom deepens so the panel reads cleanly. */
+.vp--panel .vp__center {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.vp--panel .vp__bottom {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.5) 55%, rgba(0, 0, 0, 0));
+  padding-top: 160px;
+}
+
+/* ---------- Access options when the trailer ends ---------- */
+
+/* Keep the back / ⋯ bar; the playback controls step aside for the access card. */
+/* YouTube draws its own replay button on the end frame; hide the video and use the still. */
+.vp--ended .vp__video {
+  opacity: 0;
+}
+
+.vp--ended .vp__center,
+.vp--ended .vp__bottom,
+.vp--ended .vp__buffer {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.vp-access {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 96px var(--gutter) 48px;
+  overflow-y: auto;
+  isolation: isolate;
+  background: #000;
+  animation: vp-access-in 0.4s ease both;
+}
+
+.vp-access__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(10px) brightness(0.42) saturate(1.2);
+  transform: scale(1.04);
+}
+
+@keyframes vp-access-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.vp-access__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  animation: vp-access-rise 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) 0.05s both;
+}
+
+@keyframes vp-access-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.vp-access__eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-300);
+}
+
+.vp-access__title {
+  margin: 8px 0 22px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: var(--tracking);
+  text-align: center;
+}
+
+.vp-access__tickets {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.vp-access__cta {
+  width: 100%;
+  height: 56px;
+  margin-top: 20px;
+  font-size: 17px;
+}
+
+.vp-access__cta:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+.vp-access__spin {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.18);
+  border-top-color: currentColor;
+  animation: vp-spin 0.7s linear infinite;
+}
+
+@keyframes vp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vp-access__fine {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-300);
+  text-align: center;
+}
+
+/* Pass perks, separated by dots. */
+.vp-access__perks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 12px;
+  margin-top: 20px;
+  list-style: none;
+  font-size: 13px;
+  color: var(--text-200);
+}
+
+.vp-access__perks li {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vp-access__perks li + li::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-300);
+}
+
+/* What a studio subscription unlocks: a small fan of posters and a count, as the subtitle. */
+.vp-access__catalog {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -12px 0 22px;
+  font-size: 15px;
+  color: var(--text-200);
+}
+
+.vp-access__catalog strong {
+  font-weight: 600;
+  color: var(--text-100);
+}
+
+.vp-access__posters {
+  display: flex;
+  flex: none;
+  padding: 0 4px;
+}
+
+.vp-access__posters img {
+  width: 20px;
+  height: 28px;
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.vp-access__posters img:nth-child(1) {
+  transform: rotate(-10deg) translateY(1px);
+}
+
+.vp-access__posters img:nth-child(2) {
+  position: relative;
+  z-index: 1;
+  margin: 0 -7px;
+  transform: translateY(-1px);
+}
+
+.vp-access__posters img:nth-child(3) {
+  transform: rotate(10deg) translateY(1px);
+}
+
+.vp-access__tickets--plans {
+  gap: 12px;
+}
+
+.vp-access__tickets--plans .ticket {
+  min-height: 86px;
+}
+
+/* Payment method: two options side by side. */
+.vp-access__methods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.vp-access__methods button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  text-align: left;
+  color: var(--text-200);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.vp-access__methods button:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.vp-access__methods button.is-on {
+  border-color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-100);
+}
+
+.vp-access__methods button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.vp-access__methods span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vp-access__methods strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-100);
+}
+
+.vp-access__methods small {
+  font-size: 12px;
+  color: var(--text-300);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Paid: a short reveal, then the film plays on its own. Two looks while they are compared
+   (Reveal.tsx mirrors these timings). */
+@property --iris {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+.unlock {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.reveal__veil {
+  position: absolute;
+  inset: 0;
+  background: #050403;
+}
+
+.reveal__glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(90vw, 900px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 196, 128, 0.32) 0%, rgba(255, 170, 96, 0.1) 38%, rgba(255, 170, 96, 0) 68%);
+}
+
+.reveal__title {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 var(--gutter);
+  text-align: center;
+}
+
+.reveal__title span {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #e9cf9c;
+}
+
+.reveal__title strong {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  letter-spacing: var(--tracking);
+  text-wrap: balance;
+  color: #fff6e8;
+}
+
+.reveal__title em {
+  font-size: 15px;
+  font-style: normal;
+  color: rgba(255, 246, 232, 0.7);
+}
+
+/* House lights down: dim, glow breathes behind the title, film fades up from the dark. */
+.unlock--lights .reveal__veil {
+  animation: reveal-dim 4.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.unlock--lights .reveal__glow {
+  animation: reveal-breathe 3.4s ease-in-out 0.5s both;
+}
+
+.unlock--lights .reveal__title {
+  animation: reveal-title 2.2s ease 0.7s both;
+}
+
+@keyframes reveal-dim {
+  0% { opacity: 0; }
+  17%, 57% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes reveal-breathe {
+  0% { opacity: 0; transform: scale(0.7); }
+  45% { opacity: 1; transform: scale(1); }
+  70% { opacity: 0.8; transform: scale(1.08); }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+
+@keyframes reveal-title {
+  0% { opacity: 0; letter-spacing: 0.04em; }
+  30%, 78% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Light iris: a point of light swells, then the dark opens outward like a lens. */
+.unlock--iris {
+  animation: reveal-iris 1.9s cubic-bezier(0.7, 0, 0.3, 1) 2.4s both;
+}
+
+.unlock--iris .reveal__veil {
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 1px));
+  mask: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 1px));
+  animation: reveal-fade-in 0.6s ease both;
+}
+
+.unlock--iris .reveal__glow {
+  width: 220px;
+  animation: reveal-point 2.6s ease 0.3s both;
+}
+
+.unlock--iris .reveal__ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--iris) * 2);
+  height: calc(var(--iris) * 2);
+  translate: -50% -50%;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 222, 170, 0.85), 0 0 40px 10px rgba(255, 190, 120, 0.45), inset 0 0 40px 6px rgba(255, 190, 120, 0.35);
+  animation: reveal-ring 1.9s ease 2.4s both;
+}
+
+.unlock--iris .reveal__title {
+  top: 28%;
+  justify-content: flex-start;
+  animation: reveal-title 1.9s ease 0.6s both;
+}
+
+@keyframes reveal-iris {
+  from { --iris: 0px; }
+  to { --iris: 150vmax; }
+}
+
+@keyframes reveal-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes reveal-point {
+  0% { opacity: 0; transform: scale(0.2); }
+  60% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1.4); }
+  100% { opacity: 0; transform: scale(3); }
+}
+
+@keyframes reveal-ring {
+  0% { opacity: 0; }
+  12%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unlock--iris {
+    animation: none;
+  }
+
+  .unlock--iris .reveal__veil {
+    -webkit-mask: none;
+    mask: none;
+    animation: reveal-dim 4.3s ease both;
+  }
+
+  .reveal__glow,
+  .reveal__ring {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+.vp-access__replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 8px 12px;
+  border-radius: 100px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-200);
+  transition: color 0.2s, background 0.2s;
+}
+
+.vp-access__replay:hover {
+  color: var(--text-100);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.vp-access__replay svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Ticket: glass body with a perforation and a half-circle notch top and bottom. The body is
+   masked so the notches are real cut-outs; the rings redraw the border around them. */
+.ticket {
+  --stub: 140px;
+  --notch: 12px;
+  --line: rgba(255, 255, 255, 0.2);
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 108px;
+  text-align: left;
+  color: var(--text-100);
+}
+
+.ticket::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 0, transparent calc(var(--notch) - 0.5px), #000 var(--notch)),
+    radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 100%, transparent calc(var(--notch) - 0.5px), #000 var(--notch));
+  -webkit-mask-composite: source-in;
+  mask:
+    radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 0, transparent calc(var(--notch) - 0.5px), #000 var(--notch)),
+    radial-gradient(circle var(--notch) at calc(100% - var(--stub)) 100%, transparent calc(var(--notch) - 0.5px), #000 var(--notch));
+  mask-composite: intersect;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+/* Dashed perforation between the notches. */
+.ticket::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--notch) + 4px);
+  bottom: calc(var(--notch) + 4px);
+  left: calc(100% - var(--stub));
+  border-left: 1px dashed rgba(255, 255, 255, 0.28);
+}
+
+/* Notch rings: the top one shows its lower half, the bottom one its upper half. */
+.ticket__notch {
+  position: absolute;
+  left: calc(100% - var(--stub) - var(--notch));
+  width: calc(var(--notch) * 2);
+  height: calc(var(--notch) * 2);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transition: border-color 0.2s;
+}
+
+.ticket__notch--top {
+  top: calc(var(--notch) * -1);
+  clip-path: inset(50% 0 0 0);
+}
+
+.ticket__notch--bottom {
+  bottom: calc(var(--notch) * -1);
+  clip-path: inset(0 0 50% 0);
+}
+
+.ticket--action:not(.is-selected):hover .ticket__notch {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.ticket__label,
+.ticket__price {
+  position: relative;
+}
+
+.ticket__label {
+  flex: 1;
+  padding: 0 20px 0 22px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.ticket__price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  width: var(--stub);
+  padding-right: 22px;
+}
+
+.ticket__price strong {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: var(--tracking);
+}
+
+.ticket__price span {
+  font-size: 12px;
+  color: var(--text-300);
+}
+
+.ticket--action {
+  cursor: pointer;
+}
+
+.ticket.is-selected {
+  --line: rgba(255, 255, 255, 0.85);
+}
+
+.ticket.is-selected::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+}
+
+.ticket__label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ticket__radio {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ticket.is-selected .ticket__radio {
+  border-color: #fff;
+  box-shadow: inset 0 0 0 4px #000, inset 0 0 0 10px #fff;
+}
+
+.ticket__badge {
+  position: absolute;
+  top: -11px;
+  left: 20px;
+  z-index: 1;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.ticket--action:not(.is-selected):hover::before {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+}
+
+.ticket--action:active {
+  transform: scale(0.99);
+}
+
+/* Circo ident, one 4.4s timeline (percentages below are of that; the opening runs a little past). Every hand-off overlaps
+   with the next so nothing cuts:
+   0.35s to 1.7s  the C draws itself and closes; the play mark settles in
+   1.9s to 2.5s   the mark dissolves into lens glass
+   2.3s to 2.9s   the dark lifts off the aperture blades around the lens
+   2.75s to 5.15s the blades glide open and turn, the glass and ring melt away
+   Blades and rings move with transforms only, so the browser can run them off the main thread. */
+.unlock--circo .reveal__veil {
+  z-index: 2;
+  animation: circo-veil 4.4s linear both;
+}
+
+.unlock--circo .reveal__glow {
+  width: 360px;
+  background: radial-gradient(circle, rgba(255, 45, 74, 0.26) 0%, rgba(255, 122, 26, 0.07) 45%, rgba(255, 45, 74, 0) 70%);
+  animation: circo-glow 4.4s linear both;
+}
+
+/* The C: a ring drawn with its gap facing right, then the gap closes. */
+.reveal__c {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 160px;
+  translate: -50% -50%;
+  overflow: visible;
+  will-change: transform, opacity;
+  animation: circo-c 4.4s linear both;
+}
+
+.reveal__c circle {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transform: rotate(40deg);
+  transform-origin: 50% 50%;
+  animation: circo-c-draw 4.4s linear both;
+}
+
+.reveal__mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  width: 54px;
+  translate: -42% -50%;
+  will-change: transform, opacity, filter;
+  animation: circo-mark 4.4s linear both;
+}
+
+/* Lens glass inside the closed C: dark coated glass with violet and green reflections. */
+.reveal__glass {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: 140px;
+  height: 140px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.5) 0, rgba(255, 255, 255, 0) 9%),
+    radial-gradient(ellipse 60% 40% at 34% 30%, rgba(150, 110, 255, 0.45), rgba(150, 110, 255, 0) 70%),
+    radial-gradient(ellipse 50% 35% at 70% 76%, rgba(60, 255, 190, 0.25), rgba(60, 255, 190, 0) 70%),
+    repeating-radial-gradient(circle, rgba(255, 255, 255, 0) 0 9px, rgba(255, 255, 255, 0.05) 10px, rgba(255, 255, 255, 0) 11px),
+    radial-gradient(circle, #15131c 0%, #07070a 75%);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.9);
+  will-change: transform, opacity;
+  animation: circo-glass 4.4s linear both;
+}
+
+/* Aperture: eight dark metal blades, each a half-plane whose edge starts at the centre (shut).
+   Sliding every blade outward while the set turns opens the iris. */
+.reveal__aperture {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 0;
+  height: 0;
+  will-change: transform, opacity;
+  animation:
+    circo-aperture 4.4s linear both,
+    circo-twist 2.4s cubic-bezier(0.4, 0, 0.2, 1) 2.75s both;
+}
+
+.reveal__aperture i {
+  position: absolute;
+  left: -150vmax;
+  top: -150vmax;
+  width: 300vmax;
+  height: 150vmax;
+  transform-origin: 50% 100%;
+  /* Dark wine metal with a faint warm wash at the edge; the brand gradient is the rim (::after). */
+  background:
+    linear-gradient(to top, rgba(255, 70, 70, 0.1) 0, rgba(255, 70, 70, 0) 70px),
+    linear-gradient(to top, #240b14 0, #170a0e 180px, #0f0709 480px, #080405 1000px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8);
+  will-change: transform;
+  animation: circo-blade 2.4s cubic-bezier(0.4, 0, 0.2, 1) 2.75s both;
+}
+
+/* Rim: the Circo play-mark gradient (orange, red, magenta) along each blade edge, softly lit. */
+.reveal__aperture i::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, #ff8a1a 30%, #ff2d4a 45%, #ff004f 55%, #c2105e 70%);
+  opacity: 0.6;
+  box-shadow: 0 0 10px rgba(255, 45, 74, 0.25);
+}
+
+/* Black over everything at first, then lifts slowly to show the blades around the lens. */
+@keyframes circo-veil {
+  0% { opacity: 0; animation-timing-function: ease-out; }
+  8%, 52.3% { opacity: 1; animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1); }
+  66%, 100% { opacity: 0; }
+}
+
+@keyframes circo-c-draw {
+  0%, 8% { stroke-dasharray: 0 100; animation-timing-function: cubic-bezier(0.55, 0, 0.25, 1); }
+  28.4% { stroke-dasharray: 78 100; animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1); }
+  38.6%, 100% { stroke-dasharray: 100 100; }
+}
+
+/* The ring holds as the lens barrel, then drifts outward with the blades and melts away. */
+@keyframes circo-c {
+  0%, 62.5% { opacity: 1; transform: scale(1); animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1); }
+  77.3%, 100% { opacity: 0; transform: scale(2.6); }
+}
+
+/* Settles in softly, then dissolves into the glass (shrinks, blurs and fades together). */
+@keyframes circo-mark {
+  0%, 24% { opacity: 0; transform: scale(0.7); filter: blur(6px); animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
+  34%, 43.2% { opacity: 1; transform: scale(1); filter: blur(0); animation-timing-function: cubic-bezier(0.45, 0, 0.3, 1); }
+  56.8%, 100% { opacity: 0; transform: scale(0.55); filter: blur(5px); }
+}
+
+/* Grows out of the mark as it dissolves, turns slowly, then swells and fades as the iris opens. */
+@keyframes circo-glass {
+  0%, 43.2% { opacity: 0; transform: scale(0.5) rotate(-40deg); animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1); }
+  56.8% { opacity: 1; transform: scale(1) rotate(-6deg); animation-timing-function: linear; }
+  62.5% { opacity: 1; transform: scale(1) rotate(0deg); animation-timing-function: cubic-bezier(0.5, 0, 0.3, 1); }
+  74%, 100% { opacity: 0; transform: scale(1.7) rotate(14deg); }
+}
+
+/* Hidden until the veil is solid, so the blades never flash in. */
+@keyframes circo-aperture {
+  0%, 7.9% { opacity: 0; }
+  8%, 100% { opacity: 1; }
+}
+
+/* The opening runs on its own 2.4s glide from 2.75s: one long curve, gentle in and a long settle,
+   so the speed stays even the whole way out. */
+@keyframes circo-twist {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(70deg); }
+}
+
+/* Each blade slides out along its own direction: shut, then a long, soft glide just clear of the
+   corners, so the whole glide is on screen. */
+@keyframes circo-blade {
+  from { transform: rotate(calc(var(--i) * 45deg)) translateY(0); }
+  to { transform: rotate(calc(var(--i) * 45deg)) translateY(-64vmax); }
+}
+
+@keyframes circo-glow {
+  0%, 22% { opacity: 0; transform: scale(0.6); animation-timing-function: cubic-bezier(0.3, 0, 0.2, 1); }
+  45% { opacity: 1; transform: scale(1); animation-timing-function: ease-in-out; }
+  58% { opacity: 1; transform: scale(1.05); animation-timing-function: cubic-bezier(0.5, 0, 0.3, 1); }
+  75%, 100% { opacity: 0; transform: scale(1.7); }
+}
+
+/* ---------- Coming soon: the premiere card a teaser ends on ---------- */
+
+.soon {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  isolation: isolate;
+  background: #000;
+  animation: vp-access-in 0.6s ease both;
+}
+
+/* Sharp artwork with a slow push-in, like a trailer's last shot. */
+.soon__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7) saturate(1.1);
+  animation: soon-push 18s cubic-bezier(0.2, 0, 0.2, 1) both;
+}
+
+@keyframes soon-push {
+  from { transform: scale(1.12); }
+  to { transform: scale(1); }
+}
+
+.soon__shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.94) 0%, rgba(0, 0, 0, 0.72) 38%, rgba(0, 0, 0, 0.15) 72%, rgba(0, 0, 0, 0.3) 100%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 45%);
+}
+
+.soon__body {
+  display: grid;
+  grid-template-columns: minmax(0, 620px) auto;
+  justify-content: space-between;
+  align-items: center;
+  gap: 48px;
+  height: 100%;
+  padding: 96px clamp(24px, 6vw, 96px) 64px;
+}
+
+.soon__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Each line rises in after the last. */
+.soon__copy > * {
+  animation: soon-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.soon__copy > :nth-child(1) { animation-delay: 0.15s; }
+.soon__copy > :nth-child(2) { animation-delay: 0.25s; }
+.soon__copy > :nth-child(3) { animation-delay: 0.35s; }
+.soon__copy > :nth-child(4) { animation-delay: 0.42s; }
+.soon__copy > :nth-child(5) { animation-delay: 0.5s; }
+.soon__copy > :nth-child(6) { animation-delay: 0.6s; }
+.soon__copy > :nth-child(7) { animation-delay: 0.7s; }
+
+@keyframes soon-rise {
+  from { opacity: 0; transform: translateY(18px); }
+}
+
+/* A quiet eyebrow: a short brand-red rule, then the date. */
+.soon__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.soon__tag i {
+  width: 28px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.soon__title {
+  margin: 18px 0 0;
+  font-size: clamp(44px, 6.4vw, 96px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+  text-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.soon__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin: 16px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-200);
+}
+
+.soon__meta span + span::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin-right: 14px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+  opacity: 0.6;
+}
+
+.soon__blurb {
+  max-width: 520px;
+  margin: 14px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-200);
+}
+
+.soon__countdown {
+  margin-top: 30px;
+}
+
+.soon__label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-300);
+}
+
+.soon__clock {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.soon__unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 76px;
+  padding: 12px 10px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.soon__unit strong {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.soon__unit small {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-300);
+}
+
+.soon__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+/* The one thing to press: brand red, softly glowing. */
+.soon__remind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 30px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, #ff3d5e, #ff004f 55%, #d1003f);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(255, 0, 79, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s, background 0.3s;
+}
+
+.soon__remind:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 40px rgba(255, 0, 79, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.soon__remind:active {
+  transform: scale(0.98);
+}
+
+.soon__remind.is-on {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.soon__round {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-100);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.soon__round:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.soon__waiting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 0;
+  font-size: 14px;
+  color: var(--text-200);
+}
+
+.soon__waiting strong {
+  color: var(--text-100);
+}
+
+/* Poster: tilted, lit from behind in brand red. */
+.soon__poster {
+  position: relative;
+  width: clamp(200px, 20vw, 300px);
+  perspective: 1200px;
+  animation: soon-poster 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+}
+
+.soon__poster::before {
+  content: '';
+  position: absolute;
+  inset: 10% -10%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 0, 79, 0.5), rgba(255, 0, 79, 0));
+  filter: blur(30px);
+}
+
+.soon__poster img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transform: rotateY(-12deg) rotateX(3deg);
+}
+
+@keyframes soon-poster {
+  from { opacity: 0; transform: translateX(40px) scale(0.94); }
+}
+
+@media (max-width: 900px) {
+  .soon__body {
+    grid-template-columns: 1fr;
+    align-items: end;
+    padding: 88px 20px 32px;
+  }
+
+  .soon__poster {
+    display: none;
+  }
+
+  .soon__shade {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 55%, rgba(0, 0, 0, 0.2) 100%);
+  }
+
+  .soon__unit {
+    min-width: 64px;
+  }
+
+  .soon__unit strong {
+    font-size: 26px;
+  }
+}
+
+/* ---------- Up Next: the last seconds of an episode ---------- */
+
+.upnext {
+  position: absolute;
+  right: var(--gutter);
+  /* Bottom right; rides up above the controls while they show (minus their fade-in padding). */
+  bottom: calc(var(--ctrl-h, 220px) - 64px);
+  transition: bottom 0.35s var(--ease);
+  z-index: 6;
+  display: flex;
+  gap: 16px;
+  width: min(460px, calc(100% - 32px));
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(16, 16, 19, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  animation: upnext-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes upnext-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+}
+
+.vp--idle .upnext {
+  bottom: 32px;
+}
+
+.upnext__art {
+  width: 150px;
+  flex: none;
+  aspect-ratio: 16 / 9;
+  align-self: flex-start;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.upnext__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.upnext__kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-300);
+  font-variant-numeric: tabular-nums;
+}
+
+.upnext__text strong {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.upnext__text p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-200);
+}
+
+.upnext__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* The button fills as the countdown runs out. */
+.upnext__play {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.upnext__fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--text-200);
+  transform-origin: left;
+  animation: upnext-fill var(--left) linear both;
+}
+
+@keyframes upnext-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.upnext__stay {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-200);
+  transition: background 0.2s, color 0.2s;
+}
+
+.upnext__stay:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-100);
+}
+
+@media (max-width: 767px) {
+  .upnext__art {
+    width: 110px;
+  }
+}
+
+/* ---------- Pass time and resume ---------- */
+
+/* Last 10 minutes: a banner with a one-tap extend. */
+.vp-passwarn {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 8px 8px 8px 16px;
+  border-radius: 100px;
+  translate: -50% 0;
+  background: rgba(16, 16, 19, 0.92);
+  border: 1px solid rgba(255, 170, 40, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+  color: var(--text-200);
+  animation: upnext-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.vp-passwarn strong {
+  color: #ffc46b;
+  font-variant-numeric: tabular-nums;
+}
+
+.vp-passwarn__dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: #ffaa28;
+  animation: soon-live 1.8s ease-out infinite;
+}
+
+.vp-passwarn__extend {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 100px;
+  background: var(--bg-light);
+  color: var(--text-on-light);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.vp-passwarn__close {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-300);
+}
+
+.vp-passwarn__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.vp-passwarn__close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-100);
+}
+
+/* "Resumed from 24:10 · Start over", just above the scrubber. */
+.vp__resumed {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 6px 6px 6px 14px;
+  border-radius: 100px;
+  background: rgba(16, 16, 19, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-200);
+  font-variant-numeric: tabular-nums;
+  animation: upnext-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.vp__resumed button {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-100);
+}
+
+.vp__resumed button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 767px) {
+  .vp-passwarn {
+    top: 72px;
+    font-size: 13px;
+  }
+}
+
+
+/* ---------- Checkout: top-up, failures, receipt ---------- */
+
+.vp-access__methods small.is-short {
+  color: #ffc46b;
+}
+
+/* Balance is short: pick a top-up amount, charged to the card on file. */
+.vp-topup {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  animation: upnext-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.vp-topup__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.vp-topup__head span {
+  font-size: 12px;
+  color: var(--text-300);
+}
+
+.vp-topup__amounts {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.vp-topup__amounts button {
+  flex: 1;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-200);
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.vp-topup__amounts button:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.vp-topup__amounts button.is-on {
+  border-color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-100);
+}
+
+.vp-topup__after {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-300);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Payment failed: what happened, that nothing was taken, and another way to pay. */
+.vp-payfail {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 64, 64, 0.1);
+  border: 1px solid rgba(255, 90, 90, 0.4);
+  text-align: left;
+  animation: upnext-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.vp-payfail__icon {
+  flex: none;
+  color: #ff7a7a;
+}
+
+.vp-payfail strong {
+  font-size: 14px;
+  color: var(--text-100);
+}
+
+.vp-payfail p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-200);
+}
+
+.vp-payfail__alt {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-100);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.vp-access__link {
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-100);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Receipt after the reveal, top left. */
+.receipt {
+  position: absolute;
+  top: 88px;
+  left: var(--gutter);
+  z-index: 7;
+  width: min(340px, calc(100% - 32px));
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(16, 16, 19, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  animation: upnext-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.receipt__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.receipt__head strong {
+  margin-right: auto;
+  font-size: 15px;
+}
+
+.receipt__tick {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #04170a;
+}
+
+.receipt__close {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--text-300);
+}
+
+.receipt__close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-100);
+}
+
+.receipt__rows {
+  margin: 14px 0 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.16);
+  padding-top: 10px;
+}
+
+.receipt__rows div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.receipt__rows dt {
+  color: var(--text-300);
+}
+
+.receipt__rows dd {
+  margin: 0;
+  text-align: right;
+  color: var(--text-100);
+  font-variant-numeric: tabular-nums;
+}
+
+.receipt__rows .receipt__balance {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+}
+
+.receipt__balance dt {
+  color: var(--text-100);
+}
+
+.receipt__ref {
+  display: block;
+  margin-top: 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--text-300);
+}
+
+/* Pulsing ring for live dots (pass warning). */
+@keyframes soon-live {
+  0% { box-shadow: 0 0 0 0 rgba(255, 170, 40, 0.6); }
+  100% { box-shadow: 0 0 0 10px rgba(255, 170, 40, 0); }
 }

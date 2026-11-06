@@ -126,7 +126,7 @@ const FOOTER = [
   { h: 'Circo', links: ['About us', 'Careers', 'Press', 'Contact'] },
   { h: 'Watch', links: ['Ways to watch', 'Devices', 'Downloads', 'Gift cards'] },
   { h: 'Creators', links: ['Become a creator', 'Studio tools', 'Affiliates', 'Brand partners'] },
-  { h: 'Help', links: ['Help centre', 'Account', 'Wallet & payments', 'Report a problem'] },
+  { h: 'Help', links: ['Help centre', 'Account', 'Balance & payments', 'Report a problem'] },
 ]
 
 export function Footer() {

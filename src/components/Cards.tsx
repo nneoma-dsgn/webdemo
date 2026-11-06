@@ -5,8 +5,8 @@ import { icons, studios, titles, type Title } from '../data/catalog'
 import { useMenu } from './Menu'
 import { usePreview } from './Preview'
 
-/* Cards only navigate when given a destination (e.g. the signed-out page sends to sign up).
-   There is no title page, so by default a card is just a focusable tile. */
+/* Cards navigate to their destination when given one; without one they're a focusable tile.
+   Posters default to the player, so a tap opens the title without waiting for the preview. */
 function Tile({ to, children, ...rest }: { to?: string; children: React.ReactNode } & React.HTMLAttributes<HTMLElement>) {
   if (to)
     return (
@@ -54,11 +54,12 @@ export function PosterCard({ t, grid, to, menu = true }: { t: Title; grid?: bool
   const preview = grid ? null : ctx
   return (
     <Tile
-      to={to}
+      to={to ?? `/watch/${t.id}`}
       className={`card poster${grid ? ' poster--grid' : ''}`}
       onContextMenu={menu ? onContext : undefined}
       onMouseEnter={preview ? (e) => preview.hover(t.id, e.currentTarget) : undefined}
       onMouseLeave={preview?.leave}
+      onClick={preview?.leave}
     >
       <div className="poster__art">
         <img src={t.poster} alt={t.name} loading="lazy" />
@@ -73,6 +74,7 @@ export function PosterCard({ t, grid, to, menu = true }: { t: Title; grid?: bool
    weeks and months. */
 export function accessLeft(hours: number) {
   const n = (v: number, unit: string) => `${v} ${unit}${v === 1 ? '' : 's'} left`
+  if (hours <= 0) return 'Access ended'
   if (hours < 1) return n(Math.max(1, Math.round(hours * 60)), 'min')
   if (hours < 24) return n(Math.floor(hours), 'hr')
   const days = Math.floor(hours / 24)
@@ -148,7 +150,7 @@ export function ContinueCard({ t, accessHours, progress, ep, onRemove }: { t: Ti
 export function ComingCard({ t, when, label, reminded, onRemind, to }: { t: Title; when: string; label?: string[]; reminded: boolean; onRemind: () => void; to?: string }) {
   return (
     <div className="coming">
-      <Tile to={to} className="card poster">
+      <Tile to={to ?? `/watch/${t.id}`} className="card poster">
         <div className="poster__art">
           <img src={t.poster} alt="" loading="lazy" />
           <div className="poster__fade" />

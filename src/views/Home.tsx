@@ -8,15 +8,30 @@ import { ComingCard, ContinueCard, PosterCard } from '../components/Cards'
 import { Shelf } from '../components/Shelf'
 import { useMenu } from '../components/Menu'
 import { HeroVideo } from '../components/HeroVideo'
+import { useReminders } from '../data/reminders'
+import { savedToast, useSaved } from '../data/saved'
+import { accessLeft, clearProgress, useViewing } from '../data/viewing'
 
 export default function Home() {
   const params = useSearchParams()
   const tab = params.get('tab') === 'series' ? 'series' : 'shows'
   const { toast } = useMenu()
-  const [reminders, setReminders] = useState<Set<string>>(new Set())
+  const reminders = useReminders()
+  const saved = useSaved()
   const [removed, setRemoved] = useState<Set<string>>(new Set())
   // Shows and Series are separate feeds, each with its own hero carousel and shelves.
   const feed = feeds[tab]
+  // Continue Watching: only what you've actually been watching, latest first.
+  const viewing = useViewing()
+  const kind = tab === 'series' ? 'series' : 'show'
+  const watched = Object.entries(viewing.progress)
+    .filter(([id]) => titles[id]?.kind === kind)
+    .sort((a, b) => b[1].at - a[1].at)
+    .map(([id, p]) => {
+      const ms = accessLeft(viewing, titles[id])
+      return { id, ep: p.ep, progress: p.d ? p.t / p.d : 0, accessHours: ms === null ? 0 : isFinite(ms) ? ms / 36e5 : 24 }
+    })
+  const continueRow = watched
   const [slide, setSlide] = useState(0)
   useEffect(() => setSlide(0), [tab])
   const n = feed.heroes.length
@@ -58,16 +73,9 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slide, tab])
 
-  const remind = (id: string) =>
-    setReminders((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else {
-        next.add(id)
-        toast(`We'll remind you when ${titles[id].name} lands`)
-      }
-      return next
-    })
+  const remind = (id: string) => {
+    if (reminders.toggle(id)) toast(`We'll remind you when ${titles[id].name} lands`)
+  }
 
   return (
     <div className="page page--home">
@@ -90,9 +98,15 @@ export default function Home() {
               <PlayGlyph />
               Watch Now
             </Link>
-            <button className="btn-dark" onClick={() => toast('Added to Saved for later')}>
-              <img src={icons.plus} alt="" width={20} height={20} />
-              Watch later
+            <button className="btn-dark" onClick={() => toast(savedToast(saved.toggle(hero.id)))} aria-pressed={saved.has(hero.id)}>
+              {saved.has(hero.id) ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M5 12.5l4.5 4.5L19 7.5" />
+                </svg>
+              ) : (
+                <img src={icons.plus} alt="" width={20} height={20} />
+              )}
+              {saved.has(hero.id) ? 'Saved for later' : 'Watch later'}
             </button>
           </div>
         </div>
@@ -115,23 +129,27 @@ export default function Home() {
           ))}
         </Shelf>
 
-        <Shelf title="Continue Watching">
-          {feed.continueWatching
-            .filter((c) => !removed.has(c.id))
-            .map((c) => (
-              <ContinueCard
-                key={c.id}
-                t={titles[c.id]}
-                accessHours={c.accessHours}
-                progress={c.progress}
-                ep={c.ep}
-                onRemove={() => {
-                  setRemoved((r) => new Set(r).add(c.id))
-                  toast(`Removed ${titles[c.id].name} from Continue Watching`)
-                }}
-              />
-            ))}
-        </Shelf>
+        {/* Hidden until you've started something. */}
+        {continueRow.some((c) => !removed.has(c.id)) && (
+          <Shelf title="Continue Watching">
+            {continueRow
+              .filter((c) => !removed.has(c.id))
+              .map((c) => (
+                <ContinueCard
+                  key={c.id}
+                  t={titles[c.id]}
+                  accessHours={c.accessHours}
+                  progress={c.progress}
+                  ep={c.ep}
+                  onRemove={() => {
+                    clearProgress(c.id)
+                    setRemoved((r) => new Set(r).add(c.id))
+                    toast(`Removed ${titles[c.id].name} from Continue Watching`)
+                  }}
+                />
+              ))}
+          </Shelf>
+        )}
 
         <Shelf title={feed.middle.title} to={`/browse/${feed.middle.id === 'nollywood' ? 'nollywood' : 'all'}`}>
           {feed.middle.items.map((id) => (

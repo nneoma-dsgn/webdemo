@@ -5,14 +5,14 @@ import { all, comingSoon, mustSee, studios, titles } from '../data/catalog'
 import { ComingCard, PosterCard } from '../components/Cards'
 import { Shelf } from '../components/Shelf'
 import { BackButton } from '../components/Nav'
-import { useState } from 'react'
+import { useReminders } from '../data/reminders'
 
 /* Web version of the mobile "PROFILE" (studio page). */
 export default function Studio() {
   const params = useParams<{ id: string }>()
   const id = params?.id ?? 'velvet'
   const s = studios[id] ?? studios.velvet
-  const [reminders, setReminders] = useState<Set<string>>(new Set())
+  const reminders = useReminders()
 
   return (
     <div className="page page--studio">
@@ -46,13 +46,7 @@ export default function Studio() {
               when={c.when}
               label={c.label}
               reminded={reminders.has(c.id)}
-              onRemind={() =>
-                setReminders((p) => {
-                  const n = new Set(p)
-                  n.has(c.id) ? n.delete(c.id) : n.add(c.id)
-                  return n
-                })
-              }
+              onRemind={() => reminders.toggle(c.id)}
             />
           ))}
         </Shelf>

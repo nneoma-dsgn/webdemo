@@ -19,6 +19,9 @@ export type Title = {
   studioId: string
   year: number
   rating: string
+  /* Public studios sell a pass per title; private studios sell a subscription. */
+  access: 'public' | 'private'
+  passPrice: number // naira, public titles only
 }
 
 export type Studio = {
@@ -76,14 +79,41 @@ const seeds: Seed[] = [
   ['oppenheimer', 'Oppenheimer', 'show', 2023, '16+', 'Drama', 'intl', 'velvet', 'The physicist behind the atomic bomb and the cost of his work.'],
 ]
 
+/* Stable pseudo-random pick per id, so server and client agree. */
+const hash = (id: string) => [...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
+const PASS_PRICES = [1500, 2000, 2500, 3000]
+
 export const titles: Record<string, Title> = Object.fromEntries(
   seeds.map(([id, name, kind, year, rating, genre, origin, studioId, blurb]) => [
     id,
-    { id, name, kind, year, rating, genre, origin, studioId, blurb, poster: poster(id), still: backdrop(id) },
+    {
+      id,
+      name,
+      kind,
+      year,
+      rating,
+      genre,
+      origin,
+      studioId,
+      blurb,
+      poster: poster(id),
+      still: backdrop(id),
+      access: hash(id) % 2 ? 'public' : 'private',
+      passPrice: PASS_PRICES[(hash(id) >>> 3) % PASS_PRICES.length],
+    },
   ]),
 )
 // The home hero keeps the exact Silo artwork from the Figma file.
 titles.silo.still = a('hero-silo.png')
+
+/* Subscription plans for private studios. */
+export const plans = [
+  { id: 'week', label: 'Weekly Access', price: 5000, per: 'week' },
+  { id: 'month', label: 'Monthly Access', price: 18000, per: 'month' },
+  { id: 'year', label: 'Annual Access', price: 55000, per: 'year' },
+]
+
+export const naira = (n: number) => `₦${n.toLocaleString('en-NG')}`
 
 export type Shelf = {
   id: string
@@ -97,7 +127,7 @@ export const nollywood: Shelf = { id: 'nollywood', title: 'Nollywood Hits', item
 export const all: Shelf = { id: 'all', title: 'All', items: seeds.map((s) => s[0]) }
 
 export const comingSoon: { id: string; when: string; label?: string[] }[] = [
-  { id: 'funmilayo', when: 'Coming 30 October' },
+  { id: 'funmilayo', when: 'Coming 27 November' },
   { id: 'jagun', when: 'Coming 6 November' },
   { id: 'wednesday', when: 'More episodes soon' },
   { id: 'breath', when: 'Coming 14 November' },
@@ -179,7 +209,7 @@ export const feeds: Record<'shows' | 'series', Feed> = {
     ],
     middle: { id: 'nollywood', title: 'Nollywood Hits', items: ofKind('show').filter((id) => titles[id].origin === 'ng') },
     coming: [
-      { id: 'funmilayo', when: 'Coming 30 October' },
+      { id: 'funmilayo', when: 'Coming 27 November' },
       { id: 'jagun', when: 'Coming 6 November' },
       { id: 'breath', when: 'Coming 14 November' },
       { id: 'citation', when: 'Coming 9 December' },
@@ -215,6 +245,32 @@ export const feeds: Record<'shows' | 'series', Feed> = {
 
 /* Preview trailers on YouTube used for hover previews, as short clips past the studio cards.
    Titles without one fall back to their backdrop. */
+/* Episodes for series that have them. Clips are YouTube stand-ins for the prototype; each one
+   plays as that episode. Descriptions are Circo's own. */
+export type Episode = { title: string; blurb: string; mins: number; videoId: string }
+
+export const episodes: Record<string, Episode[]> = {
+  squid: [
+    { title: 'Red Light, Green Light', mins: 60, videoId: 'PHWML7JdVTE', blurb: 'Broke and out of options, Gi-hun accepts a stranger’s invitation to play a game. The first round turns deadly.' },
+    { title: 'Hell', mins: 63, videoId: 'oqxAJKy0ii4', blurb: 'The survivors vote to walk away, but life outside is its own kind of trap, and the invitation comes again.' },
+    { title: 'The Man with the Umbrella', mins: 55, videoId: '51smxeWPaW4', blurb: 'Back in the arena, a childhood sweet becomes a test of nerve, and Gi-hun draws the hardest shape.' },
+    { title: 'Stick to the Team', mins: 55, videoId: 'njQUQ6SUmjk', blurb: 'Lights go out in the dormitory and the night turns violent. By morning, everyone needs a team.' },
+    { title: 'A Fair World', mins: 52, videoId: 'VEtmLWXTTA4', blurb: 'A secret trade among the guards comes to light, while a detective hides in plain sight.' },
+    { title: 'Gganbu', mins: 62, videoId: 'Gj8pBmiiYeM', blurb: 'Partners are told to play against each other. Friendships are tested over a bag of marbles.' },
+    { title: 'VIPS', mins: 58, videoId: 'lwZJHHQ8ib4', blurb: 'Masked guests arrive to watch as the remaining players face a bridge made of glass.' },
+    { title: 'Front Man', mins: 33, videoId: 'Ls8ilKMQHxQ', blurb: 'Three players remain. Grief and suspicion build on the eve of the final game.' },
+    { title: 'One Lucky Day', mins: 56, videoId: 'fGUJ7MRWa68', blurb: 'The last two face off in the game that started it all. One walks away with the prize, and a question.' },
+  ],
+}
+
+/* What plays once a title is unlocked, so it never looks like the teaser. Blender Studio's open
+   movies stand in for the real films in the prototype; each title (and episode) gets one. */
+const FEATURES = ['eRsGyueVLvQ', 'R6MlUcmOul8', 'aqz-KE-bpKQ', 'Y-rmzh0PI3c', 'WhWc3b3KhnY', 'mN0zPOpADL4', 'TLkA0RELQ1g', 'UXqq0ZvbOnk', 'PVGeM40dABA']
+export const featureFor = (id: string, ep = 1) => FEATURES[([...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) + ep - 1) % FEATURES.length]
+
+/* Episode artwork from the clip itself, until Circo has its own stills. */
+export const episodeThumb = (videoId: string) => `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+
 export const trailers: Record<string, { videoId: string; start: number; end: number }> = {
   tribe: { videoId: 'pEUZVfeCU94', start: 15, end: 60 },
   kob: { videoId: 'cF-FQLKaUCk', start: 6, end: 52 },
@@ -231,4 +287,10 @@ export const trailers: Record<string, { videoId: string; start: number; end: num
   wedding: { videoId: 'taXftAd2kGA', start: 20, end: 65 },
   severance: { videoId: '_UXKlYvLGJY', start: 25, end: 70 },
   lastofus: { videoId: 'wk5vOCcASHg', start: 20, end: 65 },
+  // Coming soon: these end on a reminder instead of access options.
+  funmilayo: { videoId: 'VUlOxcbI4CY', start: 15, end: 60 },
+  wednesday: { videoId: 'Di310WS8zLk', start: 10, end: 55 },
+  breath: { videoId: 'yXJA6f3p71A', start: 15, end: 60 },
+  bridgerton: { videoId: 'gpv7ayf_tyE', start: 20, end: 65 },
+  citation: { videoId: 'I_64eebjIDQ', start: 15, end: 60 },
 }

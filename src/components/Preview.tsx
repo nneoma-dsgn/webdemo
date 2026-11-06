@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { backdropSm, featured, studios, titles, trailers } from '../data/catalog'
 import { loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
 import { useMenu } from './Menu'
+import { savedToast, useSaved } from '../data/saved'
 
 /* Hover preview for poster rails (signed-in only). Resting on a poster opens one card that
    grows out of it: the trailer plays muted on top, and a frosted body tinted with the
@@ -64,7 +65,8 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
   const ready = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [muted, setMuted] = useState(true)
-  const [saved, setSaved] = useState(false)
+  const savedList = useSaved()
+  const saved = savedList.has(t.id)
   // If the trailer can't start (blocked, slow, unavailable), show the backdrop instead of a blank frame.
   const [stalled, setStalled] = useState(!clip)
 
@@ -115,7 +117,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
       role="dialog"
       aria-label={`${t.name} preview`}
     >
-      <div className={`pv__media${playing ? ' is-playing' : ''}`}>
+      <div className={`pv__media${playing ? ' is-playing' : ''}`} onClick={() => router.push(`/watch/${t.id}`)}>
         {/* Loading base: a dark blur of the art, not the thumbnail itself. */}
         <img className="pv__blur" src={backdropSm(t.id)} alt="" />
         {clip && (
@@ -161,11 +163,10 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
           </button>
           <button
             className={`pv__round${saved ? ' is-on' : ''}`}
-            aria-label={saved ? 'Saved' : 'Watch later'}
-            onClick={() => {
-              setSaved(true)
-              toast('Added to Saved for later')
-            }}
+            aria-label={saved ? 'Saved for later' : 'Watch later'}
+            aria-pressed={saved}
+            title={saved ? 'Saved for later' : 'Watch later'}
+            onClick={() => toast(savedToast(savedList.toggle(t.id)))}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               {saved ? <path d="M5 12.5l4.5 4.5L19 7.5" /> : <path d="M12 5v14M5 12h14" />}
