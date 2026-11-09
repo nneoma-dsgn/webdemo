@@ -7,7 +7,7 @@ import { idForName, isSaved, savedToast, toggleSaved } from '../data/saved'
    Open it with a title (the standard title menu) or a full spec of header + items. */
 
 export type MenuItem =
-  | { kind?: 'item'; id: string; label: string; icon?: IconName; hint?: string; danger?: boolean; onSelect?: () => void }
+  | { kind?: 'item'; id: string; label: string; icon?: IconName; hint?: string; danger?: boolean; chevron?: boolean; onSelect?: () => void }
   | { kind: 'separator'; id: string }
 
 export type MenuSpec = { label: string; header?: ReactNode; items: MenuItem[] }
@@ -18,7 +18,7 @@ type Ctx = { open: (anchor: Anchor, menu: string | MenuSpec) => void; close: () 
 const MenuCtx = createContext<Ctx>({ open: () => {}, close: () => {}, toast: () => {} })
 export const useMenu = () => useContext(MenuCtx)
 
-const MENU_W = 248
+const MENU_W = 272
 const GAP = 8
 const EDGE = 12
 
@@ -147,6 +147,9 @@ function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) 
   }, [onClose, placed])
 
   const { spec } = placed
+  // Ticks sit at the right end of a row; only other icons get a column on the left.
+  const hasIcons = spec.items.some((it) => it.kind !== 'separator' && it.icon && it.icon !== 'check')
+
   return (
     <div ref={ref} className="dd" role="menu" aria-label={spec.label} style={{ left: placed.x, top: pos.y, width: MENU_W, transformOrigin: pos.origin }}>
       {spec.header && <div className="dd__header">{spec.header}</div>}
@@ -163,11 +166,24 @@ function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) 
               it.onSelect?.()
             }}
           >
-            <span className="dd__icon" aria-hidden>
-              {it.icon && <Icon name={it.icon} />}
-            </span>
+            {/* The icon column only exists when some row in this menu has an icon (keeps ticks aligned). */}
+            {hasIcons && (
+              <span className="dd__icon" aria-hidden>
+                {it.icon && it.icon !== 'check' && <Icon name={it.icon} />}
+              </span>
+            )}
             <span className="dd__label">{it.label}</span>
             {it.hint && <span className="dd__hint">{it.hint}</span>}
+            {it.icon === 'check' && (
+              <span className="dd__icon dd__tick" aria-hidden>
+                <Icon name="check" />
+              </span>
+            )}
+            {it.chevron && (
+              <svg className="dd__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            )}
           </button>
         ),
       )}

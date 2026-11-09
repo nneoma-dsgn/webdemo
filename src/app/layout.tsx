@@ -5,6 +5,7 @@ import '@/styles/tokens.css'
 import '@/styles/app.css'
 import '@/styles/login.css'
 import { MenuProvider } from '@/components/Menu'
+import { MiniPlayer } from '@/components/MiniPlayer'
 
 export const metadata: Metadata = {
   title: 'Circo',
@@ -31,7 +32,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <Script src="https://www.youtube.com/iframe_api" strategy="afterInteractive" />
-        <MenuProvider>{children}</MenuProvider>
+        <MenuProvider>
+          {children}
+          <MiniPlayer />
+        </MenuProvider>
       </body>
     </html>
   )

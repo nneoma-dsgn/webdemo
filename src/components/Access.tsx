@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { naira, plans, titles, type Studio, type Title } from '../data/catalog'
+import { ALWAYS, HICCUPS, naira, roll, plans, titles, type Studio, type Title } from '../data/catalog'
 import { spend, topUp, useViewing } from '../data/viewing'
 import { primeSound } from './unlockSound'
 
@@ -44,7 +44,9 @@ export function Access({ t, studio, expired, onReplay, onPlay }: { t: Title; stu
   const [failure, setFailure] = useState<Failure | null>(null)
   const timers = useRef<number[]>([])
   const attempts = useRef(0)
-  const simulate = useSearchParams().get('pay')
+  const payFlag = useSearchParams().get('pay')
+  // A URL flag, or now and then a natural failure: mostly declined, sometimes a timeout.
+  const [simulate] = useState(() => payFlag ?? ALWAYS[t.id]?.pay ?? (roll(HICCUPS.payFail) ? (roll(0.7) ? 'declined' : 'timeout') : null))
 
   const clear = () => {
     timers.current.forEach((x) => window.clearTimeout(x))
@@ -158,7 +160,7 @@ export function Access({ t, studio, expired, onReplay, onPlay }: { t: Title; stu
           </svg>
           <span>
             <strong>Balance</strong>
-            <small className={short ? 'is-short' : ''}>{short ? `${naira(balance)} · ${naira(short)} short` : `${naira(balance)} available`}</small>
+            <small className={short ? 'is-short' : ''}>{short ? `${naira(balance)} · Load ${naira(short)}` : `${naira(balance)} available`}</small>
           </span>
         </button>
         <button role="radio" aria-checked={method === 'card'} className={method === 'card' ? 'is-on' : ''} disabled={busy} onClick={() => setMethod('card')}>

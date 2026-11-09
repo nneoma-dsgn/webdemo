@@ -5,8 +5,8 @@ import { studios, type Title } from '../data/catalog'
 import { useReminders } from '../data/reminders'
 import { useMenu } from './Menu'
 
-/* Where a coming-soon trailer ends: a premiere card built to make you want it. Sharp artwork
-   with a slow push-in, a live countdown, how many people are waiting, and one red Remind me. */
+/* Where a coming-soon trailer ends, styled like a trailer's own end card: the scene behind, key
+   art on one side, the title and a boxed release date on the other, then Remind me. */
 
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
 const PREMIERE_HOUR = 19 // evening premiere, local time
@@ -33,7 +33,6 @@ function useNow() {
   return now
 }
 
-const pad = (n: number) => String(n).padStart(2, '0')
 // Stable per title, so the count doesn't jump between visits.
 const waitingFor = (id: string) => 200 + ([...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % 9000)
 
@@ -44,12 +43,6 @@ export function ComingSoon({ t, when, onReplay }: { t: Title; when: string; onRe
   const now = useNow()
   const date = premiere(when)
   const left = date ? Math.max(0, date.getTime() - now) : 0
-  const parts = [
-    { v: Math.floor(left / 864e5), l: 'Days' },
-    { v: Math.floor(left / 36e5) % 24, l: 'Hours' },
-    { v: Math.floor(left / 6e4) % 60, l: 'Mins' },
-    { v: Math.floor(left / 1e3) % 60, l: 'Secs' },
-  ]
   const waiting = waitingFor(t.id) + (on ? 1 : 0)
   const studio = studios[t.studioId]
   const day = date?.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -59,31 +52,39 @@ export function ComingSoon({ t, when, onReplay }: { t: Title; when: string; onRe
       <img className="soon__bg" src={t.still} alt="" />
       <i className="soon__shade" aria-hidden />
 
+      {/* Laid out like a trailer's end card: key art on one side, title and date on the other. */}
       <div className="soon__body">
+        <div className="soon__art" aria-hidden>
+          {/* The poster's own colours, blurred behind it as a glow. */}
+          <img className="soon__glow" src={t.poster} alt="" />
+          <div className="soon__card">
+            <img src={t.poster} alt="" />
+          </div>
+        </div>
+
         <div className="soon__copy">
-          <span className="soon__tag">
-            <i aria-hidden />
-            {date ? `Coming ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}` : when}
-          </span>
           <h2 className="soon__title">{t.name}</h2>
           <p className="soon__meta">
             <span>{t.kind === 'series' ? 'Series' : 'Show'}</span>
             {studio && <span>{studio.name}</span>}
           </p>
-          <p className="soon__blurb">{t.blurb}</p>
 
-          {date && (
-            <div className="soon__countdown" aria-label={`Premieres ${day} at 7pm`}>
-              <span className="soon__label">Premieres in</span>
-              <div className="soon__clock">
-                {parts.map((p) => (
-                  <span key={p.l} className="soon__unit">
-                    <strong>{pad(p.v)}</strong>
-                    <small>{p.l}</small>
-                  </span>
-                ))}
-              </div>
+          {date ? (
+            <div className="soon__date" aria-label={`Premieres ${day} at 7pm`}>
+              <span className="soon__cal" aria-hidden>
+                <span>{date.toLocaleDateString('en-GB', { month: 'short' })}</span>
+                <strong>{date.getDate()}</strong>
+              </span>
+              <span className="soon__when">
+                <strong>Premieres {date.toLocaleDateString('en-GB', { weekday: 'long' })}</strong>
+                <span>
+                  {date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })} · 7pm ·{' '}
+                  {left < 864e5 ? 'tonight' : `in ${Math.ceil(left / 864e5)} day${Math.ceil(left / 864e5) === 1 ? '' : 's'}`}
+                </span>
+              </span>
             </div>
+          ) : (
+            <p className="soon__open">{when}</p>
           )}
 
           <div className="soon__actions">
@@ -125,7 +126,7 @@ export function ComingSoon({ t, when, onReplay }: { t: Title; when: string; onRe
             <p className="soon__waiting">
               {on ? (
                 <span>
-                  <strong>You</strong> and {(waiting - 1).toLocaleString('en-NG')} others are waiting{day ? `. See you ${day}, 7pm.` : '.'}
+                  <strong>You</strong> and {(waiting - 1).toLocaleString('en-NG')} others are waiting
                 </span>
               ) : (
                 <span>
@@ -134,10 +135,6 @@ export function ComingSoon({ t, when, onReplay }: { t: Title; when: string; onRe
               )}
             </p>
           )}
-        </div>
-
-        <div className="soon__poster" aria-hidden>
-          <img src={t.poster} alt="" />
         </div>
       </div>
     </div>

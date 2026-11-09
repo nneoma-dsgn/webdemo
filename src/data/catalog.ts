@@ -77,7 +77,51 @@ const seeds: Seed[] = [
   ['lastofus', 'The Last of Us', 'series', 2023, '18+', 'Drama', 'intl', 'wb', 'A smuggler escorts a teenage girl across a ruined America.'],
   ['bridgerton', 'Bridgerton', 'series', 2020, '16+', 'Romance', 'intl', 'velvet', 'Love and scandal among the high society of Regency London.'],
   ['oppenheimer', 'Oppenheimer', 'show', 2023, '16+', 'Drama', 'intl', 'velvet', 'The physicist behind the atomic bomb and the cost of his work.'],
+  // More Nollywood
+  ['blackbook', 'The Black Book', 'show', 2023, '16+', 'Thriller', 'ng', 'velvet', 'A deacon takes on a corrupt gang to clear his murdered son’s name.'],
+  ['mamiwata', 'Mami Wata', 'show', 2023, '16+', 'Fantasy', 'ng', 'velvet', 'A village’s faith in its water goddess is shaken when a stranger washes ashore.'],
+  ['ijogbon', 'Ìjọ̀gbọ̀n', 'show', 2023, '13+', 'Adventure', 'ng', 'velvet', 'Four teenagers find a stash of diamonds and trouble follows them home.'],
+  ['gidiblues', 'Gidi Blues', 'show', 2016, '13+', 'Romance', 'ng', 'velvet', 'A Lagos playboy falls for a woman who wants nothing to do with his world.'],
+  ['farfromhome', 'Far From Home', 'series', 2022, '16+', 'Drama', 'ng', 'velvet', 'A struggling teen wins a scholarship to an elite school and starts living a lie.'],
+  ['smartmoney', 'The Smart Money Woman', 'series', 2020, '16+', 'Comedy', 'ng', 'velvet', 'Five friends in Lagos chase love, money and the lives they want.'],
+  // More international
+  ['barbie', 'Barbie', 'show', 2023, '13+', 'Comedy', 'intl', 'wb', 'Barbie leaves Barbieland and discovers the real world isn’t what she expected.'],
+  ['spiderverse', 'Spider-Man: Across the Spider-Verse', 'show', 2023, '13+', 'Animation', 'intl', 'wb', 'Miles Morales is thrown across the multiverse and up against every Spider-Person.'],
+  ['shogun', 'Shōgun', 'series', 2024, '18+', 'Drama', 'intl', 'velvet', 'A shipwrecked English sailor is caught in a war for power in feudal Japan.'],
+  ['strangerthings', 'Stranger Things', 'series', 2016, '16+', 'Sci-fi', 'intl', 'velvet', 'A boy vanishes and a small town uncovers secret experiments and a girl with powers.'],
+  // Sitcoms
+  ['skinnygirl', 'Skinny Girl in Transit', 'series', 2015, '13+', 'Comedy', 'ng', 'velvet', 'A radio presenter juggles her weight, her mother and her love life in Lagos.'],
+  ['theoffice', 'The Office', 'series', 2005, '13+', 'Comedy', 'intl', 'wb', 'A camera crew follows the very ordinary staff of a paper company and their boss.'],
+  ['friends', 'Friends', 'series', 1994, '13+', 'Comedy', 'intl', 'wb', 'Six friends in New York get through work, love and everything in between.'],
+  ['b99', 'Brooklyn Nine-Nine', 'series', 2013, '13+', 'Comedy', 'intl', 'velvet', 'A gifted but goofy detective meets his match in a strict new captain.'],
+  ['abbott', 'Abbott Elementary', 'series', 2021, '13+', 'Comedy', 'intl', 'velvet', 'Teachers at an underfunded Philadelphia school do their best for their kids.'],
+  ['modernfamily', 'Modern Family', 'series', 2009, '13+', 'Comedy', 'intl', 'velvet', 'Three branches of one big family, and all the mess that comes with them.'],
+  ['parksrec', 'Parks and Recreation', 'series', 2009, '13+', 'Comedy', 'intl', 'velvet', 'An endlessly upbeat official tries to turn a pit into a park in small-town Indiana.'],
+  ['freshprince', 'The Fresh Prince of Bel-Air', 'series', 1990, '13+', 'Comedy', 'intl', 'wb', 'A street-smart teen from Philadelphia moves in with his rich relatives in Bel-Air.'],
 ]
+
+/* Access and price for titles that need specific ones; the rest are picked from the id. Premium
+   passes cost more than the starting balance, so the top-up flow comes up. */
+const PRICING: Record<string, { access: Title['access']; passPrice?: number }> = {
+  blackbook: { access: 'public', passPrice: 22000 },
+  barbie: { access: 'public', passPrice: 25000 },
+  spiderverse: { access: 'public', passPrice: 35000 },
+  shogun: { access: 'public', passPrice: 28000 },
+  mamiwata: { access: 'public', passPrice: 4500 },
+  ijogbon: { access: 'public', passPrice: 3500 },
+  gidiblues: { access: 'public', passPrice: 2500 },
+  farfromhome: { access: 'private' },
+  smartmoney: { access: 'private' },
+  strangerthings: { access: 'private' },
+  skinnygirl: { access: 'public', passPrice: 2000 },
+  theoffice: { access: 'private' },
+  friends: { access: 'public', passPrice: 24000 },
+  b99: { access: 'public', passPrice: 3000 },
+  abbott: { access: 'public', passPrice: 3500 },
+  modernfamily: { access: 'private' },
+  parksrec: { access: 'public', passPrice: 2500 },
+  freshprince: { access: 'public', passPrice: 3000 },
+}
 
 /* Stable pseudo-random pick per id, so server and client agree. */
 const hash = (id: string) => [...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
@@ -98,8 +142,8 @@ export const titles: Record<string, Title> = Object.fromEntries(
       blurb,
       poster: poster(id),
       still: backdrop(id),
-      access: hash(id) % 2 ? 'public' : 'private',
-      passPrice: PASS_PRICES[(hash(id) >>> 3) % PASS_PRICES.length],
+      access: PRICING[id]?.access ?? (hash(id) % 2 ? 'public' : 'private'),
+      passPrice: PRICING[id]?.passPrice ?? PASS_PRICES[(hash(id) >>> 3) % PASS_PRICES.length],
     },
   ]),
 )
@@ -200,7 +244,7 @@ export const feeds: Record<'shows' | 'series', Feed> = {
       { id: 'anikulapo', videoId: 'rXIKrHPaB-o', start: 25, end: 60 },
       { id: 'dune', videoId: 'U2Qp5pL3ovA', start: 40, end: 75 },
     ],
-    mustSee: ['tribe', 'anikulapo', 'dune', 'gangs', 'oppenheimer', 'jagun', 'lionheart', 'wedding'],
+    mustSee: ['blackbook', 'tribe', 'barbie', 'anikulapo', 'spiderverse', 'dune', 'mamiwata', 'gangs', 'oppenheimer', 'ijogbon', 'lionheart', 'wedding'],
     continueWatching: [
       { id: 'tribe', accessHours: 17, progress: 0.55 },
       { id: 'dune', accessHours: 5, progress: 0.3 },
@@ -224,7 +268,7 @@ export const feeds: Record<'shows' | 'series', Feed> = {
       { id: 'severance', videoId: '_UXKlYvLGJY', start: 25, end: 60 },
       { id: 'lastofus', videoId: 'wk5vOCcASHg', start: 20, end: 55 },
     ],
-    mustSee: ['squid', 'severance', 'lastofus', 'shanty', 'bear', 'bloodsisters', 'moneyheist', 'wednesday'],
+    mustSee: ['shogun', 'squid', 'farfromhome', 'abbott', 'severance', 'strangerthings', 'skinnygirl', 'lastofus', 'smartmoney', 'shanty', 'bear', 'theoffice', 'bloodsisters', 'moneyheist', 'wednesday'],
     continueWatching: [
       { id: 'silo', accessHours: 72, progress: 0.6, ep: 'S1 · E4' },
       { id: 'bloodsisters', accessHours: 11, progress: 0.3, ep: 'EP 2' },
@@ -232,7 +276,7 @@ export const feeds: Record<'shows' | 'series', Feed> = {
       { id: 'shanty', accessHours: 144, progress: 0.15, ep: 'EP 5' },
       { id: 'moneyheist', accessHours: 21, progress: 0.45, ep: 'S3 · E1' },
     ],
-    middle: { id: 'binge', title: 'Binge-worthy', items: ['moneyheist', 'bridgerton', 'lastofus', 'shanty', 'severance', 'bloodsisters', 'squid'] },
+    middle: { id: 'binge', title: 'Binge-worthy', items: ['strangerthings', 'friends', 'moneyheist', 'shogun', 'b99', 'bridgerton', 'farfromhome', 'modernfamily', 'lastofus', 'parksrec', 'shanty', 'severance', 'freshprince', 'bloodsisters', 'squid'] },
     coming: [
       { id: 'wednesday', when: 'More episodes soon' },
       { id: 'bridgerton', when: 'Coming 2 December' },
@@ -263,8 +307,71 @@ export const episodes: Record<string, Episode[]> = {
   ],
 }
 
-/* What plays once a title is unlocked, so it never looks like the teaser. Blender Studio's open
-   movies stand in for the real films in the prototype; each title (and episode) gets one. */
+/* Audio and subtitle languages. The original language comes first; dubs and subtitles vary by
+   title (picked from the id, so each title keeps the same set). */
+const ORIGINAL: Record<string, string> = { anikulapo: 'Yoruba', jagun: 'Yoruba', ijogbon: 'Yoruba', funmilayo: 'Yoruba', squid: 'Korean', moneyheist: 'Spanish', shogun: 'Japanese' }
+const NG_DUBS = ['English', 'Pidgin', 'Hausa', 'Igbo', 'Yoruba']
+const INTL_DUBS = ['English', 'French', 'Pidgin']
+const SUB_LANGS = ['English', 'Yoruba', 'Igbo', 'Hausa', 'Pidgin', 'French']
+const pick = (id: string, list: string[], n: number) => {
+  const h = [...id].reduce((a, c) => (a * 33 + c.charCodeAt(0)) >>> 0, 5)
+  return list.filter((_, i) => (h >> i) & 1).slice(0, n)
+}
+export function languagesFor(t: Title) {
+  const original = ORIGINAL[t.id] ?? 'English'
+  const dubs = pick(t.id, t.origin === 'ng' ? NG_DUBS : INTL_DUBS, 3).filter((l) => l !== original)
+  if (original !== 'English' && !dubs.includes('English')) dubs.unshift('English')
+  const subs = ['English', ...pick(t.id + 's', SUB_LANGS.slice(1), 3)]
+  return { audio: [original, ...dubs], original, subtitles: subs }
+}
+
+/* Real-world hiccups, rolled fresh on every visit so the player's error states turn up
+   naturally (the ?fail=, ?pay=, ?autoplay=off and ?slow=1 flags still force one). */
+export const HICCUPS = { loadFail: 0.1, autoplayBlocked: 0.1, slow: 0.15, payFail: 0.2 }
+export const roll = (chance: number) => Math.random() < chance
+
+/* Test titles that misbehave on every visit, for quick checks. A load failure only hits the
+   first try, so Retry moves on to the next issue; a payment failure only hits the first charge. */
+export type Hiccups = { load?: 'load' | 'timeout'; autoplay?: boolean; slow?: boolean; pay?: 'declined' | 'timeout' }
+export const ALWAYS: Record<string, Hiccups> = {
+  gidiblues: { load: 'load', autoplay: true, slow: true, pay: 'declined' },
+  parksrec: { load: 'timeout', autoplay: true, slow: true, pay: 'timeout' },
+  mamiwata: { load: 'timeout' },
+  theoffice: { autoplay: true },
+  smartmoney: { slow: true },
+  barbie: { pay: 'declined' },
+  friends: { pay: 'timeout' },
+}
+
+/* What plays once a title is unlocked: another real video of the same title (a scene or clip,
+   never its trailer), so it's clearly not the teaser. Titles without one fall back to a sample. */
+export const films: Record<string, string> = {
+  kob: 'vo0K0fl__Zc',
+  jagun: 'gHU_u8wQkOc',
+  shanty: 'dIDZNFD199s',
+  breath: 'DifiD3gD7Vw',
+  silo: '2HWLe6TMzvI',
+  dune: 'BEO2D_hhXDs',
+  severance: '2RAE3bC1RZY',
+  lastofus: 'j8psSy34-c0',
+  oppenheimer: 'tK0IDmSYYGk',
+  gidiblues: '85rvGcGZamY',
+  barbie: 'CBqlDWHkdHk',
+  spiderverse: '-rnS2GG0zpg',
+  shogun: 'ClmWZX28ARg',
+  strangerthings: 'w323iXW02G4',
+  skinnygirl: 'cMJVwMa_aSE',
+  theoffice: '6clWCvx63Ao',
+  friends: 'Lhpu3GdlV3w',
+  b99: 'HlBYdiXdUa8',
+  abbott: 'RJgndIsVg-M',
+  modernfamily: 'yaSBXuwEZJE',
+  parksrec: 'IDJ2ic5u770',
+  freshprince: 'Snj9NS3tfVM',
+}
+
+/* Sample films for titles without a clip of their own: Blender Studio's open movies, one per
+   title (and episode). The player labels these "Sample film". */
 const FEATURES = ['eRsGyueVLvQ', 'R6MlUcmOul8', 'aqz-KE-bpKQ', 'Y-rmzh0PI3c', 'WhWc3b3KhnY', 'mN0zPOpADL4', 'TLkA0RELQ1g', 'UXqq0ZvbOnk', 'PVGeM40dABA']
 export const featureFor = (id: string, ep = 1) => FEATURES[([...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) + ep - 1) % FEATURES.length]
 
@@ -293,4 +400,22 @@ export const trailers: Record<string, { videoId: string; start: number; end: num
   breath: { videoId: 'yXJA6f3p71A', start: 15, end: 60 },
   bridgerton: { videoId: 'gpv7ayf_tyE', start: 20, end: 65 },
   citation: { videoId: 'I_64eebjIDQ', start: 15, end: 60 },
+  blackbook: { videoId: '6PPH4SOm9gk', start: 15, end: 60 },
+  mamiwata: { videoId: 'FPWBaKBYUfw', start: 15, end: 60 },
+  ijogbon: { videoId: 'ocOjEtqq_Nw', start: 15, end: 60 },
+  gidiblues: { videoId: 'Rk7wLD3vt-Q', start: 15, end: 60 },
+  farfromhome: { videoId: 'JtrA9DELEhA', start: 15, end: 60 },
+  smartmoney: { videoId: 'oPAxVbqh8cI', start: 15, end: 60 },
+  barbie: { videoId: 'pBk4NYhWNMM', start: 20, end: 65 },
+  spiderverse: { videoId: 'cqGjhVJWtEg', start: 20, end: 65 },
+  shogun: { videoId: 'yAN5uspO_hk', start: 20, end: 65 },
+  strangerthings: { videoId: 'b9EkMc79ZSU', start: 20, end: 65 },
+  skinnygirl: { videoId: 'N7vBDpLAdgU', start: 10, end: 55 },
+  theoffice: { videoId: '-DveSNTYbXU', start: 10, end: 55 },
+  friends: { videoId: 'Zg2LCD5QOJs', start: 10, end: 55 },
+  b99: { videoId: 'sEOuJ4z5aTc', start: 10, end: 55 },
+  abbott: { videoId: 'l4lP8roLz3I', start: 5, end: 30 },
+  modernfamily: { videoId: 'Ub_lfN2VMIo', start: 10, end: 55 },
+  parksrec: { videoId: '5IZWeAwdJ-s', start: 10, end: 55 },
+  freshprince: { videoId: '_u6vYpbfCmQ', start: 10, end: 55 },
 }

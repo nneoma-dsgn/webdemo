@@ -8,6 +8,8 @@ import { useEffect, useRef, useState } from 'react'
 
 export type YTPlayer = {
   unloadModule?: (m: string) => void
+  loadModule?: (m: string) => void
+  setOption?: (module: string, option: string, value: unknown) => void
   loadVideoById: (o: { videoId: string; startSeconds?: number; endSeconds?: number }) => void
   getCurrentTime: () => number
   getDuration?: () => number
@@ -21,6 +23,9 @@ export type YTPlayer = {
   pauseVideo: () => void
   destroy: () => void
 }
+/* YouTube only adds the player's methods once it's ready; before that a call throws. */
+export const timeOf = (p: YTPlayer | null | undefined) => (p && typeof p.getCurrentTime === 'function' ? p.getCurrentTime() : null)
+
 declare global {
   interface Window {
     YT?: { Player: new (el: HTMLElement, opts: object) => YTPlayer; PlayerState: { PLAYING: number; ENDED: number; PAUSED: number; BUFFERING: number } }

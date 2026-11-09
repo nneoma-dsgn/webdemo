@@ -16,6 +16,8 @@ const PreviewCtx = createContext<Ctx | null>(null)
 export const usePreview = () => useContext(PreviewCtx)
 
 const OPEN_DELAY_MS = 450
+// While the page is scrolling, posters sliding under the cursor shouldn't open previews.
+const SCROLL_SETTLE_MS = 250
 // `shown` flips after the delay; the card mounts hidden right away so the trailer starts loading early.
 type Open = { id: string; x: number; y: number; w: number; ox: number; oy: number; shown: boolean }
 
@@ -23,9 +25,18 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<Open | null>(null)
   const openT = useRef(0)
   const closeT = useRef(0)
+  const lastScroll = useRef(0)
+  const settleT = useRef(0)
+  const pending = useRef<{ id: string; el: HTMLElement } | null>(null)
 
   const hover = useCallback((id: string, el: HTMLElement) => {
     if (window.matchMedia('(hover: none)').matches) return
+    // Mid-scroll: remember the poster and open once scrolling settles (if still on it).
+    if (Date.now() - lastScroll.current < SCROLL_SETTLE_MS) {
+      pending.current = { id, el }
+      return
+    }
+    pending.current = null
     window.clearTimeout(closeT.current)
     window.clearTimeout(openT.current)
     {
@@ -41,10 +52,32 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const leave = useCallback(() => {
+    pending.current = null
     window.clearTimeout(openT.current)
     window.clearTimeout(closeT.current)
     closeT.current = window.setTimeout(() => setOpen(null), 140)
   }, [])
+
+  // Scrolling (page or a rail) closes any preview and holds new ones until it stops.
+  useEffect(() => {
+    const onScroll = () => {
+      lastScroll.current = Date.now()
+      window.clearTimeout(openT.current)
+      setOpen(null)
+      window.clearTimeout(settleT.current)
+      settleT.current = window.setTimeout(() => {
+        const p = pending.current
+        if (p && p.el.isConnected && p.el.matches(':hover')) hover(p.id, p.el)
+      }, SCROLL_SETTLE_MS)
+    }
+    window.addEventListener('wheel', onScroll, { passive: true })
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true })
+    return () => {
+      window.removeEventListener('wheel', onScroll)
+      window.removeEventListener('scroll', onScroll, { capture: true })
+      window.clearTimeout(settleT.current)
+    }
+  }, [hover])
 
   return (
     <PreviewCtx.Provider value={{ hover, leave }}>

@@ -9,14 +9,16 @@ import { plans, type Title } from './catalog'
 export type Progress = { ep?: string; t: number; d: number; at: number }
 type Pass = { startedAt: number | null } // the 24 hours start on first play
 type Sub = { plan: string; until: number }
-type State = { progress: Record<string, Progress>; passes: Record<string, Pass>; subs: Record<string, Sub>; balance: number }
+export type Quality = 'auto' | '480' | '720' | '1080'
+type State = { progress: Record<string, Progress>; passes: Record<string, Pass>; subs: Record<string, Sub>; balance: number; quality: Quality; audioLang: string | null; subLang: string | null }
 
 const KEY = 'circo:viewing'
 export const PASS_MS = 24 * 3600 * 1000
 const PLAN_MS: Record<string, number> = { week: 7 * 864e5, month: 30 * 864e5, year: 365 * 864e5 }
 
 // Starting balance until accounts are real.
-const EMPTY: State = { progress: {}, passes: {}, subs: {}, balance: 20000 }
+// audioLang null = the title's original; subLang null = subtitles off.
+const EMPTY: State = { progress: {}, passes: {}, subs: {}, balance: 20000, quality: 'auto', audioLang: null, subLang: null }
 let state: State = EMPTY
 let loaded = false
 const listeners = new Set<() => void>()
@@ -134,5 +136,21 @@ export function topUp(amount: number) {
 
 export function spend(amount: number) {
   set((s) => ({ ...s, balance: Math.max(0, s.balance - amount) }))
+}
+
+/* --- Playback quality (480p is Data saver) --- */
+
+export function setQuality(q: Quality) {
+  set((s) => ({ ...s, quality: q }))
+}
+
+/* --- Language preferences, applied to any title that offers them --- */
+
+export function setAudioLang(l: string | null) {
+  set((s) => ({ ...s, audioLang: l }))
+}
+
+export function setSubLang(l: string | null) {
+  set((s) => ({ ...s, subLang: l }))
 }
 
