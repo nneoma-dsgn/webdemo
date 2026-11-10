@@ -6395,14 +6395,14 @@ a.result:hover .result__title,
   background: var(--bg-200);
 }
 
-.epcard__art img {
+.epcard__art > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.4s var(--ease);
 }
 
-.epcard:hover .epcard__art img {
+.epcard:hover .epcard__art > img {
   transform: scale(1.04);
 }
 
@@ -6454,77 +6454,8 @@ a.result:hover .result__title,
   }
 }
 
-.clipplayer {
-  min-height: 100vh;
-  padding: 0 var(--gutter) 80px;
-  background: var(--bg-primary);
-}
 
-.clipplayer__bar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  height: 80px;
-}
-
-.clipplayer__head {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.clipplayer__head strong {
-  font-size: var(--fs-h3);
-  font-weight: var(--fw-semibold);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.clipplayer__head span {
-  font-size: var(--fs-body-sm);
-  color: var(--text-200, rgba(255, 255, 255, 0.7));
-}
-
-.clipplayer__frame {
-  position: relative;
-  max-width: 1280px;
-  margin: 0 auto;
-  aspect-ratio: 16 / 9;
-  border-radius: 16px;
-  overflow: hidden;
-  background: #000 center / cover;
-}
-
-.clipplayer__frame iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-.clipplayer__next {
-  max-width: 1280px;
-  margin: 40px auto 0;
-}
-
-.clipplayer__next .shelf__title a {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.clipplayer__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(220px, 20vw, 300px), 1fr));
-  gap: var(--space-6) var(--space-3);
-  margin-top: var(--space-4);
-}
-
-@media (max-width: 767px) {
-  .clipplayer__frame {
-    margin: 0 calc(var(--gutter) * -1);
-    border-radius: 0;
-  }
+/* Saved episodes sit under saved titles on the Saved for later page. */
+.grid + .lib-saved-eps {
+  margin-top: var(--space-10);
 }

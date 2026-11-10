@@ -115,6 +115,7 @@ export function joinStudio(studioId: string, plan: string) {
 /* Time left on whatever unlocks this title, in ms. null: no access. Infinity: pass bought but
    not started yet (the clock starts on play). */
 export function accessLeft(s: State, t: Title, now = Date.now()): number | null {
+  if (t.access === 'free') return Infinity
   const sub = s.subs[t.studioId]
   if (sub && sub.until > now) return sub.until - now
   const pass = s.passes[t.id]

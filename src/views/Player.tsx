@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { exploreEpisodes, exploreTitle } from '../data/explore'
 import { ALWAYS, films, upcoming, languagesFor, HICCUPS, roll, episodes, episodeThumb, featureFor, naira, studios, titles, trailers, type Title } from '../data/catalog'
 import { accessLeft, setAudioLang, setQuality, setSubLang, type Quality, buyPass, extendPass, fakePassLeft, getProgress, joinStudio, saveProgress, clearProgress, startPass, useClock, useViewing } from '../data/viewing'
 import { Access } from '../components/Access'
@@ -67,9 +68,10 @@ function PlayerView() {
   const search = useSearchParams()
   const router = useRouter()
   const { open, toast } = useMenu()
-  const t = titles[params?.id ?? ''] ?? titles.kob
+  // Explore's shows (podcasts, masterclasses and the rest) play here too, as free series.
+  const t = titles[params?.id ?? ''] ?? exploreTitle(params?.id ?? '') ?? titles.kob
   // Series with real episodes play each episode's own clip; everything else plays its trailer.
-  const eps = episodes[t.id]
+  const eps = episodes[t.id] ?? exploreEpisodes(t.id)
   // Where this title was left off (read once; the player remounts per title and episode).
   const [saved0] = useState(() => getProgress(t.id))
   const ep = search.get('ep') ?? saved0?.ep ?? null

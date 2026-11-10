@@ -19,8 +19,9 @@ export type Title = {
   studioId: string
   year: number
   rating: string
-  /* Public studios sell a pass per title; private studios sell a subscription. */
-  access: 'public' | 'private'
+  /* Public studios sell a pass per title; private studios sell a subscription. Explore's
+     masterclasses, podcasts and the rest are free. */
+  access: 'public' | 'private' | 'free'
   passPrice: number // naira, public titles only
 }
 

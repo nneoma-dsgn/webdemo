@@ -6,6 +6,7 @@ import { ButtonLink, EmptyState } from '../components/ui'
 import { StudioTile } from '../components/Cards'
 import { BackButton } from '../components/Nav'
 import { PosterTile, leftLabel, useLibrary } from './Library'
+import { EpisodeCard } from './Explore'
 
 /* "See all" behind each Library row (Figma WALLET): the full grid of purchases or saved
    titles, or every studio you've joined. Empty sections get the Library empty state. */
@@ -21,9 +22,9 @@ type Section = keyof typeof SECTIONS
 export default function LibraryAll() {
   const params = useParams<{ section: string }>()
   const section: Section = params?.section && params.section in SECTIONS ? (params.section as Section) : 'purchases'
-  const { now, purchases, savedTitles, joined } = useLibrary()
+  const { now, purchases, savedTitles, savedEpisodes, joined } = useLibrary()
 
-  const count = section === 'purchases' ? purchases.length : section === 'saved' ? savedTitles.length : joined.length
+  const count = section === 'purchases' ? purchases.length : section === 'saved' ? savedTitles.length + savedEpisodes.length : joined.length
 
   return (
     <div className="page page--padded">
@@ -67,12 +68,29 @@ export default function LibraryAll() {
             <StudioTile key={id} s={studios[id]} detail={`${leftLabel(sub.until - now)} left`} tone="warning" />
           ))}
         </div>
-      ) : (
+      ) : section === 'purchases' ? (
         <div className="grid">
-          {section === 'purchases'
-            ? purchases.map((p) => <PosterTile key={p.t.id} t={p.t} tag={leftLabel(p.ms)} />)
-            : savedTitles.map((t) => <PosterTile key={t.id} t={t} />)}
+          {purchases.map((p) => (
+            <PosterTile key={p.t.id} t={p.t} tag={leftLabel(p.ms)} />
+          ))}
         </div>
+      ) : (
+        <>
+          {savedTitles.length > 0 && (
+            <div className="grid">
+              {savedTitles.map((t) => (
+                <PosterTile key={t.id} t={t} />
+              ))}
+            </div>
+          )}
+          {savedEpisodes.length > 0 && (
+            <div className="episodes__grid lib-saved-eps">
+              {savedEpisodes.map((e) => (
+                <EpisodeCard key={e.clip.id} ep={e} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

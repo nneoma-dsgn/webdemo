@@ -10,6 +10,8 @@ import { useSaved } from '../data/saved'
 import { Shelf } from '../components/Shelf'
 import { StudioTile } from '../components/Cards'
 import { useMenu } from '../components/Menu'
+import { allEpisodes } from '../data/explore'
+import { EpisodeCard } from './Explore'
 
 /* Library (Figma "WALLET"): your balance up top, then what you've paid for, what you've saved,
    and the studios you've joined. Downloads are app-only, so the web leaves that row out. */
@@ -48,12 +50,13 @@ export function useLibrary() {
     .filter((p): p is { t: Title; ms: number } => p.ms !== null && p.ms > 0)
     .sort((a, b) => a.ms - b.ms)
   const savedTitles = Object.values(titles).filter((t) => saved.has(t.id))
+  const savedEpisodes = allEpisodes().filter((e) => saved.has(e.clip.id))
   const joined = Object.entries(viewing.subs).filter(([id, s]) => s.until > now && studios[id])
-  return { viewing, now, purchases, savedTitles, joined }
+  return { viewing, now, purchases, savedTitles, savedEpisodes, joined }
 }
 
 export default function Library() {
-  const { viewing, now, purchases, savedTitles, joined } = useLibrary()
+  const { viewing, now, purchases, savedTitles, savedEpisodes, joined } = useLibrary()
   const { toast } = useMenu()
 
   // Three balance header looks to compare: ?look=a (card), b (title + pill), c (wallet + stats).
@@ -98,6 +101,12 @@ export default function Library() {
         <Shelf title="Saved for later" to="/library/saved">
           {savedTitles.map((t) => (
             <PosterTile key={t.id} t={t} />
+          ))}
+        </Shelf>
+
+        <Shelf title="Saved Episodes" to="/library/saved">
+          {savedEpisodes.map((e) => (
+            <EpisodeCard key={e.clip.id} ep={e} />
           ))}
         </Shelf>
 

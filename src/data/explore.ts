@@ -1,8 +1,10 @@
+import type { Episode as CatalogEpisode, Title } from './catalog'
+
 /* Explore: free videos beyond Shows and Series (masterclasses, podcasts, documentaries and
    more), played from their publishers' YouTube channels. Full-length uploads only (no clips or
    trailers), each checked as embeddable. Swap for Circo's own catalogue once the backend serves it. */
 
-export type Clip = { id: string; title: string; channel: string; se?: [season: number, episode: number] }
+export type Clip = { id: string; title: string; channel: string }
 /* A show (podcast, series or channel) and its episodes, newest first. */
 export type Show = { name: string; items: Clip[] }
 /* Spotlight: the hero carousel, like Home's. Each slide plays a stretch of its video. */
@@ -13,9 +15,9 @@ export type Category = { id: string; label: string; spotlight: Spot[]; shows: Sh
 export const clipThumb = (id: string) => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`
 export const clipThumbFallback = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
 
-const show = (name: string, channel: string, list: [id: string, title: string, se?: [number, number]][]): Show => ({
+const show = (name: string, channel: string, list: [id: string, title: string][]): Show => ({
   name,
-  items: list.map(([id, title, se]) => ({ id, title, channel, se })),
+  items: list.map(([id, title]) => ({ id, title, channel })),
 })
 const spot = (id: string, blurb: string): Spot => ({ id, blurb, start: 30, end: 75 })
 
@@ -73,9 +75,9 @@ export const categories: Category[] = [
     ],
     shows: [
       show('I Said What I Said', 'I Said What I Said Podcast', [
-        ['NR6Xzl8TeZE', 'The Influencer Playbook ft. KieKie', [7, 9]],
-        ['wamZGjv2Oww', 'What Women Face in Politics and Society in Nigeria', [7, 6]],
-        ['NNCpBcryfqs', 'What to Do When Your Friend Picks a Man Over You', [7, 5]],
+        ['NR6Xzl8TeZE', 'The Influencer Playbook ft. KieKie'],
+        ['wamZGjv2Oww', 'What Women Face in Politics and Society in Nigeria'],
+        ['NNCpBcryfqs', 'What to Do When Your Friend Picks a Man Over You'],
         ['JOj25VemZ5w', 'The Older We Get, the Thicker the Plot ft. Arike Alaso'],
         ['tMuWVSwUdHo', 'How to Build a Global Skincare Brand ft. Ifedayo Agoro'],
         ['_rzzdetu1Ws', 'The Dangerous Business of Telling the Truth ft. Fisayo Soyombo'],
@@ -92,7 +94,7 @@ export const categories: Category[] = [
         ['iwDAhq--0Fw', 'Odumeje: The Man Behind Indaboski'],
         ['3IHVNGK3dic', 'Okey Bakassi on Relationships and Success'],
         ['xOsjNrX77tg', 'What Do Men Really Want?'],
-        ['P9u8lMT7Tu8', 'Changing the Rules ft. Dr Olakunle Soriyan', [5, 9]],
+        ['P9u8lMT7Tu8', 'Changing the Rules ft. Dr Olakunle Soriyan'],
         ['Z5gPb8lvtNE', 'The Gospel According to Dr Abel Damina'],
       ]),
       show('The Receipts Podcast', 'The Receipts Podcast', [
@@ -175,8 +177,8 @@ export const categories: Category[] = [
         ['u6Sa7APnUGU', 'The Ultimate Marathon: All 78 Episodes'],
       ]),
       show('Who Wants to Be a Millionaire? Nigeria', 'Topnews TV Nigeria', [
-        ['MDfqysbdfNg', 'Series 2, Episode 1', [2, 1]],
-        ['dQRFcY8hFmo', 'Series 2, Episode 2', [2, 2]],
+        ['MDfqysbdfNg', 'Series 2, Episode 1'],
+        ['dQRFcY8hFmo', 'Series 2, Episode 2'],
         ['pNNC2VqB8rY', 'Aroma Ufodike, the First Millionaire Winner'],
       ]),
       show('Hot Ones', 'First We Feast', [
@@ -242,10 +244,51 @@ export const categories: Category[] = [
 
 export const category = (id: string) => categories.find((x) => x.id === id)
 
-/* One episode with its show. Season and episode come from the publisher where they number
-   them; otherwise placeholders (season 1, numbered newest first) until the backend sends them. */
-export type Episode = { clip: Clip; show: string; season: number; episode: number }
-const toEpisodes = (s: Show) => s.items.map((clip, i) => ({ clip, show: s.name, season: clip.se?.[0] ?? 1, episode: clip.se?.[1] ?? s.items.length - i }))
+/* One episode with its show. Placeholder numbering (season 1, the oldest upload as episode 1)
+   until the backend sends real seasons and episodes. */
+export type Episode = { clip: Clip; show: string; showId: string; season: number; episode: number; single: boolean }
+const toEpisodes = (s: Show) => s.items.map((clip, i) => ({ clip, show: s.name, showId: showId(s), season: 1, episode: s.items.length - i, single: s.items.length === 1 }))
+
+/* Each show plays in the same player as Shows and Series. With several uploads it's a free
+   series (episodes oldest first, Episodes panel, Next Episode); with one it plays like a film.
+   Ids are prefixed so they never clash with catalogue titles. */
+const slug = (x: string) => x.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+export const showId = (s: Show) => `x-${slug(s.name)}`
+export const watchHref = (e: Episode) => (e.single ? `/watch/${e.showId}` : `/watch/${e.showId}?ep=${encodeURIComponent(`S${e.season} · E${e.episode}`)}`)
+
+function showById(id: string) {
+  for (const cat of categories) for (const s of cat.shows) if (showId(s) === id) return { cat, show: s }
+  return null
+}
+
+export function exploreTitle(id: string): Title | undefined {
+  const f = showById(id)
+  if (!f) return undefined
+  const { cat, show } = f
+  const lead = show.items[0]
+  const blurb = cat.spotlight.find((sp) => show.items.some((c) => c.id === sp.id))?.blurb ?? `${show.name}, from ${lead.channel}.`
+  return {
+    id,
+    name: show.name,
+    kind: show.items.length > 1 ? 'series' : 'show',
+    poster: clipThumb(lead.id),
+    still: clipThumb(lead.id),
+    blurb,
+    genre: cat.label,
+    origin: 'intl',
+    studioId: `x-${slug(lead.channel)}`,
+    year: 2026,
+    rating: '13+',
+    access: 'free',
+    passPrice: 0,
+  }
+}
+
+export function exploreEpisodes(id: string): CatalogEpisode[] | undefined {
+  const f = showById(id)
+  if (!f) return undefined
+  return [...f.show.items].reverse().map((c) => ({ title: c.title, mins: MINS[c.id] ?? 30, videoId: c.id, blurb: `${c.channel}` }))
+}
 
 /* Mix shows together (one from each in turn) so a row never reads as one show's list. */
 function mix(shows: Show[]): Episode[] {
@@ -272,6 +315,12 @@ export function rowsFor(cat: Category): EpisodeRow[] {
   ]
 }
 
+/* Every episode across Explore, once each (for Saved for later). */
+export function allEpisodes(): Episode[] {
+  const seen = new Set<string>()
+  return categories.flatMap((c) => c.shows.flatMap(toEpisodes)).filter((e) => !seen.has(e.clip.id) && !!seen.add(e.clip.id))
+}
+
 /* Find a video, its category and its episode details, for the player. */
 export function findClip(id: string) {
   for (const cat of categories)
@@ -280,4 +329,112 @@ export function findClip(id: string) {
       if (ep) return { clip: ep.clip, cat, show: s, ep }
     }
   return null
+}
+
+/* Running time of each upload, in minutes. */
+const MINS: Record<string, number> = {
+  '-5MBx6Oef1o': 47,
+  '-WHJKgZxMQ4': 48,
+  '0C3kVyxZ11A': 68,
+  '0MXRz3XQmbk': 100,
+  '2Ubrg8Ri1-M': 31,
+  '3IHVNGK3dic': 171,
+  '4EvkzXMPGns': 85,
+  '4p1yZgR4F9k': 26,
+  '6OIhk5QBAS8': 27,
+  '6VTSAs4Rsck': 92,
+  '7yDSoRPnoIs': 83,
+  '9-tjY-DG5-0': 49,
+  '95ABSqRpy74': 26,
+  '9yJw-fJAsm8': 45,
+  'Ap8jTCMK3c4': 47,
+  'AwGzyL5Ia_M': 16,
+  'B-3ozJZ4zWs': 69,
+  'BHcyuzXRqLs': 20,
+  'CBYhVcO4WgI': 44,
+  'Co6Qv1aMa3U': 69,
+  'Cv9ftqQTN0Y': 25,
+  'DvSfdjOh32c': 12,
+  'GNRnrKUEnCQ': 29,
+  'GlaSnROMqRY': 83,
+  'GuF14oKon8A': 42,
+  'H4sxbmM-W_A': 30,
+  'HBVeSzs23BA': 117,
+  'InpJ0vJ8c4I': 33,
+  'JOj25VemZ5w': 158,
+  'K64_vALHLzo': 28,
+  'KCZaSSr5m6o': 9,
+  'Kn_BC0VJxoY': 9,
+  'LqMzkKPHcVM': 31,
+  'LtS4lur6unc': 10,
+  'LxO-6rlihSg': 144,
+  'M0cDGeD8bLs': 43,
+  'MDfqysbdfNg': 55,
+  'MUYOB5LosSA': 70,
+  'MnhJh3fBmgs': 95,
+  'NNCpBcryfqs': 120,
+  'NR6Xzl8TeZE': 126,
+  'No4l3ocAJl0': 106,
+  'OqyO8VbWpkA': 27,
+  'P9u8lMT7Tu8': 183,
+  'Pepol0GPW2Y': 22,
+  'Q-DFC0AnbY4': 88,
+  'QK_xf_KVNiU': 90,
+  'R1hYK7p3EkE': 94,
+  'UIJUgnykkOA': 53,
+  'UhzI1fg8rCA': 109,
+  'V8I2b1TK2EY': 83,
+  'VzyIrzdJPXM': 496,
+  'WG1aY5OOR2o': 53,
+  'WpQsP7KsGl4': 30,
+  'XIz_7A2F5u0': 68,
+  'XJIKMZpzYeM': 69,
+  'Z5gPb8lvtNE': 149,
+  'Zk6o1l6Pt9c': 63,
+  'ZplWTxVPH34': 41,
+  '_rzzdetu1Ws': 162,
+  'ab90EInQbjo': 65,
+  'c4--3q6iAa8': 25,
+  'cU-Ook_YN-A': 14,
+  'dQRFcY8hFmo': 58,
+  'eRfXcWT_oFs': 41,
+  'eRpZmhULTDk': 51,
+  'eTEdKrJ1DhI': 44,
+  'erKYH3ixfkM': 14,
+  'feiF4mTzfsU': 29,
+  'fgH-0FuwshA': 98,
+  'fiBMVkRahxQ': 47,
+  'gqFO7GvK_t0': 28,
+  'i-DS4hrdmyQ': 23,
+  'ifEJnQLaMvk': 52,
+  'ii1jcLg-eIQ': 48,
+  'iwDAhq--0Fw': 89,
+  'kaUemcqIQ-k': 113,
+  'korbMR6LobM': 6,
+  'n3l4hJS0jsc': 38,
+  'ojOdB-7Dbdg': 44,
+  'pGUhBzSgOxw': 22,
+  'pNNC2VqB8rY': 38,
+  'pO2MP_HTjrM': 46,
+  'r10g5gERB04': 220,
+  'r1Bi10Xt0fc': 52,
+  'r2HmsqLV70Y': 18,
+  'rUdsv7EXPQ4': 65,
+  'sz_LgBAGYyo': 48,
+  'tFve2KjZFvA': 89,
+  'tMuWVSwUdHo': 127,
+  'u6Sa7APnUGU': 3264,
+  'uRQAhWZ1bxs': 78,
+  'uWmxJ9_q8t4': 11,
+  'w9o0MfwB7SA': 31,
+  'wHctxljqXhE': 41,
+  'wamZGjv2Oww': 152,
+  'xA7RPI9C1IQ': 89,
+  'xOsjNrX77tg': 111,
+  'xPpsz1UDcSY': 90,
+  'xi6r3hZe5Tg': 44,
+  'ydidoWn8bn8': 59,
+  'yePLuwL3FbM': 135,
+  'yq2hHZLssL4': 47,
+  'zLb5Mq-cyOo': 25,
 }

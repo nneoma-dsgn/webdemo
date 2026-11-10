@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { notFound, useParams } from 'next/navigation'
-import { category, clipThumb, clipThumbFallback, findClip, rowsFor, type Episode } from '../data/explore'
+import { category, clipThumb, clipThumbFallback, findClip, rowsFor, watchHref, type Episode } from '../data/explore'
 import { Shelf } from '../components/Shelf'
 import { icons } from '../data/catalog'
 import { HeroVideo } from '../components/HeroVideo'
-import { ButtonLink, SegmentedControl } from '../components/ui'
+import { Button, ButtonLink, SegmentedControl } from '../components/ui'
+import { useMenu } from '../components/Menu'
+import { isSaved as isSavedNow, savedToast, toggleSaved, useSaved } from '../data/saved'
 import { useExploreTab } from '../components/Nav'
 import { PlayGlyph } from './Home'
 
@@ -18,6 +20,8 @@ export default function Explore() {
   const params = useParams<{ category: string }>()
   const cat = category(params?.category ?? '')
   const explore = useExploreTab()
+  const saved = useSaved()
+  const { toast } = useMenu()
   const [slide, setSlide] = useState(0)
   const n = cat?.spotlight.length ?? 1
   const go = (d: number) => setSlide((i) => (i + d + n) % n)
@@ -60,7 +64,9 @@ export default function Explore() {
   }
 
   if (!cat || !spot) notFound()
-  const clip = findClip(spot.id)?.clip ?? { id: spot.id, title: '', channel: '' }
+  const found = findClip(spot.id)
+  const clip = found?.clip ?? { id: spot.id, title: '', channel: '' }
+  const play = found ? watchHref(found.ep) : '/'
 
   return (
     <div className="page page--home">
@@ -77,12 +83,22 @@ export default function Explore() {
           <h1 className="hero__title">{clip.title}</h1>
           <p className="hero__blurb">{spot.blurb}</p>
           <div className="hero__actions">
-            <ButtonLink href={`/play/${spot.id}`} icon={<PlayGlyph />}>
+            <ButtonLink href={play} icon={<PlayGlyph />}>
               Watch Now
             </ButtonLink>
+            <Button variant="secondary" onClick={() => toast(savedToast(saved.toggle(spot.id)))} aria-pressed={saved.has(spot.id)}>
+              {saved.has(spot.id) ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M5 12.5l4.5 4.5L19 7.5" />
+                </svg>
+              ) : (
+                <img src={icons.plus} alt="" width={20} height={20} />
+              )}
+              {saved.has(spot.id) ? 'Saved for later' : 'Watch later'}
+            </Button>
           </div>
         </div>
-        <Link href={`/play/${spot.id}`} className="hero__play" aria-label={`Play ${clip.title}`}>
+        <Link href={play} className="hero__play" aria-label={`Play ${clip.title}`}>
           <img src={icons.play} alt="" width={20} height={20} />
         </Link>
         <div className="hero__dots" role="tablist" aria-label="Featured">
@@ -110,8 +126,37 @@ export default function Explore() {
 /* An episode: its own YouTube thumbnail, the episode name, then studio, season and episode. */
 export function EpisodeCard({ ep }: { ep: Episode }) {
   const { clip } = ep
+  const { open, toast } = useMenu()
+  // The standard card menu: Watch later (or Saved for later) and Share.
+  const menu = (anchor: HTMLElement | { x: number; y: number }) =>
+    open(anchor, {
+      label: `${clip.title} options`,
+      header: <span className="dd__title">{clip.title}</span>,
+      items: [
+        isSavedNow(clip.id)
+          ? { id: 'later', label: 'Saved for later', icon: 'check', onSelect: () => toast(savedToast(toggleSaved(clip.id))) }
+          : { id: 'later', label: 'Watch later', icon: 'bookmark', onSelect: () => toast(savedToast(toggleSaved(clip.id))) },
+        {
+          id: 'share',
+          label: 'Share',
+          icon: 'share',
+          onSelect: () => {
+            navigator.clipboard?.writeText(`${location.origin}${watchHref(ep)}`).catch(() => {})
+            toast('Link copied')
+          },
+        },
+      ],
+    })
   return (
-    <Link href={`/play/${clip.id}`} className="card epcard" aria-label={`${ep.show}, season ${ep.season} episode ${ep.episode}: ${clip.title}`}>
+    <Link
+      href={watchHref(ep)}
+      className="card epcard"
+      aria-label={`${clip.title}, ${clip.channel}, season ${ep.season} episode ${ep.episode}`}
+      onContextMenu={(e) => {
+        e.preventDefault()
+        menu({ x: e.clientX, y: e.clientY })
+      }}
+    >
       <div className="epcard__art">
         <img
           src={clipThumb(clip.id)}
@@ -126,10 +171,21 @@ export function EpisodeCard({ ep }: { ep: Episode }) {
         <span className="epcard__play" aria-hidden>
           <PlayGlyph />
         </span>
+        <button
+          className="card__more"
+          aria-label={`More options for ${clip.title}`}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            menu(e.currentTarget)
+          }}
+        >
+          <img src={icons.more} alt="" width={24} height={24} />
+        </button>
       </div>
       <strong className="epcard__title">{clip.title}</strong>
       <span className="epcard__meta">
-        {clip.channel} · S{ep.season} · E{ep.episode}
+        {ep.single ? clip.channel : `${clip.channel} · S${ep.season} · E${ep.episode}`}
       </span>
     </Link>
   )
