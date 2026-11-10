@@ -43,6 +43,9 @@ export default function Player() {
 
 /* Up Next appears near the end without credit markers: 4% of the running time before the end,
    at least 20s (short clips) and at most 6 min (films). Once it ends, a 10s countdown plays it. */
+/* Free shows opened this session: their teaser has been seen, so later episodes start directly. */
+const freeStarted = new Set<string>()
+
 const upNextAt = (duration: number) => Math.min(360, Math.max(20, duration * 0.04))
 const COUNTDOWN_S = 10
 // No player after this long counts as a failed load.
@@ -115,8 +118,12 @@ function PlayerView() {
   const viewing = useViewing()
   const now = useClock(1000)
   const accessMs = accessLeft(viewing, t, now)
+  // Free titles (Explore) follow the same path: teaser first, then Watch Now unlocks them for the
+  // visit (and the show's next episodes, so Next Episode doesn't replay a teaser).
+  const free = t.access === 'free'
+  const [freeGo, setFreeGo] = useState(() => freeStarted.has(t.id))
   // Not out yet: nothing unlocks it, not even a studio subscription. Teaser, then the coming-soon card.
-  const unlocked = !soon && accessMs !== null && accessMs > 0
+  const unlocked = !soon && (free ? freeGo : accessMs !== null && accessMs > 0)
   /* Teaser until you have access; then the title itself (an episode's own clip, or the film).
      Sticky for this visit, so a pass running out mid-film doesn't swap the video. */
   /* With access you get the title itself, never its trailer: an episode's clip, else the title's
@@ -129,7 +136,7 @@ function PlayerView() {
   // films only cover titles with no video at all).
   const clip = featureMode
     ? { videoId: epClip?.videoId ?? films[t.id] ?? featureFor(t.id, epNo), start: 0, end: 0 }
-    : (trailers[t.id] ?? (epClip ? { videoId: epClip.videoId, start: 0, end: 0 } : undefined))
+    : (trailers[t.id] ?? (epClip ? (free ? { videoId: epClip.videoId, start: 30, end: 75 } : { videoId: epClip.videoId, start: 0, end: 0 }) : undefined))
   const isPassAccess = unlocked && !viewing.subs[t.studioId]
   const passExpired = accessMs === 0
   // Prototype: ?passLeft=5m (or 90s, 2h) fakes a pass that is about to run out.
@@ -784,7 +791,10 @@ function PlayerView() {
             studio={studio}
             expired={passExpired}
             onPlay={(plan) => {
-              if (plan) joinStudio(t.studioId, plan)
+              if (free) {
+                freeStarted.add(t.id)
+                setFreeGo(true)
+              } else if (plan) joinStudio(t.studioId, plan)
               else buyPass(t.id)
               setPaidHere(true)
               paidRef.current = true
