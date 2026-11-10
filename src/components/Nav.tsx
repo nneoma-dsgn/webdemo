@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { getSession, signOut } from '../auth'
+import { signOut } from '../auth'
 import { icons } from '../data/catalog'
 import { categories, category } from '../data/explore'
 import { useMenu } from './Menu'
@@ -145,15 +145,8 @@ function AccountMenu() {
   const { open, toast } = useMenu()
 
   const show = (el: HTMLElement) => {
-    const name = getSession()?.name ?? getSession()?.username ?? 'you'
     open(el, {
       label: 'Account',
-      header: (
-        <div className="dd__user">
-          <img src={icons.avatar} alt="" />
-          <strong>{name}</strong>
-        </div>
-      ),
       items: [
         { id: 'account', label: 'Account', icon: 'user', onSelect: () => router.push('/account') },
         { id: 'library', label: 'Library', icon: 'library', onSelect: () => router.push('/library') },

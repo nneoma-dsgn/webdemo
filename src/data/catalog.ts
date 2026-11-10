@@ -1,4 +1,5 @@
 import type { TheaterItem } from '../components/Theater'
+import { exploreStudios } from './explore'
 
 const a = (file: string) => `/assets/${file}`
 /* Preview artwork from TMDB (posters w500, backdrops w1280). Placeholder for the real catalogue. */
@@ -130,6 +131,9 @@ export const studios: Record<string, Studio> = {
     about: 'Courtroom and campus dramas, premiering soon.',
   },
 }
+
+/* Explore's publishers (podcasts, masterclasses and the rest) are studios too. */
+Object.assign(studios, exploreStudios)
 
 type Seed = [id: string, name: string, kind: Title['kind'], year: number, rating: string, genre: string, origin: Title['origin'], studioId: string, blurb: string]
 

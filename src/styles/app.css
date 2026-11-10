@@ -2370,29 +2370,9 @@ body.spot-focus .page--welcome .cta-wrap {
   text-overflow: ellipsis;
 }
 
-.dd__user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
 
-.dd__user img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
 
-.dd__user strong {
-  display: block;
-  font-size: var(--fs-body);
-  font-weight: var(--fw-semibold);
-}
 
-.dd__user span {
-  font-size: var(--fs-caption);
-  color: var(--text-300);
-}
 
 .dd__item {
   display: flex;

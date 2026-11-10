@@ -6,6 +6,8 @@ import { ComingCard, PosterCard } from '../components/Cards'
 import { Shelf } from '../components/Shelf'
 import { BackButton } from '../components/Nav'
 import { useReminders } from '../data/reminders'
+import { episodesByStudio } from '../data/explore'
+import { EpisodeCard } from './Explore'
 
 /* Web version of the mobile "PROFILE" (studio page). */
 export default function Studio() {
@@ -15,6 +17,8 @@ export default function Studio() {
   const reminders = useReminders()
   // Only this studio's titles.
   const mine = Object.values(titles).filter((t) => t.studioId === s.id).map((t) => t.id)
+  // Explore publishers (podcasts, masterclasses and the rest) show their episodes.
+  const eps = episodesByStudio(s.id)
 
   return (
     <div className="page page--studio">
@@ -31,6 +35,11 @@ export default function Studio() {
         </div>
       </section>
       <div className="shelves">
+        <Shelf title="Episodes">
+          {eps.map((e) => (
+            <EpisodeCard key={e.clip.id} ep={e} />
+          ))}
+        </Shelf>
         <Shelf title="Shows" to="/browse/all">
           {mine.filter((x) => titles[x].kind === 'show' && !upcoming(x)).map((x) => (
             <PosterCard key={x} t={titles[x]} />

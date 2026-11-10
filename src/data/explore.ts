@@ -1,4 +1,4 @@
-import type { Episode as CatalogEpisode, Title } from './catalog'
+import type { Episode as CatalogEpisode, Studio, Title } from './catalog'
 
 /* Explore: free videos beyond Shows and Series (masterclasses, podcasts, documentaries and
    more), played from their publishers' YouTube channels. Full-length uploads only (no clips or
@@ -261,6 +261,31 @@ function showById(id: string) {
   return null
 }
 
+/* Each publisher is a Circo studio, with the same round monogram logo as the others, so the
+   player's studio card, mute/block and the studio page all work for Explore too. */
+const studioIdFor = (channel: string) => `x-${slug(channel)}`
+const HUES = [['#6a1b9a', '#ec407a'], ['#0d47a1', '#26c6da'], ['#bf360c', '#ffb300'], ['#1b5e20', '#9ccc65'], ['#311b92', '#7c4dff'], ['#880e4f', '#ff7043'], ['#004d40', '#4db6ac']]
+function monogram(name: string) {
+  const letters = name.replace(/^the\s+/i, '').split(/\s+/).filter((w) => /^[a-z0-9]/i.test(w)).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
+  const [a, b] = HUES[[...name].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % HUES.length]
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="200" height="200" rx="100" fill="url(#g)"/><circle cx="100" cy="100" r="84" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="3"/><text x="100" y="100" dy="0.36em" text-anchor="middle" font-family="Inter, -apple-system, Helvetica, Arial, sans-serif" font-weight="800" font-size="64" letter-spacing="-2" fill="#fff">${letters}</text></svg>`
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+}
+
+export const exploreStudios: Record<string, Studio> = Object.fromEntries(
+  categories.flatMap((cat) =>
+    cat.shows.flatMap((s) =>
+      s.items.map((c) => [
+        studioIdFor(c.channel),
+        { id: studioIdFor(c.channel), name: c.channel, logo: monogram(c.channel), backdrop: clipThumb(c.id), about: `${cat.label} from ${c.channel}, free on Circo.` },
+      ]),
+    ),
+  ),
+)
+
+/* Every episode a studio has published in Explore, for its studio page. */
+export const episodesByStudio = (studioId: string) => allEpisodes().filter((e) => studioIdFor(e.clip.channel) === studioId)
+
 export function exploreTitle(id: string): Title | undefined {
   const f = showById(id)
   if (!f) return undefined
@@ -276,7 +301,7 @@ export function exploreTitle(id: string): Title | undefined {
     blurb,
     genre: cat.label,
     origin: 'intl',
-    studioId: `x-${slug(lead.channel)}`,
+    studioId: studioIdFor(lead.channel),
     year: 2026,
     rating: '13+',
     access: 'free',
