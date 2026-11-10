@@ -14,8 +14,8 @@ import { useExploreTab } from '../components/Nav'
 import { PlayGlyph } from './Home'
 
 /* A category from the More dropdown: a spotlight carousel up top like Home's (each slide plays
-   a stretch of its video, with title and description), then themed rows of episodes (new, from
-   Africa, around the world), never one row per show. Free to watch: no passes or access options. */
+   a stretch of its video, with title and description), then curated rows of episodes (New
+   Episodes, Must Watch and more), never one row per show. */
 export default function Explore() {
   const params = useParams<{ category: string }>()
   const cat = category(params?.category ?? '')

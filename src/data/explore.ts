@@ -1,7 +1,7 @@
 import type { Episode as CatalogEpisode, Studio, Title } from './catalog'
 
-/* Explore: free videos beyond Shows and Series (masterclasses, podcasts, documentaries and
-   more), played from their publishers' YouTube channels. Full-length uploads only (no clips or
+/* Explore: videos beyond Shows and Series (masterclasses, podcasts, documentaries and more),
+   played from their publishers' YouTube channels. Full-length uploads only (no clips or
    trailers), each checked as embeddable. Swap for Circo's own catalogue once the backend serves it. */
 
 export type Clip = { id: string; title: string; channel: string }
@@ -249,9 +249,12 @@ export const category = (id: string) => categories.find((x) => x.id === id)
 export type Episode = { clip: Clip; show: string; showId: string; season: number; episode: number; single: boolean }
 const toEpisodes = (s: Show) => s.items.map((clip, i) => ({ clip, show: s.name, showId: showId(s), season: 1, episode: s.items.length - i, single: s.items.length === 1 }))
 
-/* Each show plays in the same player as Shows and Series. With several uploads it's a free
-   series (episodes oldest first, Episodes panel, Next Episode); with one it plays like a film.
-   Ids are prefixed so they never clash with catalogue titles. */
+/* Each show plays in the same player as Shows and Series, and is bought the same way: a pass per
+   show from a public studio, or a subscription to a private one, after its teaser. With several
+   uploads it's a series (Episodes panel, Next Episode); with one it plays like a film. Ids are
+   prefixed so they never clash with catalogue titles. */
+const hash = (x: string) => [...x].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
+const PASS_PRICES = [1500, 2000, 2500, 3000]
 const slug = (x: string) => x.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 export const showId = (s: Show) => `x-${slug(s.name)}`
 export const watchHref = (e: Episode) => (e.single ? `/watch/${e.showId}` : `/watch/${e.showId}?ep=${encodeURIComponent(`S${e.season} · E${e.episode}`)}`)
@@ -277,7 +280,7 @@ export const exploreStudios: Record<string, Studio> = Object.fromEntries(
     cat.shows.flatMap((s) =>
       s.items.map((c) => [
         studioIdFor(c.channel),
-        { id: studioIdFor(c.channel), name: c.channel, logo: monogram(c.channel), backdrop: clipThumb(c.id), about: `${cat.label} from ${c.channel}, free on Circo.` },
+        { id: studioIdFor(c.channel), name: c.channel, logo: monogram(c.channel), backdrop: clipThumb(c.id), about: `${cat.label} from ${c.channel}.` },
       ]),
     ),
   ),
@@ -304,8 +307,9 @@ export function exploreTitle(id: string): Title | undefined {
     studioId: studioIdFor(lead.channel),
     year: 2026,
     rating: '13+',
-    access: 'free',
-    passPrice: 0,
+    // Same rule as the catalogue: the studio decides pass or subscription.
+    access: hash(studioIdFor(lead.channel)) % 2 ? 'public' : 'private',
+    passPrice: PASS_PRICES[(hash(id) >>> 3) % PASS_PRICES.length],
   }
 }
 

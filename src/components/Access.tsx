@@ -112,19 +112,6 @@ export function Access({ t, studio, expired, onPlay }: { t: Title; studio?: Stud
   const catalog = studio ? Object.values(titles).filter((x) => x.studioId === studio.id) : []
   const studioName = studio?.name ?? 'the Studio'
 
-  // Free titles (Explore) end their teaser on the same card, with nothing to buy.
-  if (t.access === 'free')
-    return (
-      <div className="vp-access__inner">
-        <span className="vp-access__eyebrow">Free on Circo</span>
-        <h2 className="vp-access__title">{t.kind === 'series' ? 'Watch the Full Episode' : 'Watch the Full Video'}</h2>
-        <Button size="lg" block className="vp-access__cta" onClick={() => onPlay(null, { item: 'Free', title: t.name, amount: 0, paidWith: 'Free', ref: '' })}>
-          Watch Now
-        </Button>
-        <p className="vp-access__fine">No pass or subscription needed.</p>
-      </div>
-    )
-
   return (
     <div className="vp-access__inner">
       <span className="vp-access__eyebrow">{expired ? 'Your pass has ended' : isPass ? 'Your video pass' : 'Choose your access'}</span>
