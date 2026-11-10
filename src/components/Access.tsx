@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { ALWAYS, HICCUPS, naira, roll, plans, titles, type Studio, type Title } from '../data/catalog'
 import { spend, topUp, useViewing } from '../data/viewing'
 import { primeSound } from './unlockSound'
+import { Button } from './ui'
 
 /* Shown when a trailer ends. Public studios sell a 24-hour pass for the title; private studios
    sell a subscription to the whole studio. Choose, pay (balance or online), then the player
@@ -19,7 +20,6 @@ export type Receipt = { item: string; title: string; amount: number; paidWith: s
 
 // The card on file that tops up the balance (prototype).
 const CARD = 'Visa •••• 4821'
-const roundUp = (n: number, to: number) => Math.ceil(n / to) * to
 const newRef = () => `CIR-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
 
 // Annual against twelve months of Monthly.
@@ -28,7 +28,7 @@ const annualSave = Math.round((1 - plans.find((p) => p.id === 'year')!.price / (
 
 /* onPlay gets the plan id for a studio subscription (null for a 24-hour pass) and the receipt.
    Prototype: ?pay=declined or ?pay=timeout makes the first card charge fail that way. */
-export function Access({ t, studio, expired, onReplay, onPlay }: { t: Title; studio?: Studio; expired?: boolean; onReplay: () => void; onPlay: (plan: string | null, receipt: Receipt) => void }) {
+export function Access({ t, studio, expired, onPlay }: { t: Title; studio?: Studio; expired?: boolean; onPlay: (plan: string | null, receipt: Receipt) => void }) {
   const isPass = t.access === 'public'
   const [planId, setPlanId] = useState('month')
   const plan = plans.find((p) => p.id === planId)!
@@ -36,9 +36,8 @@ export function Access({ t, studio, expired, onReplay, onPlay }: { t: Title; stu
   const { balance } = useViewing()
   const short = Math.max(0, price - balance)
   // Top up at least the shortfall, rounded up, with a couple of rounder amounts on offer.
-  const topUps = short ? [...new Set([roundUp(short, 1000), roundUp(short + 5000, 5000), roundUp(short + 15000, 10000)])] : []
-  const [topUpPick, setTopUpPick] = useState<number | null>(null)
-  const topUpAmt = short ? (topUpPick !== null && topUpPick >= short ? topUpPick : topUps[0]) : 0
+  // Short on balance: load exactly the difference, then it unlocks in the same step.
+  const topUpAmt = short
   const [method, setMethod] = useState<Method>(balance >= price ? 'wallet' : 'card')
   const [stage, setStage] = useState<Stage>('choose')
   const [failure, setFailure] = useState<Failure | null>(null)
@@ -175,23 +174,6 @@ export function Access({ t, studio, expired, onReplay, onPlay }: { t: Title; stu
         </button>
       </div>
 
-      {/* Balance is short: top it up in the same step. */}
-      {method === 'wallet' && short > 0 && (
-        <div className="vp-topup">
-          <div className="vp-topup__head">
-            <strong>Top up your balance</strong>
-            <span>from {CARD}</span>
-          </div>
-          <div className="vp-topup__amounts" role="radiogroup" aria-label="Top-up amount">
-            {topUps.map((a) => (
-              <button key={a} role="radio" aria-checked={a === topUpAmt} className={a === topUpAmt ? 'is-on' : ''} disabled={busy} onClick={() => setTopUpPick(a)}>
-                {naira(a)}
-              </button>
-            ))}
-          </div>
-          <span className="vp-topup__after">Balance after paying: {naira(balance + topUpAmt - price)}</span>
-        </div>
-      )}
 
       {stage === 'failed' && failure && (
         <div className="vp-payfail" role="alert">
@@ -209,14 +191,14 @@ export function Access({ t, studio, expired, onReplay, onPlay }: { t: Title; stu
                 ? 'Your bank didn’t approve this payment, so nothing was charged. Check with your bank, or pay another way.'
                 : 'Your bank didn’t respond in time. If money left your account, it comes back within 24 hours. Nothing was unlocked.'}
             </p>
-            <button className="vp-payfail__alt" onClick={switchMethod}>
+            <Button variant="link" className="vp-payfail__alt" onClick={switchMethod}>
               {method === 'wallet' ? 'Pay online instead' : short ? 'Top up balance instead' : 'Pay from balance instead'}
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      <button className="btn-white vp-access__cta" onClick={pay} disabled={busy} aria-busy={busy}>
+      <Button size="lg" block className="vp-access__cta" onClick={pay} disabled={busy} aria-busy={busy}>
         {busy ? (
           <>
             <span className="vp-access__spin" aria-hidden />
@@ -225,13 +207,13 @@ export function Access({ t, studio, expired, onReplay, onPlay }: { t: Title; stu
         ) : stage === 'failed' ? (
           `Try again · ${naira(method === 'wallet' && short ? topUpAmt : price)}`
         ) : method === 'wallet' && short ? (
-          `Add ${naira(topUpAmt)} and pay`
+          `Access for ${naira(price)}`
         ) : isPass ? (
           `Access for ${naira(price)}`
         ) : (
-          `Continue with ${plan.label.replace(' Access', '')} · ${naira(price)}`
+          `Access for ${naira(price)}`
         )}
-      </button>
+      </Button>
       {stage === 'slow' ? (
         <p className="vp-access__fine">
           This is taking longer than usual with your bank.{' '}
@@ -243,13 +225,6 @@ export function Access({ t, studio, expired, onReplay, onPlay }: { t: Title; stu
         <p className="vp-access__fine">{isPass ? 'Your 24 hours start when you press play.' : `Cancel anytime. Renews at ${naira(price)} / ${plan.per}.`}</p>
       )}
 
-      <button className="vp-access__replay" onClick={onReplay}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
-          <path d="M3 3v5h5" />
-        </svg>
-        Replay Teaser
-      </button>
     </div>
   )
 }

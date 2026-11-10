@@ -10,7 +10,9 @@ export type MenuItem =
   | { kind?: 'item'; id: string; label: string; icon?: IconName; hint?: string; danger?: boolean; chevron?: boolean; onSelect?: () => void }
   | { kind: 'separator'; id: string }
 
-export type MenuSpec = { label: string; header?: ReactNode; items: MenuItem[] }
+/* align 'start' drops the menu from the button's left edge (tab dropdowns); the default is
+   right-aligned to the button (⋯ and account menus). */
+export type MenuSpec = { label: string; header?: ReactNode; items: MenuItem[]; align?: 'start' | 'end' }
 
 type Anchor = HTMLElement | { x: number; y: number }
 type Ctx = { open: (anchor: Anchor, menu: string | MenuSpec) => void; close: () => void; toast: (msg: string) => void }
@@ -40,6 +42,8 @@ function titleMenu(name: string, toast: (m: string) => void): MenuSpec {
 
 export function MenuProvider({ children }: { children: ReactNode }) {
   const [menu, setMenu] = useState<Placed | null>(null)
+  const current = useRef<Placed | null>(null)
+  current.current = menu
   const [msg, setMsg] = useState<string | null>(null)
   const [shown, setShown] = useState(false)
   const timer = useRef(0)
@@ -59,10 +63,16 @@ export function MenuProvider({ children }: { children: ReactNode }) {
     (anchor, m) => {
       const spec = typeof m === 'string' ? titleMenu(m, toast) : m
       const el = anchor instanceof HTMLElement ? anchor : null
+      // Pressing the same button again closes its menu.
+      if (el && current.current?.anchor === el) {
+        setMenu(null)
+        return
+      }
+      const start = spec.align === 'start'
       let x: number, top: number, bottom: number
       if (el) {
         const r = el.getBoundingClientRect()
-        x = r.right - MENU_W // right-aligned to the button
+        x = start ? r.left : r.right - MENU_W
         top = r.top
         bottom = r.bottom
       } else {
@@ -72,7 +82,7 @@ export function MenuProvider({ children }: { children: ReactNode }) {
       }
       x = Math.max(EDGE, Math.min(x, window.innerWidth - MENU_W - EDGE))
       // Placed below first; the dropdown flips above after measuring if it doesn't fit.
-      setMenu({ spec, x, y: bottom + GAP, origin: el ? 'top right' : 'top left', anchor: el, anchorTop: top, anchorBottom: bottom })
+      setMenu({ spec, x, y: bottom + GAP, origin: el && !start ? 'top right' : 'top left', anchor: el, anchorTop: top, anchorBottom: bottom })
     },
     [toast],
   )
@@ -119,7 +129,9 @@ function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) 
       if (restore) placed.anchor?.focus({ preventScroll: true })
     }
     const onDown = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) dismiss()
+      // The menu's own button toggles it in open(), so a press on it isn't an outside click.
+      if (ref.current?.contains(e.target as Node) || placed.anchor?.contains(e.target as Node)) return
+      dismiss()
     }
     const onKey = (e: KeyboardEvent) => {
       const list = items()

@@ -1,0 +1,405 @@
+/* Shared components (components/ui.tsx). Primary and secondary buttons reuse .btn-white /
+   .btn-dark from app.css; the underline field reuses .uline from login.css. */
+
+/* Large primary / secondary (hero, checkout and coming-soon CTAs). */
+.btn-white--lg,
+.btn-dark--lg {
+  height: 56px;
+  padding: 0 32px;
+  font-size: var(--fs-body);
+}
+
+.ui-btn-block {
+  width: 100%;
+}
+
+/* Link: plain underlined text. */
+.ui-btn--link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-100);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.ui-btn--link:hover {
+  color: var(--text-200);
+}
+
+/* Field: label, underline input, then a hint or an error. */
+.ui-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ui-field__label {
+  font-size: 14px;
+  color: var(--text-300);
+}
+
+.ui-field .ui-field__line {
+  margin-top: 0;
+}
+
+.ui-field__line--select {
+  position: relative;
+  color: var(--text-300);
+}
+
+.ui-field__line--select {
+  width: 100%;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-100);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ui-field__line--select svg {
+  color: var(--text-300);
+}
+
+.ui-field__placeholder {
+  color: var(--input-placeholder);
+}
+
+.ui-field__line--select svg {
+  pointer-events: none;
+}
+
+.ui-field__hint,
+.ui-field__error {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ui-field__hint {
+  color: var(--text-300);
+}
+
+.ui-field__error {
+  color: var(--danger);
+}
+
+/* ---------- Type (components/ui.tsx <Text>) ---------- */
+
+.t-display,
+.t-h1,
+.t-h2,
+.t-h3,
+.t-body,
+.t-body-sm,
+.t-caption,
+.t-label {
+  margin: 0;
+}
+
+.t-display {
+  font-size: var(--fs-display);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.t-h1 {
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.03em;
+}
+
+.t-h2 {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.02em;
+}
+
+.t-h3 {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+}
+
+
+.t-body {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-body);
+}
+
+.t-body-sm {
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+}
+
+.t-caption {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-regular);
+  line-height: 1.4;
+}
+
+
+/* Small capitals label (eyebrows like "COMING SOON", "BALANCE"). */
+.t-label {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tone-primary { color: var(--text-100); }
+.tone-secondary { color: var(--text-200); }
+.tone-muted { color: var(--text-300); }
+.tone-accent { color: var(--accent); }
+.tone-danger { color: var(--danger); }
+.tone-warning { color: var(--warning); }
+.tone-success { color: var(--success); }
+
+/* ---------- Tag: small pill on artwork ("3 days", "New") ---------- */
+
+.ui-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: var(--chip-dark);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: 16px;
+  color: var(--text-100);
+  white-space: nowrap;
+}
+
+.ui-tag--accent {
+  background: var(--accent);
+}
+
+.ui-tag--warning {
+  background: rgba(206, 144, 70, 0.18);
+  color: var(--warning);
+}
+
+/* ---------- Surface: panel / card backgrounds ---------- */
+
+.ui-surface {
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ui-surface--1 { background: var(--surface-1); }
+.ui-surface--2 { background: var(--surface-2); }
+
+.ui-surface--pad-sm { padding: var(--space-4); }
+.ui-surface--pad-md { padding: var(--space-6); }
+.ui-surface--pad-lg { padding: var(--space-8) var(--space-8) var(--space-10); }
+
+/* ---------- Divider ---------- */
+
+.ui-divider {
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: var(--stroke-subtle);
+}
+
+
+/* ---------- /design reference page ---------- */
+
+.ds {
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+.ds__intro {
+  margin-top: var(--space-2);
+}
+
+.ds__intro code {
+  color: var(--text-200);
+}
+
+.ds__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-12);
+}
+
+.ds__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds__swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-4);
+}
+
+.ds__swatch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.ds__swatch > span {
+  height: 64px;
+  margin-bottom: var(--space-1);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--stroke-subtle);
+}
+
+.ds__type {
+  display: flex;
+  flex-direction: column;
+}
+
+.ds__typerow {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--space-6);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--stroke-default);
+}
+
+.ds__typemeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ds__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ds__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-8);
+  max-width: 960px;
+}
+
+.ds__surfaces {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.ds__space {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ds__spacerow {
+  display: grid;
+  grid-template-columns: 110px auto 60px;
+  align-items: center;
+  justify-content: start;
+  gap: var(--space-4);
+}
+
+.ds__spacerow > span {
+  height: 12px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+/* Disabled: dimmed and inert, for every button style. */
+.btn-white:disabled,
+.btn-dark:disabled,
+.ui-btn--link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* A coloured detail line on a studio tile (e.g. "3 days left" in amber). */
+.sstudio span.tone-warning {
+  color: var(--warning);
+}
+
+.ds__row--art {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  background: url('/media/squid-backdrop-sm.jpg') center / cover;
+}
+
+/* Field states: success line and tick; disabled dims and blocks input. */
+.uline.is-success {
+  border-bottom-color: var(--success);
+}
+
+.ui-field__ok {
+  flex: none;
+  color: var(--success);
+}
+
+.ui-field.is-disabled {
+  opacity: 0.45;
+}
+
+.ui-field.is-disabled input,
+.ui-field.is-disabled button {
+  cursor: not-allowed;
+}
+
+.ds__rowlabel {
+  width: 90px;
+}
+
+/* ---------- Empty state ---------- */
+
+.ui-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 120px var(--space-6) var(--space-16);
+  text-align: center;
+}
+
+/* Icon sits on a soft grey circle. */
+.ui-empty__icon {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: var(--space-1);
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--text-300);
+}
+
+.ui-empty__icon svg,
+.ui-empty__icon img {
+  width: 40px;
+  height: 40px;
+}
+
+.ui-empty__text {
+  margin: 0;
+  max-width: 420px;
+  font-size: var(--fs-body);
+  line-height: 1.45;
+  color: var(--text-300);
+}
+

@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { backdropSm, featured, studios, titles, trailers } from '../data/catalog'
+import { backdropSm, featured, upcoming, studios, titles, trailers } from '../data/catalog'
 import { loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
 import { useMenu } from './Menu'
 import { savedToast, useSaved } from '../data/saved'
@@ -192,7 +192,7 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
             <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden>
               <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
             </svg>
-            Watch Now
+            {upcoming(t.id) ? 'Watch Trailer' : 'Watch Now'}
           </button>
           <button
             className={`pv__round${saved ? ' is-on' : ''}`}

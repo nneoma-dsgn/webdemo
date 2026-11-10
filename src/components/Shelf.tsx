@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Children, useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { icons } from '../data/catalog'
 
@@ -34,6 +34,9 @@ export function Shelf({ title, to, tag, backdrop, children }: { title: string; t
       {to && <img className="shelf__chevron" src={icons.chevronRight} alt="" width={20} height={20} />}
     </>
   )
+
+  // An empty row isn't shown at all, heading included.
+  if (Children.toArray(children).length === 0) return null
 
   return (
     <section className={`shelf${backdrop ? ' shelf--backdrop' : ''}`}>

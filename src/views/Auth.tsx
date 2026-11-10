@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { saveSession, type Provider } from '../auth'
+import { saveSession, usernameFromName, type Provider } from '../auth'
 import { browseGrid, icons, titles } from '../data/catalog'
 
 
@@ -15,14 +15,15 @@ export default function Auth({ mode }: { mode: 'signup' | 'login' }) {
   const [phone, setPhone] = useState(false)
   const [chooser, setChooser] = useState(false)
 
-  const go = (provider: Provider) => {
+  // `name` is what the provider shares about the account (Google's chooser gives it here).
+  const go = (provider: Provider, name?: string, email?: string) => {
     // Google opens its account chooser first (mocked); the others go straight through.
     if (provider === 'google' && !chooser) return setChooser(true)
     setChooser(false)
     setBusy(provider)
     window.setTimeout(() => {
       if (mode === 'signup') {
-        saveSession({ provider, onboarded: false })
+        saveSession({ provider, name, email, username: usernameFromName(name), onboarded: false })
         router.replace('/onboarding')
       } else {
         // Prototype: a returning account that already finished onboarding.
@@ -35,7 +36,7 @@ export default function Auth({ mode }: { mode: 'signup' | 'login' }) {
   return (
     <div className="login">
       <PosterWall />
-      {chooser && <GoogleChooser onPick={() => go('google')} onClose={() => setChooser(false)} />}
+      {chooser && <GoogleChooser onPick={(name, email) => go('google', name, email)} onClose={() => setChooser(false)} />}
       <div className="login__panel">
         <header className="login__head">
           <Link href="/welcome" aria-label="Back to Circo">
@@ -93,7 +94,7 @@ const ACCOUNTS = [
   { name: 'Jon Bellion', email: 'jon.bellion@gmail.com', initial: 'J', color: '#188038' },
 ]
 
-function GoogleChooser({ onPick, onClose }: { onPick: () => void; onClose: () => void }) {
+function GoogleChooser({ onPick, onClose }: { onPick: (name: string, email?: string) => void; onClose: () => void }) {
   return (
     <div className="gpop" role="dialog" aria-label="Sign in with Google" onClick={onClose}>
       <div className="gpop__window" onClick={(e) => e.stopPropagation()}>
@@ -117,7 +118,7 @@ function GoogleChooser({ onPick, onClose }: { onPick: () => void; onClose: () =>
           <ul className="gpop__list">
             {ACCOUNTS.map((a) => (
               <li key={a.email}>
-                <button className="gpop__acct" onClick={onPick}>
+                <button className="gpop__acct" onClick={() => onPick(a.name, a.email)}>
                   <span className="gpop__avatar" style={{ background: a.color }}>
                     {a.initial}
                   </span>
@@ -129,7 +130,7 @@ function GoogleChooser({ onPick, onClose }: { onPick: () => void; onClose: () =>
               </li>
             ))}
             <li>
-              <button className="gpop__acct" onClick={onPick}>
+              <button className="gpop__acct" onClick={() => onPick('')}>
                 <span className="gpop__avatar gpop__avatar--add" aria-hidden>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2" strokeLinecap="round">
                     <circle cx="12" cy="8" r="4" />

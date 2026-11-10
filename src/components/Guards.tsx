@@ -16,14 +16,14 @@ function useSession() {
 }
 
 /* Signed-in pages: signed-out visitors go to the landing page; half-finished sign-ups resume onboarding. */
-export function RequireAuth({ children }: { children: ReactNode }) {
+export function RequireAuth({ children, fallback = null }: { children: ReactNode; fallback?: ReactNode }) {
   const router = useRouter()
   const { ready, session } = useSession()
   const target = !ready ? null : !session ? '/welcome' : !session.onboarded ? '/onboarding' : null
   useEffect(() => {
     if (target) router.replace(target)
   }, [target, router])
-  if (!ready || target) return null
+  if (!ready || target) return <>{fallback}</>
   return <>{children}</>
 }
 

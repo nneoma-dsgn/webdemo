@@ -4,8 +4,10 @@ import type { ReactNode } from 'react'
 import '@/styles/tokens.css'
 import '@/styles/app.css'
 import '@/styles/login.css'
+import '@/styles/ui.css'
 import { MenuProvider } from '@/components/Menu'
 import { MiniPlayer } from '@/components/MiniPlayer'
+import { DevPerfGuard } from '@/components/DevPerfGuard'
 
 export const metadata: Metadata = {
   title: 'Circo',
@@ -31,6 +33,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body>
+        <DevPerfGuard />
         <Script src="https://www.youtube.com/iframe_api" strategy="afterInteractive" />
         <MenuProvider>
           {children}

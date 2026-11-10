@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
+import { Button } from './ui'
 
 export type TheaterItem = {
   id: string
@@ -196,9 +197,9 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
                 </svg>
               </button>
             )}
-            <button className="btn-white screen__cta" aria-label={`${cta.label}: ${it.title}`} onClick={cta.onClick}>
+            <Button className="screen__cta" aria-label={`${cta.label}: ${it.title}`} onClick={cta.onClick}>
               {cta.label}
-            </button>
+            </Button>
           </div>
 
           <div className="queue" role="tablist" aria-label="Up next">

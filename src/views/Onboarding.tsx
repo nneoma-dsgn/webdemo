@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { USERNAME_MIN, getSession, signOut, updateSession, usernameHasBadChars, usernameTaken } from '../auth'
+import { getSession, signOut, updateSession } from '../auth'
 import { useMenu } from '../components/Menu'
 import { icons } from '../data/catalog'
 
-type Step = 'username' | 'gender' | 'interests'
-const STEPS: Step[] = ['username', 'gender', 'interests']
+type Step = 'gender' | 'interests'
+// No username step: it's made from the name the sign-in provider gives us.
+const STEPS: Step[] = ['gender', 'interests']
 
 /* Topics from the Select Interests screens, plus a few streaming-specific ones for the web. */
 const TOPICS = [
@@ -27,14 +28,13 @@ const TOPICS = [
 const MIN_PICKS = 3
 const MAX_PICKS = 5
 
-/* Onboarding after SSO sign up: Create Username, Select Gender, Select Interests.
+/* Onboarding after SSO sign up: Select Gender, Select Interests (the username comes from SSO).
    Netflix-style chrome: a step counter on every step. Back on step 1 returns to the SSO
    choice, dropping the half-created session so that screen is reachable again. */
 export default function Onboarding() {
   const router = useRouter()
   const { toast } = useMenu()
-  const [step, setStep] = useState<Step>('username')
-  const [username, setUsername] = useState('')
+  const [step, setStep] = useState<Step>('gender')
   const [gender, setGender] = useState<string | null>(null)
   const [picks, setPicks] = useState<string[]>([])
   const i = STEPS.indexOf(step)
@@ -46,8 +46,9 @@ export default function Onboarding() {
   }
 
   const finish = (interests: string[]) => {
-    updateSession({ username, gender: gender ?? undefined, interests, onboarded: true })
-    toast(`Welcome to Circo, @${username}`)
+    const session = getSession()
+    updateSession({ gender: gender ?? undefined, interests, onboarded: true })
+    toast(`Welcome to Circo${session?.name ? `, ${session.name.split(' ')[0]}` : ''}`)
     router.replace('/')
   }
 
@@ -73,7 +74,6 @@ export default function Onboarding() {
             )}
           </div>
 
-          {step === 'username' && <UsernameStep value={username} onChange={setUsername} onNext={() => setStep('gender')} />}
           {step === 'gender' && (
             <GenderStep
               value={gender}
@@ -87,62 +87,6 @@ export default function Onboarding() {
         </div>
       </main>
     </div>
-  )
-}
-
-function UsernameStep({ value, onChange, onNext }: { value: string; onChange: (v: string) => void; onNext: () => void }) {
-  const [checking, setChecking] = useState(false)
-  const [taken, setTaken] = useState(false)
-
-  const bad = usernameHasBadChars(value)
-  const short = value.length < USERNAME_MIN
-
-  // Simulated availability lookup, debounced like a real API call would be.
-  useEffect(() => {
-    setTaken(false)
-    if (bad || short) return
-    setChecking(true)
-    const t = window.setTimeout(() => {
-      setTaken(usernameTaken(value))
-      setChecking(false)
-    }, 450)
-    return () => window.clearTimeout(t)
-  }, [value, bad, short])
-
-  const error = bad ? 'Unsupported characters used. Your username can only contain letters and numbers.' : taken ? 'This Username has been taken' : null
-  const ok = !bad && !short && !taken && !checking
-
-  return (
-    <form
-      className="onb__form"
-      onSubmit={(e) => {
-        e.preventDefault()
-        if (ok) onNext()
-      }}
-      noValidate
-    >
-      <h1 className="onb__title">Enter Username</h1>
-      <div className={`uline${error ? ' uline--error' : ''}`}>
-        <input autoFocus value={value} onChange={(e) => onChange(e.target.value.trim())} placeholder="Username" aria-label="Username" autoComplete="username" spellCheck={false} maxLength={30} />
-        {checking && <span className="spinner spinner--sm" aria-label="Checking availability" />}
-        {ok && (
-          <svg className="uline__ok" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1aa064" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-label="Available">
-            <path d="M5 12.5l4.5 4.5L19 7.5" />
-          </svg>
-        )}
-      </div>
-      {error ? (
-        <p className="onb__error" role="alert">
-          <img src="/assets/icon-error.svg" alt="" width={20} height={20} />
-          {error}
-        </p>
-      ) : (
-        <p className="onb__help">Your username must be at least 3 characters and contain letters or numbers. It can only be changed after 60 days.</p>
-      )}
-      <button type="submit" className="btn-next" disabled={!ok}>
-        Next
-      </button>
-    </form>
   )
 }
 

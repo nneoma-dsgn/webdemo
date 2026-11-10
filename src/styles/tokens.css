@@ -21,6 +21,16 @@
   /* Brand */
   --accent: #ff004f;
 
+  /* Status (Figma: Accent/Warning - 200 and friends) */
+  --danger: #da3c3c;
+  --warning: #ce9046;
+  --success: #30d158;
+
+  /* Inputs */
+  --input-line: var(--stroke-strong);
+  --input-line-focus: #6a6a6a;
+  --input-placeholder: #707070;
+
   /* Glass (pills and chips over artwork) */
   --glass-strong: rgba(224, 224, 228, 0.3);
   --glass-soft: rgba(255, 255, 255, 0.1);
@@ -32,6 +42,41 @@
   --radius-md: 12px;
   --radius-xl: 20px;
   --radius-full: 999px;
+
+  /* Type scale: seven sizes (components/ui.tsx <Text variant>). */
+  --fs-display: clamp(40px, 5.6vw, 72px); /* hero and coming-soon titles */
+  --fs-h1: 32px; /* page titles, big numbers */
+  --fs-h2: 24px; /* section and panel titles */
+  --fs-h3: 20px; /* shelf headings, card titles */
+  --fs-body: 16px; /* reading text, row titles, inputs, buttons */
+  --fs-body-sm: 14px; /* secondary text, small buttons */
+  --fs-caption: 12px; /* meta lines, hints, tags, labels */
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.05;
+  --lh-snug: 1.25;
+  --lh-body: 1.5;
+
+  /* Spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Surfaces */
+  --surface-1: #121214; /* panels on the page background */
+  --surface-2: rgba(255, 255, 255, 0.06); /* cards and rows inside a panel */
+  --surface-3: rgba(255, 255, 255, 0.1); /* hover, pressed */
 
   /* Type: SF Pro on Apple platforms, Inter elsewhere. Figma tracking is -3%. */
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', Inter, system-ui, sans-serif;

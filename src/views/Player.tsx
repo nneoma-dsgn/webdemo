@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { ALWAYS, comingSoon, films, languagesFor, HICCUPS, roll, episodes, episodeThumb, featureFor, naira, studios, titles, trailers, type Title } from '../data/catalog'
+import { ALWAYS, films, upcoming, languagesFor, HICCUPS, roll, episodes, episodeThumb, featureFor, naira, studios, titles, trailers, type Title } from '../data/catalog'
 import { accessLeft, setAudioLang, setQuality, setSubLang, type Quality, buyPass, extendPass, fakePassLeft, getProgress, joinStudio, saveProgress, clearProgress, startPass, useClock, useViewing } from '../data/viewing'
-import { Access, ReceiptCard, type Receipt } from '../components/Access'
+import { Access } from '../components/Access'
 import { ComingSoon } from '../components/ComingSoon'
 import { Reveal, type RevealKind } from '../components/Reveal'
 import { playUnlock } from '../components/unlockSound'
@@ -12,6 +12,8 @@ import { loadApi, timeOf, type YTPlayer } from '../components/HeroVideo'
 import { useMenu } from '../components/Menu'
 import { savedToast, useSaved } from '../data/saved'
 import { openMini } from '../data/mini'
+import { isBlocked, isMuted, toggleBlocked, toggleMuted } from '../data/moderation'
+import { Button } from '../components/ui'
 
 /* Circo video player. Loading screen after Netflix (title top-left, spinner centre); controls
    after the Circo mobile player (glass skip/play circles, red scrubber) and Apple TV / Netflix web
@@ -54,7 +56,7 @@ const SLOW_QUIET_MS = 5 * 60 * 1000
 /* What to suggest after a film or a series finale: a random title with something to play,
    from the same genre when there is one. */
 function suggestAfter(t: Title) {
-  const pool = Object.values(titles).filter((x) => x.id !== t.id && trailers[x.id] && !comingSoon.some((c) => c.id === x.id))
+  const pool = Object.values(titles).filter((x) => x.id !== t.id && trailers[x.id] && !upcoming(x.id))
   const near = pool.filter((x) => x.genre === t.genre || x.studioId === t.studioId)
   const from = near.length ? near : pool
   return from[Math.floor(Math.random() * from.length)]
@@ -74,13 +76,12 @@ function PlayerView() {
   const epNo = Number(ep?.match(/(\d+)\s*$/)?.[1] ?? 1)
   const epClip = eps?.[epNo - 1] ?? eps?.[0]
   // Not out yet: the trailer ends on a reminder instead of access options.
-  const soon = comingSoon.find((c) => c.id === t.id)
+  const soon = upcoming(t.id)
   const saved = useSaved()
   // Resume point for this exact episode: skip near-zero starts and finished ones.
   // Coming back from the mini player (?t=) starts exactly there; otherwise the saved resume point.
   const tParam = Number(search.get('t') ?? 0)
   const [resumeAt] = useState(() => (tParam > 0 ? Math.floor(tParam) : saved0 && (saved0.ep ?? null) === ep && saved0.t > 10 && (!saved0.d || saved0.t < saved0.d - 30) ? Math.floor(saved0.t) : 0))
-  const [resumed, setResumed] = useState(false)
   // Which post-payment reveal to show while they're compared: ?reveal=circo (default), lights or iris.
   const r = search.get('reveal')
   const revealKind: RevealKind = r === 'lights' || r === 'iris' ? r : 'circo'
@@ -116,6 +117,8 @@ function PlayerView() {
   const unlocked = !soon && accessMs !== null && accessMs > 0
   /* Teaser until you have access; then the title itself (an episode's own clip, or the film).
      Sticky for this visit, so a pass running out mid-film doesn't swap the video. */
+  /* With access you get the title itself, never its trailer: an episode's clip, else the title's
+     own clip, else a sample film (a title with no clip yet). Without access: the trailer. */
   const [featureMode, setFeatureMode] = useState(unlocked)
   useEffect(() => {
     if (unlocked) setFeatureMode(true)
@@ -123,7 +126,7 @@ function PlayerView() {
   // An episode's own clip, else another real video of the title, else its trailer (the sample
   // films only cover titles with no video at all).
   const clip = featureMode
-    ? { videoId: epClip?.videoId ?? films[t.id] ?? trailers[t.id]?.videoId ?? featureFor(t.id, epNo), start: 0, end: 0 }
+    ? { videoId: epClip?.videoId ?? films[t.id] ?? featureFor(t.id, epNo), start: 0, end: 0 }
     : (trailers[t.id] ?? (epClip ? { videoId: epClip.videoId, start: 0, end: 0 } : undefined))
   const isPassAccess = unlocked && !viewing.subs[t.studioId]
   const passExpired = accessMs === 0
@@ -134,13 +137,16 @@ function PlayerView() {
     // Once per load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  // Shown once the unlock reveal has finished.
-  const [receipt, setReceipt] = useState<Receipt | null>(null)
-  const closeReceipt = useCallback(() => setReceipt(null), [])
+  // Paid during this visit: don't put the checkout straight back up when the trailer replays.
+  const [paidHere, setPaidHere] = useState(false)
+  // Just paid: the viewer has tapped, so the film never asks to be tapped again.
+  const paidRef = useRef(false)
   // Viewer chose to watch the credits instead of moving on.
   const [stayed, setStayed] = useState(false)
   // Just paid: the reveal is running.
   const [reveal, setReveal] = useState(false)
+  // While the unlock animation runs the film waits, paused, and starts when it's done.
+  const revealing = useRef(false)
   const idleT = useRef(0)
 
   /* --- Load failure: YouTube reports an error, or nothing is ready after 15s. Retry rebuilds
@@ -148,10 +154,12 @@ function PlayerView() {
   const [failed, setFailed] = useState<null | 'error' | 'gone'>(null)
   const [attempt, setAttempt] = useState(0)
   // Rolled once per visit: a URL flag, or now and then a natural failure.
-  const [simulateFail] = useState(() => search.get('fail') ?? ALWAYS[t.id]?.load ?? (roll(HICCUPS.loadFail) ? (roll(0.5) ? 'load' : 'timeout') : null))
+  // ?hiccups=off turns the random ones off (for clean testing).
+  const calm = search.get('hiccups') === 'off'
+  const [simulateFail] = useState(() => search.get('fail') ?? ALWAYS[t.id]?.load ?? (!calm && roll(HICCUPS.loadFail) ? (roll(0.5) ? 'load' : 'timeout') : null))
   // Autoplay blocked: the player is ready but the browser won't start it without a tap.
   const [blocked, setBlocked] = useState(false)
-  const [noAutoplay] = useState(() => search.get('autoplay') === 'off' || !!ALWAYS[t.id]?.autoplay || roll(HICCUPS.autoplayBlocked))
+  const [noAutoplay] = useState(() => search.get('autoplay') === 'off' || !!ALWAYS[t.id]?.autoplay || (!calm && roll(HICCUPS.autoplayBlocked)))
 
   /* --- YouTube player --- */
   useEffect(() => {
@@ -178,7 +186,7 @@ function PlayerView() {
       const YT = window.YT
       player.current = new YT.Player(host, {
         videoId: sim === 'load' ? 'xxxxxxxxxxx' : clip.videoId,
-        playerVars: { autoplay: noAutoplay ? 0 : 1, start: featureMode || tParam > 0 ? resumeAt : 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, iv_load_policy: 3, cc_load_policy: 0 },
+        playerVars: { autoplay: noAutoplay && !paidRef.current ? 0 : 1, start: featureMode || tParam > 0 ? resumeAt : 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, iv_load_policy: 3, cc_load_policy: 0 },
         events: {
           onReady: () => {
             isReady = true
@@ -186,6 +194,8 @@ function PlayerView() {
             player.current?.setVolume?.(80)
             // Ready but not playing a moment later: the browser blocked autoplay.
             blockT = window.setTimeout(() => {
+              // Held paused for the unlock animation, or just paid for: not a blocked autoplay.
+              if (revealing.current || paidRef.current) return
               if (!didPlay && !cancelled) setBlocked(true)
             }, AUTOPLAY_GRACE_MS)
           },
@@ -202,12 +212,15 @@ function PlayerView() {
               setEnded(true)
               if (document.fullscreenElement) document.exitFullscreen?.()
             }
+            if (e.data === YT.PlayerState.PLAYING && revealing.current) {
+              player.current?.pauseVideo?.()
+              return
+            }
             if (e.data === YT.PlayerState.PLAYING) {
               didPlay = true
               setBlocked(false)
               // A pass's 24 hours start on first play.
               startPass(t.id)
-              if (resumeAt && featureMode && !tParam) setResumed(true)
               setEnded(false)
               setStarted(true)
               setDuration(player.current?.getDuration?.() ?? 0)
@@ -471,9 +484,13 @@ function PlayerView() {
           ? { id: 'later', label: 'Saved for later', icon: 'check', onSelect: () => toast(savedToast(saved.toggle(t.id))) }
           : { id: 'later', label: 'Watch later', icon: 'bookmark', onSelect: () => toast(savedToast(saved.toggle(t.id))) },
         { id: 'share', label: 'Share', icon: 'share', onSelect: () => toast('Link copied') },
-        { id: 'mute', label: 'Mute', icon: 'mute', onSelect: () => toast(`You’ll see less from ${studios[t.studioId]?.name ?? 'this studio'}`) },
+        isMuted(t.studioId)
+          ? { id: 'mute', label: 'Unmute studio', icon: 'mute', onSelect: () => (toggleMuted(t.studioId), toast(`${studios[t.studioId]?.name ?? 'Studio'} unmuted`)) }
+          : { id: 'mute', label: 'Mute', icon: 'mute', onSelect: () => (toggleMuted(t.studioId), toast(`You’ll see less from ${studios[t.studioId]?.name ?? 'this studio'}`)) },
         { kind: 'separator', id: 's' },
-        { id: 'block', label: 'Block', icon: 'block', danger: true, onSelect: () => toast(`${studios[t.studioId]?.name ?? 'This studio'} is blocked`) },
+        isBlocked(t.studioId)
+          ? { id: 'block', label: 'Unblock studio', icon: 'block', danger: true, onSelect: () => (toggleBlocked(t.studioId), toast(`${studios[t.studioId]?.name ?? 'Studio'} unblocked`)) }
+          : { id: 'block', label: 'Block', icon: 'block', danger: true, onSelect: () => (toggleBlocked(t.studioId), toast(`${studios[t.studioId]?.name ?? 'This studio'} is blocked`)) },
         { id: 'report', label: 'Report', icon: 'flag', danger: true, onSelect: () => toast('Thanks, we’ll look into it') },
       ],
     })
@@ -492,7 +509,8 @@ function PlayerView() {
   const shown = scrubbing ?? time
   const pct = duration ? (shown / duration) * 100 : 0
   const hide = (hidden || (idle && playing && started)) && scrubbing === null && !panel && !langOpen
-  const series = t.kind === 'series'
+  // Coming soon is only ever a trailer: no episodes, no Info, no next episode, no Up Next.
+  const series = t.kind === 'series' && !soon
   const studio = studios[t.studioId]
   const epLabel = ep ?? (series ? 'S1 · E1' : null)
   // Current episode number from labels like "S1 · E4" or "EP 2".
@@ -523,11 +541,12 @@ function PlayerView() {
       ? { kicker: 'You might like', title: pick.name, blurb: pick.blurb, art: pick.still, cta: `Play ${pick.kind === 'series' ? 'Series' : 'Film'}`, go: () => router.replace(`/watch/${pick.id}`) }
       : null
   const left = duration ? duration - time : Infinity
-  const upNext = !!up && unlocked && !stayed && started && (ended || left <= upNextAt(duration))
+  // Only once a film or episode has actually finished; trailers end on the access screen.
+  const upNext = !!up && unlocked && featureMode && !stayed && started && ended
 
   // Once it has finished: count down, then play what's next.
   const [count, setCount] = useState<number | null>(null)
-  const counting = ended && !!up && unlocked && !stayed
+  const counting = ended && !!up && unlocked && featureMode && !stayed
   useEffect(() => setCount(counting ? COUNTDOWN_S : null), [counting])
   useEffect(() => {
     if (count === null) return
@@ -569,12 +588,6 @@ function PlayerView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready])
 
-  // "Resumed from" chip: a few seconds, then out of the way.
-  useEffect(() => {
-    if (!resumed) return
-    const t = window.setTimeout(() => setResumed(false), 7000)
-    return () => window.clearTimeout(t)
-  }, [resumed])
 
   /* --- Slow connection: long or repeated buffering after playback has started. --- */
   const [slow, setSlow] = useState(false)
@@ -603,7 +616,7 @@ function PlayerView() {
   }, [slow])
 
   // Prototype: now and then (or with ?slow=1) a 7s stall about 8s in, once per visit.
-  const [slowDemo] = useState(() => search.get('slow') === '1' || !!ALWAYS[t.id]?.slow || roll(HICCUPS.slow))
+  const [slowDemo] = useState(() => search.get('slow') === '1' || !!ALWAYS[t.id]?.slow || (!calm && roll(HICCUPS.slow)))
   const stallDone = useRef(false)
   const stallT = useRef(0)
   useEffect(() => () => window.clearTimeout(stallT.current), [])
@@ -631,7 +644,7 @@ function PlayerView() {
   }, [passExpired, started, ended])
 
   return (
-    <div ref={root} className={`vp${hide ? ' vp--idle' : ''}${hide && idle ? ' vp--rest' : ''}${!started && clip ? ' vp--loading' : ''}${panel ? ' vp--panel' : ''}${(ended || halted) && !unlocked ? ' vp--ended' : ''}`} onMouseMove={onHover} onClick={wake}>
+    <div ref={root} className={`vp${hide ? ' vp--idle' : ''}${hide && idle ? ' vp--rest' : ''}${!started && clip ? ' vp--loading' : ''}${panel ? ' vp--panel' : ''}${(ended && (soon || (!featureMode && !paidHere))) || (halted && !unlocked) ? ' vp--ended' : ''}`} onMouseMove={onHover} onClick={wake}>
       {/* Video, contained (letterboxed) rather than cropped. Rendered large and scaled down so
           YouTube's own overlays shrink with it. */}
       <div className={`vp__video${started ? ' is-on' : ''}`} aria-hidden>
@@ -696,13 +709,12 @@ function PlayerView() {
               : 'We couldn’t load this video. Check your connection and try again.'}
           </p>
           <div className="vp-fail__actions">
-            <button className="btn-white btn-white--sm" onClick={() => setAttempt((a) => a + 1)}>
-              <Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />
+            <Button size="sm" icon={<Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />} onClick={() => setAttempt((a) => a + 1)}>
               Retry
-            </button>
-            <button className="btn-dark btn-dark--sm" onClick={exit}>
+            </Button>
+            <Button variant="secondary" size="sm" onClick={exit}>
               Go back
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -761,18 +773,22 @@ function PlayerView() {
 
       {ended && soon && <ComingSoon t={t} when={soon.when} onReplay={replay} />}
 
-      {((ended && !soon && !unlocked) || (halted && !unlocked)) && (
+      {/* A trailer always ends on the access tickets. */}
+      {((ended && !soon && !featureMode && !paidHere) || (halted && !unlocked)) && (
         <div className="vp-access" role="dialog" aria-label={`Get access to ${t.name}`}>
           <img className="vp-access__bg" src={t.still} alt="" />
           <Access
             t={t}
             studio={studio}
             expired={passExpired}
-            onReplay={replay}
-            onPlay={(plan, r) => {
+            onPlay={(plan) => {
               if (plan) joinStudio(t.studioId, plan)
               else buyPass(t.id)
-              setReceipt(r)
+              setPaidHere(true)
+              paidRef.current = true
+              setBlocked(false)
+              revealing.current = true
+              player.current?.pauseVideo?.()
               setReveal(true)
               playUnlock()
             }}
@@ -780,9 +796,36 @@ function PlayerView() {
         </div>
       )}
 
-      {reveal && <Reveal kind={revealKind} title={t.name} studio={studio?.name} onClosed={() => {}} onOpen={halted ? carryOn : replay} onDone={() => setReveal(false)} />}
+      {/* Replay and close stay pinned top right over the checkout, however tall it gets. */}
+      {((ended && !soon && !featureMode && !paidHere) || (halted && !unlocked)) && !reveal && (
+        <div className="vp-access__top">
+          <Button variant="secondary" size="sm" icon={<Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />} onClick={replay}>
+            Replay Teaser
+          </Button>
+          <button className="vp-access__close" onClick={exit} aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
+              <path d="M18 6 6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
-      {receipt && !reveal && <ReceiptCard r={receipt} onClose={closeReceipt} />}
+      {reveal && (
+        <Reveal
+          kind={revealKind}
+          title={t.name}
+          studio={studio?.name}
+          onClosed={() => {}}
+          onOpen={() => {}}
+          onDone={() => {
+            revealing.current = false
+            setReveal(false)
+            if (halted) carryOn()
+            else replay()
+          }}
+        />
+      )}
 
       {/* Pass running low: the last 10 minutes. */}
       {passWarn && accessMs !== null && (
@@ -791,15 +834,15 @@ function PlayerView() {
           <span>
             Your pass ends in <strong>{clockLeft(accessMs)}</strong>
           </span>
-          <button
-            className="vp-passwarn__extend"
+          <Button
+            size="sm"
             onClick={() => {
               extendPass(t.id)
               toast('24 more hours added to your pass')
             }}
           >
             Extend 24h · {naira(t.passPrice)}
-          </button>
+          </Button>
           <button className="vp-passwarn__close" onClick={() => setWarnClosed(true)} aria-label="Dismiss">
             <Svg d={['M18 6 6 18', 'M6 6l12 12']} />
           </button>
@@ -814,16 +857,16 @@ function PlayerView() {
             <strong>{up.title}</strong>
             {up.blurb && <p>{up.blurb}</p>}
             <div className="upnext__actions">
-              <button className={`btn-white btn-white--sm upnext__play${count !== null ? ' is-counting' : ''}`} onClick={up.go} style={{ ['--left' as string]: `${COUNTDOWN_S}s` }}>
+              <Button size="sm" className={`upnext__play${count !== null ? ' is-counting' : ''}`} onClick={up.go} style={{ ['--left' as string]: `${COUNTDOWN_S}s` }}>
                 {count !== null && <i className="upnext__fill" aria-hidden />}
                 <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden>
                   <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
                 </svg>
                 {up.cta}
-              </button>
-              <button className="upnext__stay" onClick={() => setStayed(true)}>
+              </Button>
+              <Button variant="secondary" size="sm" className="upnext__stay" onClick={() => setStayed(true)}>
                 {ended ? 'Cancel' : 'Watch credits'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -865,19 +908,6 @@ function PlayerView() {
       )}
 
       <div className="vp__bottom" ref={bottom}>
-        {resumed && (
-          <div className="vp__resumed" role="status">
-            Resumed from {fmt(resumeAt)}
-            <button
-              onClick={() => {
-                player.current?.seekTo?.(0, true)
-                setResumed(false)
-              }}
-            >
-              Start over
-            </button>
-          </div>
-        )}
         <div className="vp__scrub">
           <input
             type="range"
@@ -911,6 +941,13 @@ function PlayerView() {
           {/* One line: series title, then season / episode and the episode's title. */}
           <div className="vp__title">
             <strong>{t.name}</strong>
+            {clip && !series && !soon && (
+              <div className="vp__tabs vp__tabs--inline">
+                <button aria-pressed={panel === 'info'} className={panel === 'info' ? 'is-on' : ''} onClick={() => setPanel(panel === 'info' ? null : 'info')}>
+                  Info
+                </button>
+              </div>
+            )}
             {epLabel && (
               <span>
                 {epLabel} · {current.name}
@@ -974,7 +1011,8 @@ function PlayerView() {
           </div>
         </div>
 
-        {series && (
+        {/* Series: Info and Episodes on their own row. Shows have just Info, next to the title. */}
+        {clip && series && (
           <div className="vp__tabs" role="tablist" aria-label="Episode details">
             {(['info', 'episodes'] as const).map((k) => (
               <button key={k} role="tab" aria-selected={panel === k} className={panel === k ? 'is-on' : ''} onClick={() => setPanel(panel === k ? null : k)}>
@@ -984,29 +1022,29 @@ function PlayerView() {
           </div>
         )}
 
-        {series && panel === 'info' && (
+        {panel === 'info' && (
           <div className="vp__panel vp__info">
             <div className="vp__info-main">
-              <span className="vp__info-eyebrow">
-                Season 1 · Episode {current.n}
-              </span>
-              <h3 className="vp__info-title">{current.name}</h3>
-              <p className="vp__info-blurb">{t.blurb}</p>
+              <span className="vp__info-eyebrow">{series ? `Season 1 · Episode ${current.n} · ${current.mins} min` : `${t.year} · ${t.genre} · ${t.rating}`}</span>
+              <h3 className="vp__info-title">{series ? current.name : t.name}</h3>
+              <p className="vp__info-blurb">{(series && current.blurb) || t.blurb}</p>
               <div className="vp__info-actions">
-                <button
-                  className="btn-white btn-white--sm"
+                <Button
+                  size="sm"
+                  icon={<Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />}
                   onClick={() => {
                     player.current?.seekTo?.(0, true)
                     player.current?.playVideo?.()
                     setPanel(null)
                   }}
                 >
-                  <Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />
                   Start Over
-                </button>
-                <button className="btn-dark btn-dark--sm" onClick={() => setPanel('episodes')}>
-                  All Episodes
-                </button>
+                </Button>
+                {series && (
+                  <Button variant="secondary" size="sm" onClick={() => setPanel('episodes')}>
+                    All Episodes
+                  </Button>
+                )}
                 <button
                   className={`vp__info-round${saved.has(t.id) ? ' is-on' : ''}`}
                   onClick={() => toast(savedToast(saved.toggle(t.id)))}
@@ -1024,13 +1062,8 @@ function PlayerView() {
             {studio && (
               <button className="vp__studio" onClick={() => router.push(`/studio/${studio.id}`)} aria-label={`Visit ${studio.name}`}>
                 <img src={studio.logo} alt="" />
-                <span className="vp__studio-text">
-                  <span className="vp__studio-kicker">More from this studio</span>
-                  <span className="vp__studio-name">{studio.name}</span>
-                </span>
-                <span className="vp__studio-go" aria-hidden>
-                  <Svg d={['M5 12h14', 'M13 6l6 6-6 6']} />
-                </span>
+                <span className="vp__studio-name">{studio.name}</span>
+                <Svg d={['M9 6l6 6-6 6']} />
               </button>
             )}
           </div>

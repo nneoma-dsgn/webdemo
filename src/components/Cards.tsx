@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { icons, studios, titles, type Title } from '../data/catalog'
 import { useMenu } from './Menu'
 import { usePreview } from './Preview'
+import { Button, ButtonLink } from './ui'
 
 /* Cards navigate to their destination when given one; without one they're a focusable tile.
    Posters default to the player, so a tap opens the title without waiting for the preview. */
@@ -164,16 +166,25 @@ export function ComingCard({ t, when, label, reminded, onRemind, to }: { t: Titl
         </div>
       </Tile>
       <p className="coming__when">{when}</p>
-      <button className={`btn-remind${reminded ? ' is-on' : ''}`} onClick={onRemind} aria-pressed={reminded}>
-        {reminded ? (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M5 12.5l4.5 4.5L19 7.5" />
-          </svg>
-        ) : (
-          <img src={icons.bellPlus} alt="" width={14} height={14} />
-        )}
+      <Button
+        variant="secondary"
+        size="sm"
+        block
+        className="btn-remind"
+        aria-pressed={reminded}
+        onClick={onRemind}
+        icon={
+          reminded ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          ) : (
+            <img src={icons.bellPlus} alt="" width={14} height={14} />
+          )
+        }
+      >
         {reminded ? 'Reminder set' : 'Remind me'}
-      </button>
+      </Button>
     </div>
   )
 }
@@ -188,11 +199,24 @@ export function StudioRow({ id, note }: { id: string; note?: string }) {
         <span className="studio-row__name">{s.name}</span>
         {note && <span className="studio-row__note">{note}</span>}
       </div>
-      <Link href={`/studio/${s.id}`} className="btn-white btn-white--sm">
+      <ButtonLink href={`/studio/${s.id}`} size="sm">
         See More
-      </Link>
+      </ButtonLink>
     </div>
   )
 }
 
 export const byId = (id: string) => titles[id]
+
+/* A studio as a round logo with its name and one line under it (title count, days left).
+   Used by search results and the Library. */
+export function StudioTile({ s, detail, tone, onClick }: { s: { id: string; name: string; logo: string }; detail: ReactNode; tone?: 'warning'; onClick?: () => void }) {
+  return (
+    <Link href={`/studio/${s.id}`} className="sstudio" onClick={onClick}>
+      <img src={s.logo} alt="" />
+      <strong>{s.name}</strong>
+      <span className={tone === 'warning' ? 'tone-warning' : undefined}>{detail}</span>
+    </Link>
+  )
+}
+

@@ -30,23 +30,103 @@ export type Studio = {
   logo: string
   backdrop: string
   about: string
+  teaser?: string // the studio's own reel; studios without one show STUDIO_PLACEHOLDER
 }
 
+/* Shown on studio pages until the studio uploads its own teaser: a quiet film-set loop. */
+export const STUDIO_PLACEHOLDER = '/media/studio-teaser.mp4'
+
 export const studios: Record<string, Studio> = {
-  wb: {
-    id: 'wb',
-    name: 'Warner Bros',
-    logo: a('studio-wb.png'),
-    backdrop: backdrop('dune'),
-    about: 'Film and television from one of the oldest studios in the business.',
+  harmattan: {
+    id: 'harmattan',
+    name: 'Harmattan House',
+    logo: a('studios/harmattan.svg'),
+    backdrop: backdrop('squid'),
+    about: 'Lagos-born drama house making the stories families argue about at dinner: love, money, power and blood.',
   },
-  velvet: {
-    id: 'velvet',
-    name: 'The Velvet Studio',
-    logo: a('studio-wb.png'),
-    backdrop: a('backdrop-velvet.jpg'),
-    about:
-      'Independent film production company based in Boston. Founded in 1993, we craft compelling visual stories that span thrilling dramas, indie comedies, and bold documentaries.',
+  redearth: {
+    id: 'redearth',
+    name: 'Red Earth Pictures',
+    logo: a('studios/redearth.svg'),
+    backdrop: backdrop('anikulapo'),
+    about: 'Big, mythic Nigerian cinema shot on location, from Oyo kingdoms to the shoreline gods.',
+  },
+  lagoon: {
+    id: 'lagoon',
+    name: 'Rivers Edge Films',
+    logo: a('studios/lagoon.svg'),
+    backdrop: backdrop('gangs'),
+    about: 'Fast, street-level stories from the city that never sleeps: crime, hustle and Lagos after dark.',
+  },
+  okra: {
+    id: 'okra',
+    name: 'Rooftop Comedy',
+    logo: a('studios/okra.svg'),
+    backdrop: backdrop('b99'),
+    about: 'Comedy first. Sitcoms and ensemble series built around the people you know.',
+  },
+  ninemoons: {
+    id: 'ninemoons',
+    name: 'Nine Moons Studio',
+    logo: a('studios/ninemoons.svg'),
+    backdrop: backdrop('severance'),
+    about: 'Prestige series from around the world, picked for the ones you can’t stop at one episode.',
+  },
+  silverline: {
+    id: 'silverline',
+    name: 'Silverline Pictures',
+    logo: a('studios/silverline.svg'),
+    backdrop: backdrop('dune'),
+    about: 'The big screen at home: blockbusters, auteur films and event cinema.',
+  },
+  kolanut: {
+    id: 'kolanut',
+    name: 'Kola Nut Entertainment',
+    logo: a('studios/kolanut.svg'),
+    backdrop: backdrop('bridgerton'),
+    about: 'Romance and family series, arriving on Circo soon.',
+  },
+  thirdmainland: {
+    id: 'thirdmainland',
+    name: 'Third Mainland Media',
+    logo: a('studios/thirdmainland.svg'),
+    backdrop: backdrop('funmilayo'),
+    about: 'True stories, biopics and the people who shaped Nigeria. First titles premiering soon.',
+  },
+  lekki: {
+    id: 'lekki',
+    name: 'Lekki Light Studios',
+    logo: a('studios/lekki.svg'),
+    backdrop: backdrop('skinnygirl'),
+    about: 'Feel-good series from the island: friendship, dating and city life.',
+  },
+  ojuelegba: {
+    id: 'ojuelegba',
+    name: 'Ojuelegba Originals',
+    logo: a('studios/ojuelegba.svg'),
+    backdrop: backdrop('gidiblues'),
+    about: 'Street stories from the mainland, told by the people who live them.',
+  },
+  northstar: {
+    id: 'northstar',
+    name: 'Northern Star Media',
+    logo: a('studios/northstar.svg'),
+    backdrop: backdrop('silo'),
+    about: 'Big-world science fiction and mystery series.',
+  },
+  savannah: {
+    id: 'savannah',
+    name: 'Savannah Reel',
+    logo: a('studios/savannah.svg'),
+    backdrop: backdrop('blackbook'),
+    about: 'Lean, tense thrillers from across West Africa.',
+  },
+  ember: {
+    id: 'ember',
+    name: 'Ember and Ash Films',
+    logo: a('studios/ember.svg'),
+    backdrop: backdrop('citation'),
+    about: 'Courtroom and campus dramas, premiering soon.',
   },
 }
 
@@ -54,54 +134,72 @@ type Seed = [id: string, name: string, kind: Title['kind'], year: number, rating
 
 const seeds: Seed[] = [
   // Nollywood
-  ['tribe', 'A Tribe Called Judah', 'show', 2023, '16+', 'Comedy', 'ng', 'velvet', 'Five brothers from five fathers plan a heist to save their mother.'],
-  ['kob', 'King of Boys', 'show', 2018, '18+', 'Crime', 'ng', 'velvet', 'A businesswoman fights to keep her empire when politics turns on her.'],
-  ['anikulapo', 'Aníkúlápó', 'show', 2022, '16+', 'Fantasy', 'ng', 'velvet', 'A traveller in the Oyo Empire is brought back to life by a mystical bird.'],
-  ['jagun', 'Jagun Jagun', 'show', 2023, '16+', 'Epic', 'ng', 'velvet', 'A young man joins an elite army under a fearsome warlord.'],
-  ['gangs', 'Gangs of Lagos', 'show', 2023, '18+', 'Crime', 'ng', 'velvet', 'Three friends from Isale Eko are pulled into a deadly fight for power.'],
-  ['wedding', 'The Wedding Party', 'show', 2016, '13+', 'Romance', 'ng', 'velvet', 'Two families, one wedding, and everything that can go wrong does.'],
-  ['bloodsisters', 'Blood Sisters', 'series', 2022, '16+', 'Thriller', 'ng', 'velvet', 'Two best friends go on the run after a wedding-eve tragedy.'],
-  ['shanty', 'Shanty Town', 'series', 2023, '18+', 'Crime', 'ng', 'velvet', 'A group of courtesans try to break free from a ruthless kingpin.'],
-  ['lionheart', 'Lionheart', 'show', 2018, '13+', 'Drama', 'ng', 'velvet', 'A daughter steps up to save her father’s transport company.'],
-  ['citation', 'Citation', 'show', 2020, '16+', 'Drama', 'ng', 'velvet', 'A student takes on a powerful professor after an assault.'],
-  ['breath', 'Breath of Life', 'show', 2023, '13+', 'Drama', 'ng', 'velvet', 'A reclusive former preacher finds new purpose through a gifted young man.'],
-  ['funmilayo', 'Funmilayo Ransome-Kuti', 'show', 2024, '13+', 'Biopic', 'ng', 'velvet', 'The activist who led Nigerian women in the fight for their rights.'],
+  ['tribe', 'A Tribe Called Judah', 'show', 2023, '16+', 'Comedy', 'ng', 'harmattan', 'Five brothers from five fathers plan a heist to save their mother.'],
+  ['kob', 'King of Boys', 'show', 2018, '18+', 'Crime', 'ng', 'harmattan', 'A businesswoman fights to keep her empire when politics turns on her.'],
+  ['anikulapo', 'Aníkúlápó', 'show', 2022, '16+', 'Fantasy', 'ng', 'redearth', 'A traveller in the Oyo Empire is brought back to life by a mystical bird.'],
+  ['jagun', 'Jagun Jagun', 'show', 2023, '16+', 'Epic', 'ng', 'thirdmainland', 'A young man joins an elite army under a fearsome warlord.'],
+  ['gangs', 'Gangs of Lagos', 'show', 2023, '18+', 'Crime', 'ng', 'lagoon', 'Three friends from Isale Eko are pulled into a deadly fight for power.'],
+  ['wedding', 'The Wedding Party', 'show', 2016, '13+', 'Romance', 'ng', 'harmattan', 'Two families, one wedding, and everything that can go wrong does.'],
+  ['bloodsisters', 'Blood Sisters', 'series', 2022, '16+', 'Thriller', 'ng', 'harmattan', 'Two best friends go on the run after a wedding-eve tragedy.'],
+  ['shanty', 'Shanty Town', 'series', 2023, '18+', 'Crime', 'ng', 'harmattan', 'A group of courtesans try to break free from a ruthless kingpin.'],
+  ['lionheart', 'Lionheart', 'show', 2018, '13+', 'Drama', 'ng', 'harmattan', 'A daughter steps up to save her father’s transport company.'],
+  ['citation', 'Citation', 'show', 2020, '16+', 'Drama', 'ng', 'ember', 'A student takes on a powerful professor after an assault.'],
+  ['breath', 'Breath of Life', 'show', 2023, '13+', 'Drama', 'ng', 'harmattan', 'A reclusive former preacher finds new purpose through a gifted young man.'],
+  ['funmilayo', 'Funmilayo Ransome-Kuti', 'show', 2024, '13+', 'Biopic', 'ng', 'thirdmainland', 'The activist who led Nigerian women in the fight for their rights.'],
   // International
-  ['silo', 'Silo', 'series', 2023, '16+', 'Drama', 'intl', 'velvet', 'One last coffee. A lifetime of memories. Come home to your favourite six.'],
-  ['dune', 'Dune: Part Two', 'show', 2024, '13+', 'Sci-fi', 'intl', 'wb', 'Paul Atreides unites with the Fremen on a path of revenge.'],
-  ['squid', 'Squid Game', 'series', 2021, '18+', 'Thriller', 'intl', 'velvet', 'Hundreds of desperate players compete in deadly children’s games.'],
-  ['wednesday', 'Wednesday', 'series', 2022, '13+', 'Mystery', 'intl', 'velvet', 'Wednesday Addams investigates a killing spree at Nevermore Academy.'],
-  ['bear', 'The Bear', 'series', 2022, '16+', 'Drama', 'intl', 'velvet', 'A fine-dining chef comes home to run his family’s sandwich shop.'],
-  ['severance', 'Severance', 'series', 2022, '16+', 'Sci-fi', 'intl', 'velvet', 'Office workers surgically split their work and personal memories.'],
-  ['moneyheist', 'Money Heist', 'series', 2017, '16+', 'Crime', 'intl', 'velvet', 'Eight robbers take over the Royal Mint of Spain.'],
-  ['lastofus', 'The Last of Us', 'series', 2023, '18+', 'Drama', 'intl', 'wb', 'A smuggler escorts a teenage girl across a ruined America.'],
-  ['bridgerton', 'Bridgerton', 'series', 2020, '16+', 'Romance', 'intl', 'velvet', 'Love and scandal among the high society of Regency London.'],
-  ['oppenheimer', 'Oppenheimer', 'show', 2023, '16+', 'Drama', 'intl', 'velvet', 'The physicist behind the atomic bomb and the cost of his work.'],
+  ['silo', 'Silo', 'series', 2023, '16+', 'Drama', 'intl', 'northstar', 'One last coffee. A lifetime of memories. Come home to your favourite six.'],
+  ['dune', 'Dune: Part Two', 'show', 2024, '13+', 'Sci-fi', 'intl', 'silverline', 'Paul Atreides unites with the Fremen on a path of revenge.'],
+  ['squid', 'Squid Game', 'series', 2021, '18+', 'Thriller', 'intl', 'ninemoons', 'Hundreds of desperate players compete in deadly children’s games.'],
+  ['wednesday', 'Wednesday', 'series', 2022, '13+', 'Mystery', 'intl', 'kolanut', 'Wednesday Addams investigates a killing spree at Nevermore Academy.'],
+  ['bear', 'The Bear', 'series', 2022, '16+', 'Drama', 'intl', 'ninemoons', 'A fine-dining chef comes home to run his family’s sandwich shop.'],
+  ['severance', 'Severance', 'series', 2022, '16+', 'Sci-fi', 'intl', 'ninemoons', 'Office workers surgically split their work and personal memories.'],
+  ['moneyheist', 'Money Heist', 'series', 2017, '16+', 'Crime', 'intl', 'ninemoons', 'Eight robbers take over the Royal Mint of Spain.'],
+  ['lastofus', 'The Last of Us', 'series', 2023, '18+', 'Drama', 'intl', 'ninemoons', 'A smuggler escorts a teenage girl across a ruined America.'],
+  ['bridgerton', 'Bridgerton', 'series', 2020, '16+', 'Romance', 'intl', 'kolanut', 'Love and scandal among the high society of Regency London.'],
+  ['oppenheimer', 'Oppenheimer', 'show', 2023, '16+', 'Drama', 'intl', 'silverline', 'The physicist behind the atomic bomb and the cost of his work.'],
   // More Nollywood
-  ['blackbook', 'The Black Book', 'show', 2023, '16+', 'Thriller', 'ng', 'velvet', 'A deacon takes on a corrupt gang to clear his murdered son’s name.'],
-  ['mamiwata', 'Mami Wata', 'show', 2023, '16+', 'Fantasy', 'ng', 'velvet', 'A village’s faith in its water goddess is shaken when a stranger washes ashore.'],
-  ['ijogbon', 'Ìjọ̀gbọ̀n', 'show', 2023, '13+', 'Adventure', 'ng', 'velvet', 'Four teenagers find a stash of diamonds and trouble follows them home.'],
-  ['gidiblues', 'Gidi Blues', 'show', 2016, '13+', 'Romance', 'ng', 'velvet', 'A Lagos playboy falls for a woman who wants nothing to do with his world.'],
-  ['farfromhome', 'Far From Home', 'series', 2022, '16+', 'Drama', 'ng', 'velvet', 'A struggling teen wins a scholarship to an elite school and starts living a lie.'],
-  ['smartmoney', 'The Smart Money Woman', 'series', 2020, '16+', 'Comedy', 'ng', 'velvet', 'Five friends in Lagos chase love, money and the lives they want.'],
+  ['blackbook', 'The Black Book', 'show', 2023, '16+', 'Thriller', 'ng', 'savannah', 'A deacon takes on a corrupt gang to clear his murdered son’s name.'],
+  ['mamiwata', 'Mami Wata', 'show', 2023, '16+', 'Fantasy', 'ng', 'redearth', 'A village’s faith in its water goddess is shaken when a stranger washes ashore.'],
+  ['ijogbon', 'Ìjọ̀gbọ̀n', 'show', 2023, '13+', 'Adventure', 'ng', 'redearth', 'Four teenagers find a stash of diamonds and trouble follows them home.'],
+  ['gidiblues', 'Gidi Blues', 'show', 2016, '13+', 'Romance', 'ng', 'ojuelegba', 'A Lagos playboy falls for a woman who wants nothing to do with his world.'],
+  ['farfromhome', 'Far From Home', 'series', 2022, '16+', 'Drama', 'ng', 'lagoon', 'A struggling teen wins a scholarship to an elite school and starts living a lie.'],
+  ['smartmoney', 'The Smart Money Woman', 'series', 2020, '16+', 'Comedy', 'ng', 'lagoon', 'Five friends in Lagos chase love, money and the lives they want.'],
   // More international
-  ['barbie', 'Barbie', 'show', 2023, '13+', 'Comedy', 'intl', 'wb', 'Barbie leaves Barbieland and discovers the real world isn’t what she expected.'],
-  ['spiderverse', 'Spider-Man: Across the Spider-Verse', 'show', 2023, '13+', 'Animation', 'intl', 'wb', 'Miles Morales is thrown across the multiverse and up against every Spider-Person.'],
-  ['shogun', 'Shōgun', 'series', 2024, '18+', 'Drama', 'intl', 'velvet', 'A shipwrecked English sailor is caught in a war for power in feudal Japan.'],
-  ['strangerthings', 'Stranger Things', 'series', 2016, '16+', 'Sci-fi', 'intl', 'velvet', 'A boy vanishes and a small town uncovers secret experiments and a girl with powers.'],
+  ['barbie', 'Barbie', 'show', 2023, '13+', 'Comedy', 'intl', 'silverline', 'Barbie leaves Barbieland and discovers the real world isn’t what she expected.'],
+  ['spiderverse', 'Spider-Man: Across the Spider-Verse', 'show', 2023, '13+', 'Animation', 'intl', 'silverline', 'Miles Morales is thrown across the multiverse and up against every Spider-Person.'],
+  ['shogun', 'Shōgun', 'series', 2024, '18+', 'Drama', 'intl', 'ninemoons', 'A shipwrecked English sailor is caught in a war for power in feudal Japan.'],
+  ['strangerthings', 'Stranger Things', 'series', 2016, '16+', 'Sci-fi', 'intl', 'northstar', 'A boy vanishes and a small town uncovers secret experiments and a girl with powers.'],
   // Sitcoms
-  ['skinnygirl', 'Skinny Girl in Transit', 'series', 2015, '13+', 'Comedy', 'ng', 'velvet', 'A radio presenter juggles her weight, her mother and her love life in Lagos.'],
-  ['theoffice', 'The Office', 'series', 2005, '13+', 'Comedy', 'intl', 'wb', 'A camera crew follows the very ordinary staff of a paper company and their boss.'],
-  ['friends', 'Friends', 'series', 1994, '13+', 'Comedy', 'intl', 'wb', 'Six friends in New York get through work, love and everything in between.'],
-  ['b99', 'Brooklyn Nine-Nine', 'series', 2013, '13+', 'Comedy', 'intl', 'velvet', 'A gifted but goofy detective meets his match in a strict new captain.'],
-  ['abbott', 'Abbott Elementary', 'series', 2021, '13+', 'Comedy', 'intl', 'velvet', 'Teachers at an underfunded Philadelphia school do their best for their kids.'],
-  ['modernfamily', 'Modern Family', 'series', 2009, '13+', 'Comedy', 'intl', 'velvet', 'Three branches of one big family, and all the mess that comes with them.'],
-  ['parksrec', 'Parks and Recreation', 'series', 2009, '13+', 'Comedy', 'intl', 'velvet', 'An endlessly upbeat official tries to turn a pit into a park in small-town Indiana.'],
-  ['freshprince', 'The Fresh Prince of Bel-Air', 'series', 1990, '13+', 'Comedy', 'intl', 'wb', 'A street-smart teen from Philadelphia moves in with his rich relatives in Bel-Air.'],
+  ['skinnygirl', 'Skinny Girl in Transit', 'series', 2015, '13+', 'Comedy', 'ng', 'lekki', 'A radio presenter juggles her weight, her mother and her love life in Lagos.'],
+  ['theoffice', 'The Office', 'series', 2005, '13+', 'Comedy', 'intl', 'okra', 'A camera crew follows the very ordinary staff of a paper company and their boss.'],
+  ['friends', 'Friends', 'series', 1994, '13+', 'Comedy', 'intl', 'okra', 'Six friends in New York get through work, love and everything in between.'],
+  ['b99', 'Brooklyn Nine-Nine', 'series', 2013, '13+', 'Comedy', 'intl', 'okra', 'A gifted but goofy detective meets his match in a strict new captain.'],
+  ['abbott', 'Abbott Elementary', 'series', 2021, '13+', 'Comedy', 'intl', 'lekki', 'Teachers at an underfunded Philadelphia school do their best for their kids.'],
+  ['modernfamily', 'Modern Family', 'series', 2009, '13+', 'Comedy', 'intl', 'okra', 'Three branches of one big family, and all the mess that comes with them.'],
+  ['parksrec', 'Parks and Recreation', 'series', 2009, '13+', 'Comedy', 'intl', 'okra', 'An endlessly upbeat official tries to turn a pit into a park in small-town Indiana.'],
+  ['shameless', 'Shameless', 'series', 2011, '18+', 'Comedy', 'intl', 'okra', 'A brilliant, broke family of six raise themselves while their father drinks.'],
+  ['freshprince', 'The Fresh Prince of Bel-Air', 'series', 1990, '13+', 'Comedy', 'intl', 'okra', 'A street-smart teen from Philadelphia moves in with his rich relatives in Bel-Air.'],
 ]
 
 /* Access and price for titles that need specific ones; the rest are picked from the id. Premium
    passes cost more than the starting balance, so the top-up flow comes up. */
+/* Private studios sell a subscription to everything they make; public ones sell passes. */
+const STUDIO_ACCESS: Record<string, Title['access']> = {
+  harmattan: 'private',
+  redearth: 'public',
+  lagoon: 'public',
+  okra: 'public',
+  ninemoons: 'private',
+  silverline: 'public',
+  kolanut: 'private',
+  thirdmainland: 'public',
+  lekki: 'private',
+  ojuelegba: 'public',
+  northstar: 'private',
+  savannah: 'public',
+  ember: 'public',
+}
+
 const PRICING: Record<string, { access: Title['access']; passPrice?: number }> = {
   blackbook: { access: 'public', passPrice: 22000 },
   barbie: { access: 'public', passPrice: 25000 },
@@ -121,6 +219,7 @@ const PRICING: Record<string, { access: Title['access']; passPrice?: number }> =
   modernfamily: { access: 'private' },
   parksrec: { access: 'public', passPrice: 2500 },
   freshprince: { access: 'public', passPrice: 3000 },
+  shameless: { access: 'public', passPrice: 3500 },
 }
 
 /* Stable pseudo-random pick per id, so server and client agree. */
@@ -142,7 +241,7 @@ export const titles: Record<string, Title> = Object.fromEntries(
       blurb,
       poster: poster(id),
       still: backdrop(id),
-      access: PRICING[id]?.access ?? (hash(id) % 2 ? 'public' : 'private'),
+      access: PRICING[id]?.access ?? STUDIO_ACCESS[studioId] ?? (hash(id) % 2 ? 'public' : 'private'),
       passPrice: PRICING[id]?.passPrice ?? PASS_PRICES[(hash(id) >>> 3) % PASS_PRICES.length],
     },
   ]),
@@ -185,7 +284,8 @@ export const searchResults = [
   { id: 'r3', title: 'King of Boys', show: 'Film', studio: 'The Velvet Studio', thumb: backdrop('kob') },
 ]
 
-export const browseGrid = ['tribe', 'squid', 'kob', 'silo', 'anikulapo', 'wednesday', 'gangs', 'severance', 'shanty', 'bear', 'wedding', 'lastofus', 'lionheart', 'moneyheist', 'bloodsisters', 'oppenheimer', 'citation', 'bridgerton']
+// Search before typing: everything that's out, newest titles mixed in.
+export const browseGrid = seeds.map((x) => x[0]).filter((id) => !['funmilayo', 'jagun', 'breath', 'citation', 'wednesday', 'bridgerton'].includes(id))
 
 export const shelves: Record<string, Shelf> = {
   'must-see': mustSee,
@@ -268,7 +368,7 @@ export const feeds: Record<'shows' | 'series', Feed> = {
       { id: 'severance', videoId: '_UXKlYvLGJY', start: 25, end: 60 },
       { id: 'lastofus', videoId: 'wk5vOCcASHg', start: 20, end: 55 },
     ],
-    mustSee: ['shogun', 'squid', 'farfromhome', 'abbott', 'severance', 'strangerthings', 'skinnygirl', 'lastofus', 'smartmoney', 'shanty', 'bear', 'theoffice', 'bloodsisters', 'moneyheist', 'wednesday'],
+    mustSee: ['shogun', 'squid', 'shameless', 'farfromhome', 'abbott', 'severance', 'strangerthings', 'skinnygirl', 'lastofus', 'smartmoney', 'shanty', 'bear', 'theoffice', 'bloodsisters', 'moneyheist', 'wednesday'],
     continueWatching: [
       { id: 'silo', accessHours: 72, progress: 0.6, ep: 'S1 · E4' },
       { id: 'bloodsisters', accessHours: 11, progress: 0.3, ep: 'EP 2' },
@@ -276,7 +376,7 @@ export const feeds: Record<'shows' | 'series', Feed> = {
       { id: 'shanty', accessHours: 144, progress: 0.15, ep: 'EP 5' },
       { id: 'moneyheist', accessHours: 21, progress: 0.45, ep: 'S3 · E1' },
     ],
-    middle: { id: 'binge', title: 'Binge-worthy', items: ['strangerthings', 'friends', 'moneyheist', 'shogun', 'b99', 'bridgerton', 'farfromhome', 'modernfamily', 'lastofus', 'parksrec', 'shanty', 'severance', 'freshprince', 'bloodsisters', 'squid'] },
+    middle: { id: 'binge', title: 'Binge-worthy', items: ['strangerthings', 'shameless', 'friends', 'moneyheist', 'shogun', 'b99', 'bridgerton', 'farfromhome', 'modernfamily', 'lastofus', 'parksrec', 'shanty', 'severance', 'freshprince', 'bloodsisters', 'squid'] },
     coming: [
       { id: 'wednesday', when: 'More episodes soon' },
       { id: 'bridgerton', when: 'Coming 2 December' },
@@ -346,6 +446,7 @@ export const ALWAYS: Record<string, Hiccups> = {
 /* What plays once a title is unlocked: another real video of the same title (a scene or clip,
    never its trailer), so it's clearly not the teaser. Titles without one fall back to a sample. */
 export const films: Record<string, string> = {
+  shameless: 'sbCEGo-B9C4',
   kob: 'vo0K0fl__Zc',
   jagun: 'gHU_u8wQkOc',
   shanty: 'dIDZNFD199s',
@@ -418,4 +519,14 @@ export const trailers: Record<string, { videoId: string; start: number; end: num
   modernfamily: { videoId: 'Ub_lfN2VMIo', start: 10, end: 55 },
   parksrec: { videoId: '5IZWeAwdJ-s', start: 10, end: 55 },
   freshprince: { videoId: '_u6vYpbfCmQ', start: 10, end: 55 },
+  shameless: { videoId: '9tvkYS5cA58', start: 10, end: 55 },
+  moneyheist: { videoId: '_InqQJRqGW4', start: 10, end: 55 },
+  bear: { videoId: 'ojjCvICC86c', start: 10, end: 55 },
 }
+
+/* Is this title coming soon? One answer for the whole app: the main list plus every feed's
+   "Coming to Circo" row (new seasons included). Coming soon is always trailer only. */
+export function upcoming(id: string) {
+  return [...comingSoon, ...feeds.shows.coming, ...feeds.series.coming].find((c) => c.id === id)
+}
+

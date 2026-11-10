@@ -9,6 +9,7 @@ import { Shelf } from '../components/Shelf'
 import { HeroVideo } from '../components/HeroVideo'
 import { Theater } from '../components/Theater'
 import { Faq, FinalCta, Footer, Reveal } from '../components/Marketing'
+import { Button } from '../components/ui'
 
 /* Web version of the signed-out "Circo · Discover" screen (SSO SIGN UP - USER).
    The hero carries the Sign Up / Log In actions, so the header is just the logo. */
@@ -42,12 +43,10 @@ export default function Welcome() {
           <h1 className="hero__title">{hero.name}</h1>
           <p className="hero__blurb">{hero.blurb}</p>
           <div className="hero__actions hero__actions--welcome">
-            <button className="btn-white" onClick={() => navigate('/signup')}>
-              Sign Up to watch
-            </button>
-            <button className="btn-dark" onClick={() => navigate('/login')}>
+            <Button onClick={() => navigate('/signup')}>Sign Up to watch</Button>
+            <Button variant="secondary" onClick={() => navigate('/login')}>
               Log In
-            </button>
+            </Button>
           </div>
         </div>
       </section>

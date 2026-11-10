@@ -1,0 +1,225 @@
+'use client'
+
+import { useState } from 'react'
+import { Button, Divider, EmptyState, SegmentedControl, SelectField, Surface, Tag, Text, TextField, type TextVariant, type Tone } from '../components/ui'
+
+/* Living reference for the Circo design system. Everything here is the real component. */
+
+/* The twelve core colours. Everything on screen should come from these. */
+const COLOURS: { group: string; tokens: [string, string, string][] }[] = [
+  { group: 'Background', tokens: [['--bg-primary', 'Page', 'The page'], ['--surface-1', 'Surface', 'Panels and cards'], ['--bg-light', 'Light', 'Primary buttons']] },
+  { group: 'Text', tokens: [['--text-100', 'Primary', 'Headings, key text'], ['--text-200', 'Secondary', 'Body text'], ['--text-300', 'Muted', 'Meta, hints'], ['--text-on-light', 'On light', 'Text on white']] },
+  { group: 'Brand and status', tokens: [['--accent', 'Accent', 'Brand, progress'], ['--danger', 'Danger', 'Errors'], ['--warning', 'Warning', 'Time running out'], ['--success', 'Success', 'Confirmed']] },
+  { group: 'Lines', tokens: [['--stroke-strong', 'Line', 'Dividers, input lines']] },
+]
+
+const TYPE: { v: TextVariant; size: string; use: string }[] = [
+  { v: 'display', size: '40–72', use: 'Hero and coming-soon titles' },
+  { v: 'h1', size: '32', use: 'Page titles, big numbers' },
+  { v: 'h2', size: '24', use: 'Section and panel titles' },
+  { v: 'h3', size: '20', use: 'Shelf headings, card titles' },
+  { v: 'body', size: '16', use: 'Reading text, row titles, inputs, buttons' },
+  { v: 'body-sm', size: '14', use: 'Secondary text, small buttons' },
+  { v: 'caption', size: '12', use: 'Meta lines, hints, tags' },
+  { v: 'label', size: '12', use: 'Eyebrows in capitals' },
+]
+
+const TONES: Tone[] = ['primary', 'secondary', 'muted', 'accent', 'danger', 'warning', 'success']
+const SPACE = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16]
+
+export default function DesignSystem() {
+  const [gender, setGender] = useState('')
+  const [seg, setSeg] = useState('muted')
+  return (
+    <div className="page page--padded ds">
+      <Text variant="h1">Design system</Text>
+      <Text variant="body-sm" tone="muted" className="ds__intro">
+        Tokens live in <code>styles/tokens.css</code>, components in <code>components/ui.tsx</code>. Use these instead of one-off styles.
+      </Text>
+
+      <Section title="Colour">
+        {COLOURS.map((g) => (
+          <div key={g.group} className="ds__group">
+            <Text variant="label" tone="muted">
+              {g.group}
+            </Text>
+            <div className="ds__swatches">
+              {g.tokens.map(([t, label, use]) => (
+                <div key={t} className="ds__swatch">
+                  <span style={{ background: `var(${t})` }} />
+                  <Text variant="body-sm">{label}</Text>
+                  <Text variant="caption" tone="muted">
+                    {use}
+                  </Text>
+                  <Text variant="caption" tone="muted" as="code">
+                    {t}
+                  </Text>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="Type">
+        <div className="ds__type">
+          {TYPE.map((r) => (
+            <div key={r.v} className="ds__typerow">
+              <div className="ds__typemeta">
+                <Text variant="caption">{r.v}</Text>
+                <Text variant="caption" tone="muted">
+                  {r.size}px · {r.use}
+                </Text>
+              </div>
+              <Text variant={r.v} as="div">
+                {r.v === 'label' ? 'Coming 27 November' : 'King of Boys'}
+              </Text>
+            </div>
+          ))}
+        </div>
+        <div className="ds__group">
+          <Text variant="label" tone="muted">
+            Tones
+          </Text>
+          <div className="ds__row">
+            {TONES.map((t) => (
+              <Text key={t} variant="body" tone={t} as="span">
+                {t}
+              </Text>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Buttons">
+        <Text variant="body-sm" tone="muted">
+          Three styles, three sizes. Primary for the one main action on a screen; secondary for everything else; link for low-key actions like Cancel.
+        </Text>
+        {(['lg', 'md', 'sm'] as const).map((size) => (
+          <div key={size} className="ds__row">
+            <Text variant="caption" tone="muted" as="span" className="ds__rowlabel">
+              {size} · {size === 'lg' ? 56 : size === 'md' ? 48 : 40}px
+            </Text>
+            <Button size={size}>Primary</Button>
+            <Button size={size} variant="secondary">
+              Secondary
+            </Button>
+            <Button size={size} disabled>
+              Disabled
+            </Button>
+          </div>
+        ))}
+        <div className="ds__row">
+          <Text variant="caption" tone="muted" as="span" className="ds__rowlabel">
+            link
+          </Text>
+          <Button variant="link">Cancel</Button>
+        </div>
+        <div className="ds__row ds__row--art">
+          <Button>Watch Now</Button>
+          <Button variant="secondary">Secondary over artwork</Button>
+        </div>
+      </Section>
+
+      <Section title="Fields">
+        <div className="ds__fields">
+          <TextField label="Default" placeholder="Username" />
+          <TextField label="Filled" defaultValue="abeltesfaye" />
+          <TextField label="With a hint" defaultValue="abeltesfaye" hint="Letters and numbers, at least 3." />
+          <TextField label="Checking" defaultValue="abeltesfaye" status="checking" />
+          <TextField label="Success" defaultValue="abeltesfaye" status="success" hint="That username is free." />
+          <TextField label="Error" defaultValue="jonbellion" error="This username has been taken." />
+          <TextField label="Disabled" defaultValue="abeltesfaye" disabled />
+          <SelectField
+            label="Select"
+            placeholder="Select your gender"
+            value={gender}
+            onChange={setGender}
+            options={['Male', 'Female', 'Prefer not to say'].map((g) => ({ value: g, label: g }))}
+          />
+          <SelectField label="Select, disabled" placeholder="Select your gender" value="" onChange={() => {}} options={[]} disabled />
+        </div>
+        <Text variant="caption" tone="muted">
+          Focus: click any field. The line brightens while you type.
+        </Text>
+      </Section>
+
+      <Section title="Segmented control">
+        <Text variant="body-sm" tone="muted">
+          The one switcher. Used for Shows / Series and Muted / Blocked.
+        </Text>
+        <SegmentedControl label="Example" value={seg} onChange={setSeg} options={[{ value: 'muted', label: 'Muted' }, { value: 'blocked', label: 'Blocked' }]} />
+      </Section>
+
+      <Section title="Empty state">
+        <Surface level={1} pad="none">
+          <EmptyState
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 5 6 9H2v6h4l5 4V5z" />
+                <path d="M22 9l-6 6" />
+                <path d="M16 9l6 6" />
+              </svg>
+            }
+            action={<Button size="sm">Optional action</Button>}
+          >
+            You haven’t muted any studios.
+            <br />
+            You’ll see less from studios you mute.
+          </EmptyState>
+        </Surface>
+      </Section>
+
+      <Section title="Tags">
+        <div className="ds__row">
+          <Tag>3 days</Tag>
+          <Tag tone="accent">Best value · Save 75%</Tag>
+          <Tag tone="warning">Pass ends soon</Tag>
+        </div>
+      </Section>
+
+      <Section title="Surfaces">
+        <div className="ds__surfaces">
+          <Surface level={1}>
+            <Text variant="body">Surface 1</Text>
+            <Text variant="caption" tone="muted">
+              Panels on the page background (Account section)
+            </Text>
+          </Surface>
+          <Surface level={2}>
+            <Text variant="body">Surface 2</Text>
+            <Text variant="caption" tone="muted">
+              Cards and rows inside a panel
+            </Text>
+          </Surface>
+        </div>
+      </Section>
+
+      <Section title="Spacing">
+        <div className="ds__space">
+          {SPACE.map((n) => (
+            <div key={n} className="ds__spacerow">
+              <Text variant="caption" tone="muted" as="code">
+                --space-{n}
+              </Text>
+              <span style={{ width: `var(--space-${n})` }} />
+              <Text variant="caption" tone="muted">
+                {n * 4}px
+              </Text>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </div>
+  )
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="ds__section">
+      <Text variant="h2">{title}</Text>
+      <Divider />
+      {children}
+    </section>
+  )
+}
