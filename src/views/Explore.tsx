@@ -107,7 +107,7 @@ export default function Explore() {
   )
 }
 
-/* An episode: its own YouTube thumbnail, then season and episode with the episode name beside it. */
+/* An episode: its own YouTube thumbnail, the episode name, then studio, season and episode. */
 export function EpisodeCard({ ep }: { ep: Episode }) {
   const { clip } = ep
   return (
@@ -127,12 +127,10 @@ export function EpisodeCard({ ep }: { ep: Episode }) {
           <PlayGlyph />
         </span>
       </div>
-      <p className="epcard__title">
-        <span className="epcard__num">
-          S{ep.season} · E{ep.episode}
-        </span>{' '}
-        {clip.title}
-      </p>
+      <strong className="epcard__title">{clip.title}</strong>
+      <span className="epcard__meta">
+        {clip.channel} · S{ep.season} · E{ep.episode}
+      </span>
     </Link>
   )
 }
