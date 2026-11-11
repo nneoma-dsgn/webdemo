@@ -6,7 +6,7 @@ import { useReminders } from '../data/reminders'
 import { useMenu } from './Menu'
 import { Button } from './ui'
 
-/* Where a coming-soon teaser ends: the scene blurs out like a premiere screen, the thumbnail
+/* Where a coming-soon trailer ends: the scene blurs out like a premiere screen, the thumbnail
    comes up, and below it the title, release date, a line of description, Notify Me and Replay. */
 
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']

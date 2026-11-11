@@ -22,9 +22,9 @@ export default function Studio() {
 
   return (
     <div className="page page--studio">
-      {/* The studio's own reel, or the placeholder film set until it uploads one. */}
+      {/* The studio's own trailer, or the placeholder film set until it uploads one. */}
       <section className="backdrop backdrop--center">
-        <video className="backdrop__art" src={s.teaser ?? STUDIO_PLACEHOLDER} autoPlay muted loop playsInline aria-hidden />
+        <video className="backdrop__art" src={s.trailer ?? STUDIO_PLACEHOLDER} autoPlay muted loop playsInline aria-hidden />
         <div className="backdrop__scrim" />
         <div className="page-back">
           <BackButton />
@@ -40,17 +40,17 @@ export default function Studio() {
             <EpisodeCard key={e.clip.id} ep={e} />
           ))}
         </Shelf>
-        <Shelf title="Shows" to="/browse/all">
+        <Shelf title="Shows">
           {mine.filter((x) => titles[x].kind === 'show' && !upcoming(x)).map((x) => (
             <PosterCard key={x} t={titles[x]} />
           ))}
         </Shelf>
-        <Shelf title="Series" to="/browse/all">
+        <Shelf title="Series">
           {mine.filter((x) => titles[x].kind === 'series' && !upcoming(x)).map((x) => (
             <PosterCard key={x} t={titles[x]} />
           ))}
         </Shelf>
-        <Shelf title="Coming to Circo" to="/browse/coming-to-circo">
+        <Shelf title="Coming to Circo">
           {mine.map((x) => upcoming(x)).filter((c): c is NonNullable<typeof c> => !!c).map((c) => (
             <ComingCard
               key={c.id}

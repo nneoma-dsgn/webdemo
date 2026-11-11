@@ -2370,10 +2370,6 @@ body.spot-focus .page--welcome .cta-wrap {
   text-overflow: ellipsis;
 }
 
-
-
-
-
 .dd__item {
   display: flex;
   align-items: center;
@@ -5589,15 +5585,36 @@ a.result:hover .result__title,
 }
 
 .acct__item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 18px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   text-align: left;
   color: var(--text-100);
   transition: background 0.2s;
+}
+
+/* A straight hairline between items (a border would curve with the rounded corners). It
+   hides around the selected item, whose highlight already separates it. */
+.acct__item::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.acct__item:last-child::after,
+.acct__item.is-on::after,
+.acct__item:has(+ .acct__item.is-on)::after,
+.acct__item:hover::after,
+.acct__item:has(+ .acct__item:hover)::after {
+  opacity: 0;
 }
 
 .acct__item:hover {
@@ -5712,66 +5729,6 @@ a.result:hover .result__title,
   font-variant-numeric: tabular-nums;
 }
 
-.acct__list {
-  display: flex;
-  flex-direction: column;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.acct__list--settings {
-  margin-top: 20px;
-}
-
-.acct__row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  text-align: left;
-  color: var(--text-100);
-}
-
-.acct__row + .acct__row {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.acct__row > div {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.acct__row strong {
-  flex: 1;
-  font-size: var(--fs-body);
-  font-weight: var(--fw-semibold);
-}
-
-.acct__row span {
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
-}
-
-.acct__row--link {
-  width: 100%;
-  transition: background 0.2s;
-}
-
-.acct__row--link:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.acct__logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
 .acct__poster {
   width: 36px;
   aspect-ratio: 2 / 3;
@@ -5843,6 +5800,12 @@ a.result:hover .result__title,
     background: none;
   }
 
+  /* No highlight on phones, so the lines stay. */
+  .acct__item.is-on::after,
+  .acct__item:has(+ .acct__item.is-on)::after {
+    opacity: 1;
+  }
+
   .acct__back {
     display: inline-flex;
     align-items: center;
@@ -5855,38 +5818,6 @@ a.result:hover .result__title,
 }
 
 /* ---------- Library (Figma "WALLET") ---------- */
-
-.lib-balance {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: calc(var(--nav-h) + 48px) var(--gutter) 64px;
-  background: var(--bg-200, #1a1a1a);
-  text-align: center;
-}
-
-.lib-balance__label {
-  font-size: var(--fs-body-sm);
-  font-weight: var(--fw-medium);
-  letter-spacing: -0.42px;
-  color: #4b4f54;
-}
-
-.lib-balance__amount {
-  font-size: var(--fs-h1);
-  font-weight: var(--fw-bold);
-  line-height: normal;
-  letter-spacing: -1.6px;
-  color: var(--text-100);
-  font-variant-numeric: tabular-nums;
-}
-
-.lib-balance__cents {
-  font-size: var(--fs-body);
-  font-weight: var(--fw-medium);
-  letter-spacing: 0;
-}
 
 .lib-shelves {
   padding-top: 32px;
@@ -5958,11 +5889,11 @@ a.result:hover .result__title,
 
 /* The section sits on a dark grey panel. */
 .acct .acct__panel {
-  padding: 32px 36px 40px;
+  /* Hugs its content; the last row's own padding gives the bottom breathing room. */
+  padding: 32px 36px 14px;
   border-radius: 24px;
   background: var(--surface-1);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  min-height: calc(100vh - var(--nav-h) - 120px);
 }
 
 @media (max-width: 767px) {
@@ -5975,109 +5906,15 @@ a.result:hover .result__title,
 }
 
 /* Your Account: label over value rows with a hairline between, as in the mobile design. */
-.acct-fields {
-  display: flex;
-  flex-direction: column;
-}
-
-.acct-field {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.acct-field__label {
-  font-size: var(--fs-body);
-  color: var(--text-300);
-}
-
-.acct-field__value,
-.acct-field__select {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  min-height: 28px;
-  font-size: var(--fs-body);
-  font-weight: var(--fw-medium);
-  color: var(--text-100);
-  text-align: left;
-}
-
-.acct-field__value .is-empty,
-.acct-field__select select:invalid {
-  color: var(--text-300);
-  font-weight: var(--fw-regular);
-}
-
-.acct-field__select select,
-.acct-field__select input[type='date'] {
-  flex: 1;
-  appearance: none;
-  -webkit-appearance: none;
-  border: 0;
-  outline: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  color-scheme: dark;
-}
-
-.acct-field__select select option {
-  background: #1c1c1e;
-}
 
 /* The date input stays clickable underneath; the friendly date shows over it once set. */
-.acct-field__select input[type='date'] {
-  min-height: 28px;
-}
-
-.acct-field__pretty {
-  position: absolute;
-  inset: 0 auto 0 0;
-  display: flex;
-  align-items: center;
-  padding-right: 40px;
-  background: var(--panel-bg, #121214);
-  pointer-events: none;
-}
-
-.acct-field__edit {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-}
-
-.acct-field__edit .acct-field__actions {
-  min-height: 48px;
-}
-
-.acct-field__input {
-  flex: 1;
-}
 
 /* Save and Cancel, with room between them. */
-.acct-field__actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
 
 /* Menu icons a size down to match the smaller text. */
 .acct__icon svg {
   width: 18px;
   height: 18px;
-}
-
-.acct-field__value.is-empty,
-.acct-field__value .is-empty {
-  color: var(--text-300);
-  font-weight: var(--fw-regular);
 }
 
 /* ---------- Library balance header: three looks (?look=a|b|c) ---------- */
@@ -6111,14 +5948,12 @@ a.result:hover .result__title,
   font-size: var(--fs-body-sm);
 }
 
-.lib-a,
-.lib-b,
-.lib-c {
+.lib-a {
   margin: calc(var(--nav-h) + var(--space-6)) var(--gutter) 0;
 }
 
-/* A: a dark card with a soft brand glow behind the balance. (.ui-surface.lib-a outranks the
-   plain surface fill.) */
+/* The balance card: dark, with a soft brand glow behind the balance. (.ui-surface.lib-a
+   outranks the plain surface fill.) */
 .ui-surface.lib-a {
   position: relative;
   overflow: hidden;
@@ -6142,102 +5977,10 @@ a.result:hover .result__title,
   gap: var(--space-2);
 }
 
-/* B */
-.lib-b {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-6);
-  padding-bottom: var(--space-6);
-  border-bottom: 1px solid var(--stroke-default);
-}
-
-.lib-b__pill {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-5);
-  border-radius: var(--radius-full);
-  background: var(--bg-200);
-  border: 1px solid var(--stroke-strong);
-}
-
-/* C */
-.lib-c {
-  display: grid;
-  grid-template-columns: minmax(320px, 440px) minmax(0, 1fr);
-  gap: var(--space-6);
-}
-
-.lib-c__wallet {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 240px;
-  padding: var(--space-8);
-  overflow: hidden;
-  border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, #ff3d5e 0%, #c2105e 45%, #2b1d6b 100%);
-}
-
-.lib-c__wallet::after {
-  content: '';
-  position: absolute;
-  top: -70px;
-  right: -70px;
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.lib-c__wallet .lib-amt span {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.lib-c__foot {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.lib-c__stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-}
-
-.lib-c__stat {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: var(--space-6);
-  text-align: left;
-  color: var(--text-100);
-}
-
-.lib-c__stat--action {
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.lib-c__stat--action:hover {
-  background: var(--surface-3);
-}
-
 @media (max-width: 900px) {
-  .lib-a,
-  .lib-b {
+  .lib-a {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .lib-c {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -6252,22 +5995,6 @@ a.result:hover .result__title,
 }
 
 /* A list straight on the panel: no box, a line under each row. */
-.acct__list--plain {
-  margin-top: var(--space-4);
-  border: 0;
-  border-radius: 0;
-  background: none;
-  overflow: visible;
-}
-
-.acct__list--plain .acct__row {
-  padding: var(--space-4) 0;
-  border-bottom: 1px solid var(--stroke-default);
-}
-
-.acct__list--plain .acct__row + .acct__row {
-  border-top: 0;
-}
 
 /* Pinned section header (title + switcher) inside the account panel. It bleeds to the panel's
    edges so the list scrolls cleanly underneath. */
@@ -6333,7 +6060,6 @@ a.result:hover .result__title,
   box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.03);
 }
 
-
 /* Studios heading on the Library links to its "See all" page like the shelves do. */
 .lib-studios__head {
   padding: 0;
@@ -6386,26 +6112,10 @@ a.result:hover .result__title,
   transform: scale(1.04);
 }
 
-.epcard__play {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #fff;
-  color: #000;
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.9);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.epcard:hover .epcard__play,
-.epcard:focus-visible .epcard__play {
+.epcard:hover .cw__play,
+.epcard:focus-visible .cw__play {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
+  transform: none;
 }
 
 .epcard__title {
@@ -6436,7 +6146,6 @@ a.result:hover .result__title,
   }
 }
 
-
 /* Saved episodes sit under saved titles on the Saved for later page. */
 .grid + .lib-saved-eps {
   margin-top: var(--space-10);
@@ -6451,4 +6160,269 @@ a.result:hover .result__title,
 
 .notfound .ui-empty {
   padding-top: 0;
+}
+
+/* Load Balance dialog. */
+.loadbal .ui-field input {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+}
+
+.loadbal__fail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md, 12px);
+  background: rgba(218, 60, 60, 0.12);
+}
+
+.loadbal .loadbal__fail p {
+  margin: 0;
+}
+
+.loadbal__cta {
+  margin-top: var(--space-8);
+}
+
+/* .loadbal scopes these past the shared text reset (ui.css loads after app.css). */
+.loadbal .loadbal__fine {
+  margin: var(--space-5) 0 0;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Cancel subscription confirm. */
+.ui-dialog .subcancel__text {
+  margin: 0 0 var(--space-6);
+  line-height: 1.5;
+}
+
+.subcancel__acts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Library → Studios: subscriptions on a panel, recommended studios as cards. */
+.libst + .libst {
+  margin-top: var(--space-12, 48px);
+}
+
+.libst .libst__h {
+  margin: 0 0 var(--space-4);
+}
+
+.libst__panel {
+  padding: var(--space-2) var(--space-6);
+}
+
+.libst .libst__none {
+  margin: 0;
+}
+
+.libst__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-4);
+}
+
+.libst__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-3) var(--space-4);
+}
+
+/* Studio artwork, name and price set on it. */
+.libst__art {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  color: inherit;
+}
+
+.libst__art > video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s var(--ease);
+}
+
+.libst__art:hover > video {
+  transform: scale(1.04);
+}
+
+.libst__art::after {
+  content: '';
+  position: absolute;
+  inset: 35% 0 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.85));
+}
+
+.libst__who {
+  position: absolute;
+  z-index: 1;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.libst__who img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.libst__who > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.libst__who strong {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+}
+
+.libst__who span span {
+  font-size: var(--fs-body-sm);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* A taste of the catalogue. */
+.libst__posters {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.libst__poster {
+  aspect-ratio: 156 / 218;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-200);
+}
+
+.libst__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The player's access screen, opened from a page: fixed over everything. */
+.vp-access--page {
+  position: fixed;
+  z-index: 200;
+}
+
+/* ---------- Notifications ---------- */
+
+.notif {
+  position: relative;
+}
+
+.notif .capsule__btn {
+  position: relative;
+}
+
+.notif__dot {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  /* A deeper take on the brand red, so the small dot reads as red rather than pink. */
+  background: #e0003c;
+}
+
+/* The dropdown's glass panel, anchored under the bell. */
+.notif__panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -60px;
+  width: 380px;
+  padding: var(--space-2);
+  transform-origin: top right;
+}
+
+.notif__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-3) var(--space-4);
+}
+
+.notif__head strong {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+}
+
+.notif__list {
+  display: flex;
+  flex-direction: column;
+  max-height: min(520px, 70vh);
+  overflow-y: auto;
+}
+
+.notif__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: 12px;
+  color: inherit;
+  transition: background 0.2s;
+}
+
+.notif__item:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.notif__item img {
+  flex: none;
+  width: 88px;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.notif__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notif__text strong {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  line-height: 1.35;
+  color: var(--text-300);
+}
+
+.notif__item.is-unread .notif__text strong {
+  font-weight: var(--fw-semibold);
+  color: var(--text-100);
+}
+
+.notif__text span {
+  font-size: var(--fs-body-sm);
+  color: var(--text-300);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif__panel .notif__empty {
+  padding: var(--space-8) var(--space-4) var(--space-10);
 }

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSession, signOut, updateSession } from '../auth'
-import { useMenu } from '../components/Menu'
 import { icons } from '../data/catalog'
 
 type Step = 'gender' | 'interests'
@@ -33,7 +32,6 @@ const MAX_PICKS = 5
    choice, dropping the half-created session so that screen is reachable again. */
 export default function Onboarding() {
   const router = useRouter()
-  const { toast } = useMenu()
   const [step, setStep] = useState<Step>('gender')
   const [gender, setGender] = useState<string | null>(null)
   const [picks, setPicks] = useState<string[]>([])
@@ -46,9 +44,7 @@ export default function Onboarding() {
   }
 
   const finish = (interests: string[]) => {
-    const session = getSession()
     updateSession({ gender: gender ?? undefined, interests, onboarded: true })
-    toast(`Welcome to Circo${session?.name ? `, ${session.name.split(' ')[0]}` : ''}`)
     router.replace('/')
   }
 

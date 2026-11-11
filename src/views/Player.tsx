@@ -19,7 +19,8 @@ import { Button } from '../components/ui'
 /* Circo video player. Loading screen after Netflix (title top-left, spinner centre); controls
    after the Circo mobile player (glass skip/play circles, red scrubber) and Apple TV / Netflix web
    (episode + title bottom-left, tools bottom-right). Controls fade out while playing and idle.
-   Plays the title's trailer from YouTube for the prototype; production streams Circo's own video. */
+   Plays the teaser, then the title once unlocked, from YouTube for the prototype; production
+   streams Circo's own video. */
 
 const IDLE_MS = 3000
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2]
@@ -497,7 +498,6 @@ function PlayerView() {
         isBlocked(t.studioId)
           ? { id: 'block', label: 'Unblock studio', icon: 'block', danger: true, onSelect: () => (toggleBlocked(t.studioId), toast(`${studios[t.studioId]?.name ?? 'Studio'} unblocked`)) }
           : { id: 'block', label: 'Block', icon: 'block', danger: true, onSelect: () => (toggleBlocked(t.studioId), toast(`${studios[t.studioId]?.name ?? 'This studio'} is blocked`)) },
-        { id: 'report', label: 'Report', icon: 'flag', danger: true, onSelect: () => toast('Thanks, we’ll look into it') },
       ],
     })
 
@@ -728,7 +728,7 @@ function PlayerView() {
       {!clip && (
         <div className="vp__unavailable">
           <strong>Preview unavailable</strong>
-          <span>There’s no trailer for {t.name} in this prototype yet.</span>
+          <span>There’s no teaser for {t.name} in this prototype yet.</span>
         </div>
       )}
 
@@ -778,6 +778,17 @@ function PlayerView() {
       )}
 
       {ended && soon && <ComingSoon t={t} when={soon.when} onReplay={replay} />}
+      {/* Same close as the access screen, pinned top right. */}
+      {ended && soon && (
+        <div className="vp-access__top">
+          <button className="vp-access__close" onClick={exit} aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
+              <path d="M18 6 6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* A trailer always ends on the access tickets. */}
       {((ended && !soon && !featureMode && !paidHere) || (halted && !unlocked)) && (

@@ -40,6 +40,8 @@ export default function Home() {
   const [removed, setRemoved] = useState<Set<string>>(new Set())
   // Shows and Series are separate feeds, each with its own hero carousel and shelves.
   const feed = feeds[tab]
+  // See-all pages open on the same tab's titles.
+  const q = tab === 'series' ? '?tab=series' : ''
   // Continue Watching: only what you've actually been watching, latest first.
   const viewing = useViewing()
   const kind = tab === 'series' ? 'series' : 'show'
@@ -144,7 +146,7 @@ export default function Home() {
       </section>
 
       <div className="shelves">
-        <Shelf title="Must See" to="/browse/must-see">
+        <Shelf title="Must See" to={`/browse/must-see${q}`}>
           {feed.mustSee.map((id) => (
             <PosterCard key={id} t={titles[id]} />
           ))}
@@ -172,19 +174,19 @@ export default function Home() {
           </Shelf>
         )}
 
-        <Shelf title={feed.middle.title} to={`/browse/${feed.middle.id === 'nollywood' ? 'nollywood' : 'all'}`}>
+        <Shelf title={feed.middle.title} to={`/browse/${feed.middle.id}${q}`}>
           {feed.middle.items.map((id) => (
             <PosterCard key={id} t={titles[id]} />
           ))}
         </Shelf>
 
-        <Shelf title="Coming to Circo" to="/browse/coming-to-circo">
+        <Shelf title="Coming to Circo" to={`/browse/coming-to-circo${q}`}>
           {feed.coming.map((c) => (
             <ComingCard key={c.id} t={titles[c.id]} when={c.when} label={c.label} reminded={reminders.has(c.id)} onRemind={() => remind(c.id)} />
           ))}
         </Shelf>
 
-        <Shelf title="All" to="/browse/all">
+        <Shelf title="All" to={`/browse/all${q}`}>
           {feed.all.map((id) => (
             <PosterCard key={id} t={titles[id]} />
           ))}
@@ -194,9 +196,9 @@ export default function Home() {
   )
 }
 
-export function PlayGlyph() {
+export function PlayGlyph({ size = 20 }: { size?: number }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden>
       <path d="M5.75 3.78C5.42 3.58 5 3.82 5 4.21v11.58c0 .39.42.63.75.43l9.77-5.79a.5.5 0 0 0 0-.86L5.75 3.78Z" fill="currentColor" />
     </svg>
   )

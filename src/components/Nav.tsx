@@ -8,6 +8,7 @@ import { icons } from '../data/catalog'
 import { categories, category } from '../data/explore'
 import { useMenu } from './Menu'
 import { SegmentedControl } from './ui'
+import { NotificationBell } from './Notifications'
 
 /* Desktop and tablet: Netflix/Apple TV style top bar that is transparent over the
    hero and turns solid once the page scrolls. */
@@ -44,6 +45,7 @@ export function TopNav() {
           <button className="capsule__btn" aria-label="Cast to device" onClick={() => toast('Looking for devices nearby')}>
             <CapsuleIcon name="cast" />
           </button>
+          <NotificationBell />
           <span className="capsule__sep" aria-hidden />
           <AccountMenu />
         </div>

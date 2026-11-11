@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ComponentProps, type ElementType, type HTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ComponentProps, type ElementType, type HTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useMenu } from './Menu'
 
@@ -162,6 +162,96 @@ export function EmptyState({ icon, children, action, className = '' }: { icon: R
       </span>
       <p className="ui-empty__text">{children}</p>
       {action}
+    </div>
+  )
+}
+
+/* ---------- List ---------- */
+
+/* Rows separated by hairlines, the one list style everywhere (account details, settings,
+   links, muted studios). Two kinds of row:
+     - Button row: `action` puts a button on the right (Edit, Unmute, any label).
+     - Link row: `onClick` makes the whole row a link, with a chevron on the right.
+   Either can have a small `label` above, a `leading` image and `sub` text under the title.
+   A row with neither is plain text. Pass children instead of title to put something else on
+   the line (an edit form). */
+export function List({ className = '', ...rest }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={`ui-list ${className}`.trim()} {...rest} />
+}
+
+type RowProps = { label?: ReactNode; title?: ReactNode; sub?: ReactNode; empty?: boolean; leading?: ReactNode; action?: { label: string; onClick: () => void }; onClick?: () => void; children?: ReactNode; className?: string }
+
+export function ListRow({ label, title, sub, empty, leading, action, onClick, children, className = '' }: RowProps) {
+  const line = (
+    <span className="ui-row__line">
+      {leading && <span className="ui-row__lead">{leading}</span>}
+      {children ?? (
+        <span className="ui-row__main">
+          <span className={`ui-row__title${empty ? ' is-empty' : ''}`}>{title}</span>
+          {sub && <span className="ui-row__sub">{sub}</span>}
+        </span>
+      )}
+      {action && (
+        <Button variant="secondary" size="sm" onClick={action.onClick}>
+          {action.label}
+        </Button>
+      )}
+      {onClick && (
+        <svg className="ui-row__chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M9 6l6 6-6 6" />
+        </svg>
+      )}
+    </span>
+  )
+  const body = (
+    <>
+      {label && <span className="ui-row__label">{label}</span>}
+      {line}
+    </>
+  )
+  return onClick ? (
+    <button type="button" className={`ui-row ui-row--link ${className}`.trim()} onClick={onClick}>
+      {body}
+    </button>
+  ) : (
+    <div className={`ui-row ${className}`.trim()}>{body}</div>
+  )
+}
+
+/* ---------- Dialog ---------- */
+
+/* A centred panel over a dimmed page: title, close ✕, then whatever the flow needs.
+   Escape or a click on the backdrop closes it, unless busy (e.g. mid-payment). */
+export function Dialog({ title, onClose, busy, children, className = '' }: { title: string; onClose: () => void; busy?: boolean; children: ReactNode; className?: string }) {
+  const panel = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const prev = document.activeElement as HTMLElement | null
+    panel.current?.querySelector<HTMLElement>('input, button:not(.ui-dialog__close)')?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !busy) onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      prev?.focus()
+    }
+  }, [busy, onClose])
+  return (
+    <div className="ui-dialog" onMouseDown={(e) => e.target === e.currentTarget && !busy && onClose()}>
+      <div ref={panel} className={`ui-dialog__panel ${className}`.trim()} role="dialog" aria-modal="true" aria-label={title}>
+        <div className="ui-dialog__head">
+          <Text variant="h3" as="h2">
+            {title}
+          </Text>
+          <button className="ui-dialog__close" onClick={onClose} disabled={busy} aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
+              <path d="M18 6 6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        {children}
+      </div>
     </div>
   )
 }

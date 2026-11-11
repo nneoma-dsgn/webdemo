@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Divider, EmptyState, SegmentedControl, SelectField, Surface, Tag, Text, TextField, type TextVariant, type Tone } from '../components/ui'
+import { Button, Divider, EmptyState, List, ListRow, SegmentedControl, SelectField, Surface, Tag, Text, TextField, type TextVariant, type Tone } from '../components/ui'
 
 /* Living reference for the Circo design system. Everything here is the real component. */
 
@@ -149,6 +149,29 @@ export default function DesignSystem() {
           The one switcher. Used for Shows / Series and Muted / Blocked.
         </Text>
         <SegmentedControl label="Example" value={seg} onChange={setSeg} options={[{ value: 'muted', label: 'Muted' }, { value: 'blocked', label: 'Blocked' }]} />
+      </Section>
+
+      <Section title="List">
+        <Text variant="body-sm" tone="muted">
+          The one list. A button row has an action on the right (Edit, Unmute, any label); a link row opens something and shows a chevron. Either can have a label above, an image and sub text.
+        </Text>
+        <List>
+          <ListRow label="Label" title="Value" action={{ label: 'Button', onClick: () => {} }} />
+          <ListRow label="Label" title="Not set" empty action={{ label: 'Button', onClick: () => {} }} />
+          <ListRow title="Link row" onClick={() => {}} />
+          <ListRow title="Link row with sub text" sub="A short line about where it goes" onClick={() => {}} />
+          <ListRow label="Label" title="Read-only value" />
+        </List>
+      </Section>
+
+      <Section title="Thumbnail placeholder">
+        <Text variant="body-sm" tone="muted">
+          Shown automatically when a poster or still doesn’t load. The frame keeps its shape.
+        </Text>
+        <div className="ds-thumbs">
+          <div className="poster__art img-fallback ds-thumb--portrait" />
+          <div className="cw__media img-fallback ds-thumb--landscape" />
+        </div>
       </Section>
 
       <Section title="Empty state">

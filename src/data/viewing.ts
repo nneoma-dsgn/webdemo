@@ -8,7 +8,8 @@ import { plans, type Title } from './catalog'
 
 export type Progress = { ep?: string; t: number; d: number; at: number }
 type Pass = { startedAt: number | null } // the 24 hours start on first play
-type Sub = { plan: string; until: number }
+/* until: end of the current billing cycle. cancelled: it won't renew, access runs to until. */
+export type Sub = { plan: string; until: number; cancelled?: boolean }
 export type Quality = 'auto' | '480' | '720' | '1080'
 type State = { progress: Record<string, Progress>; passes: Record<string, Pass>; subs: Record<string, Sub>; balance: number; quality: Quality; audioLang: string | null; subLang: string | null }
 
@@ -110,6 +111,16 @@ export function fakePassLeft(id: string, ms: number) {
 
 export function joinStudio(studioId: string, plan: string) {
   set((s) => ({ ...s, subs: { ...s.subs, [studioId]: { plan, until: Date.now() + (PLAN_MS[plan] ?? PLAN_MS.month) } } }))
+}
+
+/* Cancel at the end of the current billing cycle: access stays until then, it just won't
+   renew. Resume undoes that before the cycle ends. (The backend does the actual renewing.) */
+export function cancelSub(studioId: string) {
+  set((s) => (s.subs[studioId] ? { ...s, subs: { ...s.subs, [studioId]: { ...s.subs[studioId], cancelled: true } } } : s))
+}
+
+export function resumeSub(studioId: string) {
+  set((s) => (s.subs[studioId] ? { ...s, subs: { ...s.subs, [studioId]: { ...s.subs[studioId], cancelled: false } } } : s))
 }
 
 /* Time left on whatever unlocks this title, in ms. null: no access. Infinity: pass bought but

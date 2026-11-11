@@ -8,6 +8,7 @@ import '@/styles/ui.css'
 import { MenuProvider } from '@/components/Menu'
 import { MiniPlayer } from '@/components/MiniPlayer'
 import { DevPerfGuard } from '@/components/DevPerfGuard'
+import { ImageFallback } from '@/components/ImageFallback'
 
 export const metadata: Metadata = {
   title: 'Circo',
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <DevPerfGuard />
+        <ImageFallback />
         <Script src="https://www.youtube.com/iframe_api" strategy="afterInteractive" />
         <MenuProvider>
           {children}

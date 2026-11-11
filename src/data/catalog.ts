@@ -31,11 +31,15 @@ export type Studio = {
   logo: string
   backdrop: string
   about: string
-  teaser?: string // the studio's own reel; studios without one show STUDIO_PLACEHOLDER
+  /* The studio's own trailer: plays on its studio page and, blurred, behind its Join screen.
+     Studios without one show STUDIO_PLACEHOLDER. */
+  trailer?: string
 }
 
-/* Shown on studio pages until the studio uploads its own teaser: a quiet film-set loop. */
-export const STUDIO_PLACEHOLDER = '/media/studio-teaser.mp4'
+/* Shown on studio pages until the studio uploads its own trailer: a quiet film-set loop.
+   Wording: a trailer is a title's or studio's full promo; a teaser is the short preview that
+   plays before a video until you have access. */
+export const STUDIO_PLACEHOLDER = '/media/studio-trailer.mp4'
 
 export const studios: Record<string, Studio> = {
   harmattan: {
@@ -294,12 +298,6 @@ export const searchResults = [
 // Search before typing: everything that's out, newest titles mixed in.
 export const browseGrid = seeds.map((x) => x[0]).filter((id) => !['funmilayo', 'jagun', 'breath', 'citation', 'wednesday', 'bridgerton'].includes(id))
 
-export const shelves: Record<string, Shelf> = {
-  'must-see': mustSee,
-  'coming-to-circo': { id: 'coming-to-circo', title: 'Coming to Circo', items: comingSoon.map((c) => c.id) },
-  nollywood,
-  all,
-}
 
 export const icons = {
   play: a('icon-play.svg'),

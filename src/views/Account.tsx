@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { USERNAME_MIN, getSession, signOut, updateSession, usernameHasBadChars, usernameTaken, type Session } from '../auth'
 import { icons, studios, titles } from '../data/catalog'
 import { useBlocked, useMuted } from '../data/moderation'
-import { Button, EmptyState, SegmentedControl, SelectField, TextField } from '../components/ui'
+import { Button, EmptyState, List, ListRow, SegmentedControl, SelectField, TextField } from '../components/ui'
 import { useMenu } from '../components/Menu'
 
 /* Account: one place for your profile and money, what you see, the legal bits, help, and
@@ -132,27 +132,16 @@ function YourAccount() {
   }
   const gender = session?.gender ? GENDERS.find((g) => g.toLowerCase().startsWith(session.gender!.toLowerCase().slice(0, 4))) ?? session.gender : ''
 
-  const editBtn = (onClick: () => void) => (
-    <Button variant="secondary" size="sm" onClick={onClick}>
-      Edit
-    </Button>
-  )
   // Read-only details (from sign-in) are plain text.
-  const plain = (label: string, value: string | undefined) => (
-    <div className="acct-field">
-      <span className="acct-field__label">{label}</span>
-      <span className={`acct-field__value${value ? '' : ' is-empty'}`}>{value || 'Not set'}</span>
-    </div>
-  )
+  const plain = (label: string, value: string | undefined) => <ListRow label={label} title={value || 'Not set'} empty={!value} />
 
   return (
     <>
       <h2 className="acct__h">Your Account</h2>
-      <div className="acct-fields">
+      <List>
         {/* Username: editable. */}
-        <div className="acct-field">
-          <span className="acct-field__label">Username</span>
-          {editing === 'username' ? (
+        {editing === 'username' ? (
+          <ListRow label="Username">
             <form
               className="acct-field__edit"
               onSubmit={(e) => {
@@ -182,20 +171,16 @@ function YourAccount() {
                 </Button>
               </div>
             </form>
-          ) : (
-            <span className="acct-field__value">
-              <span>{session?.username ?? 'Not set'}</span>
-              {editBtn(() => edit('username'))}
-            </span>
-          )}
-        </div>
+          </ListRow>
+        ) : (
+          <ListRow label="Username" title={session?.username ?? 'Not set'} empty={!session?.username} action={{ label: 'Edit', onClick: () => edit('username') }} />
+        )}
 
         {plain('Email Address', session?.email)}
 
         {/* Gender: editable. */}
-        <div className="acct-field">
-          <span className="acct-field__label">Gender</span>
-          {editing === 'gender' ? (
+        {editing === 'gender' ? (
+          <ListRow label="Gender">
             <span className="acct-field__edit">
               <SelectField
                 className="acct-field__input"
@@ -214,16 +199,13 @@ function YourAccount() {
                 </Button>
               </div>
             </span>
-          ) : (
-            <span className="acct-field__value">
-              <span className={gender ? '' : 'is-empty'}>{gender || 'Not set'}</span>
-              {editBtn(() => setEditing('gender'))}
-            </span>
-          )}
-        </div>
+          </ListRow>
+        ) : (
+          <ListRow label="Gender" title={gender || 'Not set'} empty={!gender} action={{ label: 'Edit', onClick: () => setEditing('gender') }} />
+        )}
 
         {plain('Date of birth', session?.dob ? prettyDate(session.dob) : undefined)}
-      </div>
+      </List>
     </>
   )
 }
@@ -266,26 +248,26 @@ function SafetyPanel() {
       </div>
 
       {ids.length ? (
-        <div className="acct__list acct__list--plain">
-          {ids.map((id) => (
-            <div key={id} className="acct__row">
-              <img src={studios[id].logo} alt="" className="acct__logo" />
-              <div>
-                <strong>{studios[id].name}</strong>
-                <span>{(() => { const n = Object.values(titles).filter((t) => t.studioId === id).length; return `${n} title${n === 1 ? '' : 's'}` })()}</span>
-              </div>
-              <button
-                className="btn-dark btn-dark--sm"
-                onClick={() => {
-                  list.toggle(id)
-                  toast(`${studios[id].name} ${tab === 'muted' ? 'unmuted' : 'unblocked'}`)
+        <List>
+          {ids.map((id) => {
+            const n = Object.values(titles).filter((t) => t.studioId === id).length
+            return (
+              <ListRow
+                key={id}
+                leading={<img src={studios[id].logo} alt="" />}
+                title={studios[id].name}
+                sub={`${n} title${n === 1 ? '' : 's'}`}
+                action={{
+                  label: tab === 'muted' ? 'Unmute' : 'Unblock',
+                  onClick: () => {
+                    list.toggle(id)
+                    toast(`${studios[id].name} ${tab === 'muted' ? 'unmuted' : 'unblocked'}`)
+                  },
                 }}
-              >
-                {tab === 'muted' ? 'Unmute' : 'Unblock'}
-              </button>
-            </div>
-          ))}
-        </div>
+              />
+            )
+          })}
+        </List>
       ) : (
         <EmptyState
           icon={
@@ -328,14 +310,11 @@ function Resources() {
   return (
     <>
       <h2 className="acct__h">Resources</h2>
-      <div className="acct__list">
+      <List>
         {docs.map((d) => (
-          <button key={d} className="acct__row acct__row--link" onClick={() => toast(`${d} is coming soon`)}>
-            <strong>{d}</strong>
-            <Icon d={['M9 6l6 6-6 6']} className="acct__chev" />
-          </button>
+          <ListRow key={d} title={d} onClick={() => toast(`${d} is coming soon`)} />
         ))}
-      </div>
+      </List>
     </>
   )
 }
@@ -351,17 +330,11 @@ function Support() {
   return (
     <>
       <h2 className="acct__h">Get Support</h2>
-      <div className="acct__list">
+      <List>
         {items.map((i) => (
-          <button key={i.t} className="acct__row acct__row--link" onClick={() => toast(`${i.t} is coming soon`)}>
-            <div>
-              <strong>{i.t}</strong>
-              <span>{i.s}</span>
-            </div>
-            <Icon d={['M9 6l6 6-6 6']} className="acct__chev" />
-          </button>
+          <ListRow key={i.t} title={i.t} sub={i.s} onClick={() => toast(`${i.t} is coming soon`)} />
         ))}
-      </div>
+      </List>
     </>
   )
 }

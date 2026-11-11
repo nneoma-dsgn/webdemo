@@ -1,17 +1,28 @@
 'use client'
 
-import { notFound, useParams } from 'next/navigation'
-import { browseGrid, shelves, titles } from '../data/catalog'
+import { notFound, useParams, useSearchParams } from 'next/navigation'
+import { feeds, titles } from '../data/catalog'
 import { PosterCard } from '../components/Cards'
 import { BackButton } from '../components/Nav'
 
-/* "See all" grid behind each shelf chevron (Must See, Coming to Circo, All). */
+/* "See all" behind each Home shelf chevron: exactly that shelf's titles, from the tab you were
+   on (?tab=series for Series; Shows otherwise). */
 export default function Browse() {
   const params = useParams<{ shelf: string }>()
-  const shelf = params?.shelf ?? 'all'
-  const s = shelves[shelf]
+  const tab = useSearchParams().get('tab') === 'series' ? 'series' : 'shows'
+  const feed = feeds[tab]
+  const shelf = params?.shelf ?? ''
+  const s =
+    shelf === 'must-see'
+      ? { title: 'Must See', items: feed.mustSee }
+      : shelf === feed.middle.id
+        ? { title: feed.middle.title, items: feed.middle.items }
+        : shelf === 'coming-to-circo'
+          ? { title: 'Coming to Circo', items: feed.coming.map((c) => c.id) }
+          : shelf === 'all'
+            ? { title: 'All', items: feed.all }
+            : null
   if (!s) notFound()
-  const items = [...s.items, ...browseGrid].slice(0, 18)
 
   return (
     <div className="page page--padded">
@@ -20,8 +31,8 @@ export default function Browse() {
         <h1 className="subhead__title">{s.title}</h1>
       </div>
       <div className="grid">
-        {items.map((id, i) => (
-          <PosterCard key={i} t={titles[id]} grid />
+        {s.items.map((id) => (
+          <PosterCard key={id} t={titles[id]} grid />
         ))}
       </div>
     </div>

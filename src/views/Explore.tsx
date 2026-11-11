@@ -198,8 +198,9 @@ export function EpisodeCard({ ep }: { ep: Episode }) {
             if (img.naturalWidth <= 120 && !img.src.includes('mqdefault')) img.src = clipThumbFallback(clip.id)
           }}
         />
-        <span className="epcard__play" aria-hidden>
-          <PlayGlyph />
+        {/* Same play circle as Continue Watching. */}
+        <span className="cw__play" aria-hidden>
+          <PlayGlyph size={26} />
         </span>
         <button
           className="card__more"
