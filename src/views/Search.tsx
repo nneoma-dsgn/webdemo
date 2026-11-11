@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { browseGrid, icons, studios, titles } from '../data/catalog'
 import { StudioTile } from '../components/Cards'
+import { EpisodeCard } from './Explore'
 import { didYouMean, isUpcoming, norm, search, type Hit } from '../data/search'
 import { Button } from '../components/ui'
 
@@ -88,10 +89,18 @@ export default function Search() {
             <>
               {/* Sections instead of filter tabs: each shows only when it has results. */}
               {/* One grid of shows and series, best match first; studios follow. */}
-              {hits.some((h) => h.kind !== 'studio') && (
+              {hits.some((h) => h.kind === 'title' || h.kind === 'episode') && (
                 <section className="ssection">
                   <div className="sgrid">
-                    {hits.map((h, i) => (h.kind === 'studio' ? null : <Thumb key={`${h.kind}-${i}`} hit={h} q={q} onOpen={() => remember(q)} />))}
+                    {hits.map((h, i) => (h.kind === 'title' || h.kind === 'episode' ? <Thumb key={`${h.kind}-${i}`} hit={h} q={q} onOpen={() => remember(q)} /> : null))}
+                  </div>
+                </section>
+              )}
+              {/* Explore episodes (podcasts, masterclasses and the rest) in their own wide cards. */}
+              {hits.some((h) => h.kind === 'clip') && (
+                <section className="ssection">
+                  <div className="episodes__grid">
+                    {hits.map((h) => (h.kind === 'clip' ? <EpisodeCard key={h.ep.clip.id} ep={h.ep} /> : null))}
                   </div>
                 </section>
               )}
@@ -100,7 +109,7 @@ export default function Search() {
                   <div className="sstudios__row">
                     {hits.map((h) =>
                       h.kind === 'studio' ? (
-                        <StudioTile key={h.s.id} s={h.s} detail={`${h.count} title${h.count === 1 ? "" : "s"}`} onClick={() => remember(q)} />
+                        <StudioTile key={h.s.id} s={h.s} detail={`${h.count} ${h.unit}${h.count === 1 ? '' : 's'}`} onClick={() => remember(q)} />
                       ) : null,
                     )}
                   </div>
@@ -140,7 +149,7 @@ export default function Search() {
 }
 
 /* A title or episode as a landscape thumbnail with its name underneath. */
-function Thumb({ hit, q, onOpen }: { hit: Exclude<Hit, { kind: 'studio' }>; q: string; onOpen: () => void }) {
+function Thumb({ hit, q, onOpen }: { hit: Extract<Hit, { kind: 'title' | 'episode' }>; q: string; onOpen: () => void }) {
   const t = hit.t
   const soon = isUpcoming(t.id)
   const href = hit.kind === 'episode' ? `/watch/${t.id}?ep=${encodeURIComponent(`S1 · E${hit.n}`)}` : `/watch/${t.id}`

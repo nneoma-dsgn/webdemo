@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { feeds, icons, titles, upcoming } from '../data/catalog'
+import { feeds, icons, titleFor, titles, upcoming } from '../data/catalog'
 import { ComingCard, ContinueCard, PosterCard } from '../components/Cards'
 import { Shelf } from '../components/Shelf'
 import { useMenu } from '../components/Menu'
@@ -44,10 +44,11 @@ export default function Home() {
   const viewing = useViewing()
   const kind = tab === 'series' ? 'series' : 'show'
   const watched = Object.entries(viewing.progress)
-    .filter(([id]) => titles[id]?.kind === kind)
+    // Explore's shows count too: a podcast series sits with Series, a single video with Shows.
+    .filter(([id]) => titleFor(id)?.kind === kind)
     .sort((a, b) => b[1].at - a[1].at)
     .map(([id, p]) => {
-      const ms = accessLeft(viewing, titles[id])
+      const ms = accessLeft(viewing, titleFor(id)!)
       return { id, ep: p.ep, progress: p.d ? p.t / p.d : 0, accessHours: ms === null ? 0 : isFinite(ms) ? ms / 36e5 : 24 }
     })
   const continueRow = watched
@@ -157,14 +158,14 @@ export default function Home() {
               .map((c) => (
                 <ContinueCard
                   key={c.id}
-                  t={titles[c.id]}
+                  t={titleFor(c.id)!}
                   accessHours={c.accessHours}
                   progress={c.progress}
                   ep={c.ep}
                   onRemove={() => {
                     clearProgress(c.id)
                     setRemoved((r) => new Set(r).add(c.id))
-                    toast(`Removed ${titles[c.id].name} from Continue Watching`)
+                    toast(`Removed ${titleFor(c.id)?.name} from Continue Watching`)
                   }}
                 />
               ))}

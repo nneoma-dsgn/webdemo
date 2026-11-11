@@ -6441,3 +6441,14 @@ a.result:hover .result__title,
 .grid + .lib-saved-eps {
   margin-top: var(--space-10);
 }
+
+/* Not found: the shared empty state, centred in the window. */
+.notfound {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.notfound .ui-empty {
+  padding-top: 0;
+}

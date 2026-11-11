@@ -1,5 +1,5 @@
 import type { TheaterItem } from '../components/Theater'
-import { exploreStudios } from './explore'
+import { exploreStudios, exploreTitle } from './explore'
 
 const a = (file: string) => `/assets/${file}`
 /* Preview artwork from TMDB (posters w500, backdrops w1280). Placeholder for the real catalogue. */
@@ -250,6 +250,9 @@ export const titles: Record<string, Title> = Object.fromEntries(
     },
   ]),
 )
+/* Any playable title: the catalogue, or one of Explore's shows. Undefined means it doesn't exist. */
+export const titleFor = (id: string): Title | undefined => titles[id] ?? exploreTitle(id)
+
 // The home hero keeps the exact Silo artwork from the Figma file.
 titles.silo.still = a('hero-silo.png')
 

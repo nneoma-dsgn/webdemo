@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { notFound, useParams, useRouter, useSearchParams } from 'next/navigation'
 import { exploreEpisodes, exploreTitle } from '../data/explore'
 import { ALWAYS, films, upcoming, languagesFor, HICCUPS, roll, episodes, episodeThumb, featureFor, naira, studios, titles, trailers, type Title } from '../data/catalog'
 import { accessLeft, setAudioLang, setQuality, setSubLang, type Quality, buyPass, extendPass, fakePassLeft, getProgress, joinStudio, saveProgress, clearProgress, startPass, useClock, useViewing } from '../data/viewing'
@@ -69,7 +69,10 @@ function PlayerView() {
   const router = useRouter()
   const { open, toast } = useMenu()
   // Explore's shows (podcasts, masterclasses and the rest) play here too, bought the same way.
-  const t = titles[params?.id ?? ''] ?? exploreTitle(params?.id ?? '') ?? titles.kob
+  const found = titles[params?.id ?? ''] ?? exploreTitle(params?.id ?? '')
+  // An id we don't know is a missing page, never a stand-in title.
+  if (!found) notFound()
+  const t = found
   // Series with real episodes play each episode's own clip; everything else plays its trailer.
   const eps = episodes[t.id] ?? exploreEpisodes(t.id)
   // Where this title was left off (read once; the player remounts per title and episode).

@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { notFound, useParams } from 'next/navigation'
 import { STUDIO_PLACEHOLDER, studios, titles, upcoming } from '../data/catalog'
 import { ComingCard, PosterCard } from '../components/Cards'
 import { Shelf } from '../components/Shelf'
@@ -12,8 +12,8 @@ import { EpisodeCard } from './Explore'
 /* Web version of the mobile "PROFILE" (studio page). */
 export default function Studio() {
   const params = useParams<{ id: string }>()
-  const id = params?.id ?? 'harmattan'
-  const s = studios[id] ?? studios.harmattan
+  const s = studios[params?.id ?? '']
+  if (!s) notFound()
   const reminders = useReminders()
   // Only this studio's titles.
   const mine = Object.values(titles).filter((t) => t.studioId === s.id).map((t) => t.id)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { notFound, useParams } from 'next/navigation'
 import { studios } from '../data/catalog'
 import { ButtonLink, EmptyState } from '../components/ui'
 import { StudioTile } from '../components/Cards'
@@ -21,7 +21,8 @@ type Section = keyof typeof SECTIONS
 
 export default function LibraryAll() {
   const params = useParams<{ section: string }>()
-  const section: Section = params?.section && params.section in SECTIONS ? (params.section as Section) : 'purchases'
+  if (!params?.section || !(params.section in SECTIONS)) notFound()
+  const section = params.section as Section
   const { now, purchases, savedTitles, savedEpisodes, joined } = useLibrary()
 
   const count = section === 'purchases' ? purchases.length : section === 'saved' ? savedTitles.length + savedEpisodes.length : joined.length

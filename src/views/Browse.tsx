@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { notFound, useParams } from 'next/navigation'
 import { browseGrid, shelves, titles } from '../data/catalog'
 import { PosterCard } from '../components/Cards'
 import { BackButton } from '../components/Nav'
@@ -9,7 +9,8 @@ import { BackButton } from '../components/Nav'
 export default function Browse() {
   const params = useParams<{ shelf: string }>()
   const shelf = params?.shelf ?? 'all'
-  const s = shelves[shelf] ?? shelves.all
+  const s = shelves[shelf]
+  if (!s) notFound()
   const items = [...s.items, ...browseGrid].slice(0, 18)
 
   return (

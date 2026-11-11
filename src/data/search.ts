@@ -1,4 +1,5 @@
 import { episodes, episodeThumb, studios, titles, upcoming, type Studio, type Title } from './catalog'
+import { allEpisodes, categories, episodesByStudio, type Episode as ExploreEpisode } from './explore'
 
 /* Catalog search: titles, episodes and studios. Accent- and case-insensitive ("ijogbon" finds
    Ìjọ̀gbọ̀n), word-prefix matching, and one typo allowed on longer words. Ranked: title starts
@@ -7,7 +8,9 @@ import { episodes, episodeThumb, studios, titles, upcoming, type Studio, type Ti
 export type Hit =
   | { kind: 'title'; t: Title; score: number }
   | { kind: 'episode'; t: Title; n: number; name: string; thumb: string; score: number }
-  | { kind: 'studio'; s: Studio; count: number; score: number }
+  | { kind: 'studio'; s: Studio; count: number; unit: 'title' | 'episode'; score: number }
+  /* An episode from Explore (podcasts, masterclasses and the rest). */
+  | { kind: 'clip'; ep: ExploreEpisode; score: number }
 
 export const norm = (s: string) =>
   s
@@ -81,9 +84,33 @@ export function search(raw: string): Hit[] {
     })
   }
 
+  // Explore episodes: by episode name first, then show, publisher and category.
+  for (const ep of allEpisodes()) {
+    const name = norm(ep.clip.title)
+    const cat = categories.find((c) => c.shows.some((s) => s.name === ep.show))?.label ?? ''
+    const meta = words(`${ep.show} ${ep.clip.channel} ${cat}`)
+    let score = name.startsWith(q) ? 80 : norm(ep.show).startsWith(q) ? 70 : 0
+    if (!score) {
+      let total = 0
+      for (const w of qWords) {
+        const n = wordScore(w, words(ep.clip.title))
+        const m = wordScore(w, meta)
+        if (!n && !m) {
+          total = 0
+          break
+        }
+        total += n * 10 + m * 6
+      }
+      score = Math.min(total, 60)
+    }
+    if (score) hits.push({ kind: 'clip', ep, score })
+  }
+
   for (const s of Object.values(studios)) {
     const score = norm(s.name).startsWith(q) ? 85 : qWords.every((w) => wordScore(w, words(s.name)) >= 2) ? 60 : 0
-    if (score) hits.push({ kind: 'studio', s, count: Object.values(titles).filter((t) => t.studioId === s.id).length, score })
+    const own = Object.values(titles).filter((t) => t.studioId === s.id).length
+    // Explore publishers have episodes rather than catalogue titles.
+    if (score) hits.push(own ? { kind: 'studio', s, count: own, unit: 'title', score } : { kind: 'studio', s, count: episodesByStudio(s.id).length, unit: 'episode', score })
   }
 
   return hits.sort((a, b) => b.score - a.score)

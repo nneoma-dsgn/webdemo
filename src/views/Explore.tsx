@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { notFound, useParams } from 'next/navigation'
-import { category, clipThumb, clipThumbFallback, findClip, rowsFor, watchHref, type Episode } from '../data/explore'
+import { category, clipThumb, clipThumbFallback, exploreTitle, findClip, rowsFor, showId, watchHref, type Episode } from '../data/explore'
+import { ContinueCard } from '../components/Cards'
+import { accessLeft, clearProgress, useViewing } from '../data/viewing'
 import { Shelf } from '../components/Shelf'
 import { icons } from '../data/catalog'
 import { HeroVideo } from '../components/HeroVideo'
@@ -22,6 +24,8 @@ export default function Explore() {
   const explore = useExploreTab()
   const saved = useSaved()
   const { toast } = useMenu()
+  const viewing = useViewing()
+  const [removed, setRemoved] = useState<Set<string>>(new Set())
   const [slide, setSlide] = useState(0)
   const n = cat?.spotlight.length ?? 1
   const go = (d: number) => setSlide((i) => (i + d + n) % n)
@@ -64,6 +68,16 @@ export default function Explore() {
   }
 
   if (!cat || !spot) notFound()
+  // Continue Watching, as on Home: shows in this category you've started, latest first.
+  const mine = new Set(cat.shows.map(showId))
+  const continueRow = Object.entries(viewing.progress)
+    .filter(([id]) => mine.has(id) && !removed.has(id))
+    .sort((a, b) => b[1].at - a[1].at)
+    .map(([id, p]) => {
+      const t = exploreTitle(id)!
+      const ms = accessLeft(viewing, t)
+      return { t, ep: p.ep, progress: p.d ? p.t / p.d : 0, accessHours: ms === null ? 0 : isFinite(ms) ? ms / 36e5 : 24 }
+    })
   const found = findClip(spot.id)
   const clip = found?.clip ?? { id: spot.id, title: '', channel: '' }
   const play = found ? watchHref(found.ep) : '/'
@@ -111,6 +125,22 @@ export default function Explore() {
       </section>
 
       <div className="shelves">
+        <Shelf title="Continue Watching">
+          {continueRow.map((c) => (
+            <ContinueCard
+              key={c.t.id}
+              t={c.t}
+              accessHours={c.accessHours}
+              progress={c.progress}
+              ep={c.ep}
+              onRemove={() => {
+                clearProgress(c.t.id)
+                setRemoved((r) => new Set(r).add(c.t.id))
+                toast(`Removed ${c.t.name} from Continue Watching`)
+              }}
+            />
+          ))}
+        </Shelf>
         {rowsFor(cat).map((row) => (
           <Shelf key={row.id} title={row.title} to={`/explore/${cat.id}/${row.id}`}>
             {row.items.map((e) => (
