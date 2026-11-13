@@ -2,8 +2,10 @@
 
 import { notFound, useParams, useSearchParams } from 'next/navigation'
 import { feeds, titles } from '../data/catalog'
-import { PosterCard } from '../components/Cards'
+import { ComingCard, PosterCard } from '../components/Cards'
 import { BackButton } from '../components/Nav'
+import { useMenu } from '../components/Menu'
+import { useReminders } from '../data/reminders'
 
 /* "See all" behind each Home shelf chevron: exactly that shelf's titles, from the tab you were
    on (?tab=series for Series; Shows otherwise). */
@@ -12,6 +14,8 @@ export default function Browse() {
   const tab = useSearchParams().get('tab') === 'series' ? 'series' : 'shows'
   const feed = feeds[tab]
   const shelf = params?.shelf ?? ''
+  const { toast } = useMenu()
+  const reminders = useReminders()
   const s =
     shelf === 'must-see'
       ? { title: 'Must See', items: feed.mustSee }
@@ -30,11 +34,30 @@ export default function Browse() {
         <BackButton />
         <h1 className="subhead__title">{s.title}</h1>
       </div>
-      <div className="grid">
-        {s.items.map((id) => (
-          <PosterCard key={id} t={titles[id]} grid />
-        ))}
-      </div>
+      {shelf === 'coming-to-circo' ? (
+        // The same coming-soon cards as the Home shelf: date and Remind me under each poster.
+        <div className="grid grid--coming">
+          {feed.coming.map((c) => (
+            <ComingCard
+              key={c.id}
+              t={titles[c.id]}
+              when={c.when}
+              label={c.label}
+              grid
+              reminded={reminders.has(c.id)}
+              onRemind={() => {
+                if (reminders.toggle(c.id)) toast(`We'll remind you when ${titles[c.id].name} lands`)
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="grid">
+          {s.items.map((id) => (
+            <PosterCard key={id} t={titles[id]} grid />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,8 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
+import { hideCaptions, loadApi, REVEAL_DELAY_MS, type YTPlayer } from './HeroVideo'
 import { Button } from './ui'
+import { isPhone } from './viewport'
 
 export type TheaterItem = {
   id: string
@@ -20,7 +21,9 @@ export type TheaterItem = {
 /* Circo Theater: one big screen playing the current title's trailer clip, with a queue of
    thumbnails underneath. The section pins to the middle of the screen for a short stretch of
    scrolling: it grows into focus while the page dims, scrolling steps through the queue, and
-   when the user pauses each clip plays out and hands over to the next. */
+   when the user pauses each clip plays out and hands over to the next. On phones the screen
+   fills the width, with Watch Now and a swipeable queue under it, and scrolling doesn't step
+   through titles. */
 export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: string; onClick: () => void } }) {
   const n = items.length
   const [active, setActive] = useState(0)
@@ -51,6 +54,9 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
       setGrow(g)
       const pinned = r.top <= 1 && r.bottom >= vh - 1
       setFocused(pinned)
+      // Phones: scrolling only brings the screen into focus; clips hand over on their own and
+      // the queue is tapped or swiped.
+      if (isPhone()) return
       const growPx = vh * 0.25
       const travel = r.height - vh - growPx
       if (!pinned || travel <= 0 || -r.top < growPx) {
@@ -100,6 +106,7 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
           },
           onStateChange: (e: { data: number }) => {
             if (e.data === YT.PlayerState.PLAYING) {
+              hideCaptions(player.current)
               // Reveal as soon as frames are flowing so picture and sound start together.
               window.clearTimeout(revealTimer)
               revealTimer = window.setTimeout(() => setPlaying(true), REVEAL_DELAY_MS)
@@ -161,6 +168,16 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
     return () => window.clearInterval(tick)
   }, [focused, playing, active, it.start, it.end])
 
+  /* Phones swipe the queue sideways: keep the playing title in view (the queue only, never
+     the page). */
+  const queue = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const q = queue.current
+    const el = q?.children[active] as HTMLElement | undefined
+    if (!q || !el || q.scrollWidth <= q.clientWidth) return
+    q.scrollTo({ left: el.offsetLeft - (q.clientWidth - el.offsetWidth) / 2, behavior: 'smooth' })
+  }, [active])
+
   const toggleSound = () => {
     const p = player.current
     if (!p || !ready.current) return
@@ -183,6 +200,7 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
               <div key={x.id} className={`screen__still${i === active ? ' is-on' : ''}`}>
                 <img className="screen__blur" src={x.poster} alt="" />
                 <img className="screen__poster" src={x.poster} alt="" />
+                <img className="screen__wide" src={x.still} alt="" />
               </div>
             ))}
             <div className="screen__video" aria-hidden>
@@ -197,12 +215,15 @@ export function Theater({ items, cta }: { items: TheaterItem[]; cta: { label: st
                 </svg>
               </button>
             )}
-            <Button className="screen__cta" aria-label={`${cta.label}: ${it.title}`} onClick={cta.onClick}>
-              {cta.label}
-            </Button>
           </div>
 
-          <div className="queue" role="tablist" aria-label="Up next">
+          {/* Outside the screen so phones can stack it between the screen and the queue; on
+              larger screens it's placed over the screen's corner. */}
+          <Button className="screen__cta" aria-label={`${cta.label}: ${it.title}`} onClick={cta.onClick}>
+            {cta.label}
+          </Button>
+
+          <div className="queue" ref={queue} role="tablist" aria-label="Up next">
             {items.map((x, i) => (
               <button key={x.id} role="tab" aria-selected={i === active} aria-label={x.title} className={`queue__item${i === active ? ' is-on' : ''}`} onClick={() => setActive(i)}>
                 <img src={x.poster} alt="" loading="lazy" />

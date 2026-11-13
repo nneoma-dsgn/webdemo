@@ -289,15 +289,8 @@ export const comingSoon: { id: string; when: string; label?: string[] }[] = [
   { id: 'citation', when: 'Coming 9 December' },
 ]
 
-export const searchResults = [
-  { id: 'r1', title: 'Red Light, Green Light', show: 'Squid Game', studio: 'The Velvet Studio', thumb: backdrop('squid') },
-  { id: 'r2', title: 'Freedom Day', show: 'Silo', studio: 'The Velvet Studio', thumb: backdrop('silo') },
-  { id: 'r3', title: 'King of Boys', show: 'Film', studio: 'The Velvet Studio', thumb: backdrop('kob') },
-]
-
 // Search before typing: everything that's out, newest titles mixed in.
 export const browseGrid = seeds.map((x) => x[0]).filter((id) => !['funmilayo', 'jagun', 'breath', 'citation', 'wednesday', 'bridgerton'].includes(id))
-
 
 export const icons = {
   play: a('icon-play.svg'),
@@ -306,12 +299,14 @@ export const icons = {
   cast: a('icon-cast.svg'),
   chevronRight: a('icon-chevron-right.svg'),
   chevronLeft: a('icon-chevron-left.svg'),
-  house: a('icon-house.svg'),
-  library: a('icon-add-circle.svg'),
-  search: a('icon-search.svg'),
   searchSm: a('icon-search-sm.svg'),
   more: a('icon-more.svg'),
   avatar: a('avatar.png'),
+  // Mobile video player (Circo Mobile Designs, Play Video).
+  morePlayer: a('icon-more-player.svg'),
+  rotateCcw: a('icon-rotate-ccw.svg'),
+  rotateCw: a('icon-rotate-cw.svg'),
+  pause: a('icon-pause.svg'),
 }
 
 /* Theater on the signed-out page: preview trailers on YouTube, each played as a short clip
@@ -396,7 +391,8 @@ export const feeds: Record<'shows' | 'series', Feed> = {
    Titles without one fall back to their backdrop. */
 /* Episodes for series that have them. Clips are YouTube stand-ins for the prototype; each one
    plays as that episode. Descriptions are Circo's own. */
-export type Episode = { title: string; blurb: string; mins: number; videoId: string }
+// season: which season the episode belongs to (1 when left out).
+export type Episode = { title: string; blurb: string; mins: number; videoId: string; season?: number }
 
 export const episodes: Record<string, Episode[]> = {
   squid: [

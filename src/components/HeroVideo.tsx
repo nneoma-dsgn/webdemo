@@ -38,6 +38,13 @@ declare global {
    YouTube's own start indicator can't be hidden from here; see the note in the hero styles. */
 export const REVEAL_DELAY_MS = 150
 
+/* YouTube switches captions on for muted autoplay on phones, whatever cc_load_policy says;
+   call once a clip is playing to drop them again. */
+export const hideCaptions = (p: YTPlayer | null | undefined) => {
+  p?.unloadModule?.('captions')
+  p?.setOption?.('captions', 'track', {})
+}
+
 let apiPromise: Promise<void> | null = null
 export function loadApi() {
   if (window.YT?.Player) return Promise.resolve()
@@ -85,6 +92,7 @@ export function HeroVideo({ videoId, still, start = 0, end, onEnded }: { videoId
           },
           onStateChange: (e: { data: number }) => {
             if (e.data === YT.PlayerState.PLAYING) {
+              hideCaptions(player.current)
               // Reveal as soon as frames are flowing so picture and sound start together.
               window.clearTimeout(revealTimer)
               revealTimer = window.setTimeout(() => setPlaying(true), REVEAL_DELAY_MS)

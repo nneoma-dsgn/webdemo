@@ -133,9 +133,9 @@ export default function Home() {
             </Button>
           </div>
         </div>
-        <button className="hero__play" aria-label={`Play ${hero.name}`}>
+        <Link href={`/watch/${hero.id}`} className="hero__play" aria-label={`Play ${hero.name}`}>
           <img src={icons.play} alt="" width={20} height={20} />
-        </button>
+        </Link>
         <div className="hero__dots" role="tablist" aria-label="Featured titles">
           {feed.heroes.map((h, i) => (
             <button key={h.id} role="tab" aria-selected={i === slide % n} aria-label={titles[h.id].name} className={i === slide % n ? 'is-on' : ''} onClick={() => setSlide(i)}>

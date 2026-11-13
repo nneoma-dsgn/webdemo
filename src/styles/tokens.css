@@ -11,6 +11,7 @@
   --text-200: #e0e0e0;
   --text-300: #b0b0b0;
   --text-tertiary: #aaabb0;
+  --text-400: #707070; /* Dark Mode Text/Dark Text - 400 */
   --text-on-light: #1b1b1b;
 
   /* Strokes */
@@ -29,7 +30,7 @@
   /* Inputs */
   --input-line: var(--stroke-strong);
   --input-line-focus: #6a6a6a;
-  --input-placeholder: #707070;
+  --input-placeholder: var(--text-400);
 
   /* Glass (pills and chips over artwork) */
   --glass-strong: rgba(224, 224, 228, 0.3);
@@ -77,6 +78,7 @@
   --surface-1: #121214; /* panels on the page background */
   --surface-2: rgba(255, 255, 255, 0.06); /* cards and rows inside a panel */
   --surface-3: rgba(255, 255, 255, 0.1); /* hover, pressed */
+  --surface-wash: rgba(24, 16, 18, 0.82); /* frosted bars over the maroon sign-up wash */
 
   /* Type: SF Pro on Apple platforms, Inter elsewhere. Figma tracking is -3%. */
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', Inter, system-ui, sans-serif;

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import Link from 'next/link'
 import { ButtonLink } from './ui'
 
 /* Fades and lifts its content in the first time it scrolls into view (Apple TV-style). */

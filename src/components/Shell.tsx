@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, type ReactNode } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { MobileNav, TopNav } from './Nav'
+import { AppBanner, MobileNav, TopNav } from './Nav'
 import { PreviewProvider } from './Preview'
 
 function ScrollReset() {
@@ -14,10 +14,11 @@ function ScrollReset() {
   return null
 }
 
-/* Chrome for signed-in pages: top bar, hover previews, phone nav. */
+/* Chrome for signed-in pages: top bar, hover previews, phone nav and app banner. */
 export function Shell({ children }: { children: ReactNode }) {
   return (
     <PreviewProvider>
+      <AppBanner />
       <Suspense>
         <ScrollReset />
         <TopNav />

@@ -1,9 +1,10 @@
-/* Shared components (components/ui.tsx). Primary and secondary buttons reuse .btn-white /
-   .btn-dark from app.css; the underline field reuses .uline from login.css. */
+/* Shared components (components/ui.tsx). Primary, secondary and accent buttons reuse
+   .btn-white / .btn-dark / .btn-accent from app.css; the underline field reuses .uline from login.css. */
 
 /* Large primary / secondary (hero, checkout and coming-soon CTAs). */
 .btn-white--lg,
-.btn-dark--lg {
+.btn-dark--lg,
+.btn-accent--lg {
   height: 56px;
   padding: 0 32px;
   font-size: var(--fs-body);
@@ -130,7 +131,6 @@
   line-height: var(--lh-snug);
 }
 
-
 .t-body {
   font-size: var(--fs-body);
   font-weight: var(--fw-medium);
@@ -148,7 +148,6 @@
   font-weight: var(--fw-regular);
   line-height: 1.4;
 }
-
 
 /* Small capitals label (eyebrows like "COMING SOON", "BALANCE"). */
 .t-label {
@@ -214,7 +213,6 @@
   margin: 0;
   background: var(--stroke-subtle);
 }
-
 
 /* ---------- /design reference page ---------- */
 
@@ -326,6 +324,7 @@
 /* Disabled: dimmed and inert, for every button style. */
 .btn-white:disabled,
 .btn-dark:disabled,
+.btn-accent:disabled,
 .ui-btn--link:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -403,6 +402,20 @@
   color: var(--text-300);
 }
 
+/* Phones: stronger, so the icon and lines read at arm's length and over dim sheets. */
+@media (max-width: 767px) {
+  .ui-empty__icon {
+    color: var(--text-100);
+  }
+
+  .ui-empty__icon svg {
+    stroke-width: 2;
+  }
+
+  .ui-empty__text {
+    color: var(--text-200);
+  }
+}
 
 /* ---------- Dialog ---------- */
 

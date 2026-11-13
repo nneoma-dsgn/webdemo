@@ -27,7 +27,7 @@ export default function LibraryAll() {
   const params = useParams<{ section: string }>()
   if (!params?.section || !(params.section in SECTIONS)) notFound()
   const section = params.section as Section
-  const { now, purchases, savedTitles, savedEpisodes, joined } = useLibrary()
+  const { purchases, savedTitles, savedEpisodes, joined } = useLibrary()
 
   const count = section === 'purchases' ? purchases.length : section === 'saved' ? savedTitles.length + savedEpisodes.length : joined.length
 
