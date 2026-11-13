@@ -4,36 +4,52 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Button, ButtonLink, EmptyState, Surface, Text } from '../components/ui'
 import { icons, naira, studios, titles, upcoming, type Title } from '../data/catalog'
-import { accessLeft, useViewing } from '../data/viewing'
+import { accessLabel, accessLeft, timeLeft, useViewing } from '../data/viewing'
 import { useSaved } from '../data/saved'
 import { Shelf } from '../components/Shelf'
+import { ContinueWatching } from '../components/ContinueWatching'
 import { StudioTile } from '../components/Cards'
 import { LoadBalance } from '../components/LoadBalance'
+import { Icon } from '../components/Icon'
 import { allEpisodes } from '../data/explore'
 import { EpisodeCard } from './Explore'
 
-/* Library (Figma "WALLET"): your balance up top, then what you've paid for, what you've saved,
-   and the studios you've joined. Downloads are app-only, so the web leaves that row out. */
+/* Library (Figma "WALLET"), access first: your balance in a compact row, then Continue
+   Watching, everything you can watch (My access, with what's left on it and who it's from),
+   what you've saved, and the studios you've joined. Downloads are app-only, so the web leaves
+   that row out. */
 
-/* "3 days", "18 hrs", "Not started": time left on whatever unlocks a title. */
-export function leftLabel(ms: number) {
-  if (!isFinite(ms)) return 'Not started'
-  const h = ms / 36e5
-  if (h < 1) return `${Math.max(1, Math.round(ms / 6e4))} min`
-  if (h < 48) return `${Math.floor(h)} hrs`
-  return `${Math.floor(h / 24)} days`
-}
-
-export function PosterTile({ t, tag }: { t: Title; tag?: string }) {
-  return (
-    <Link href={`/watch/${t.id}`} className="card poster lib-poster">
+/* A poster from the Library. With `access`, its time left sits on the art ("3 days left",
+   "Expired") and the studio it's from links underneath. An expired title opens on renewal. */
+export function PosterTile({ t, access, grid }: { t: Title; access?: number; grid?: boolean }) {
+  const poster = (
+    <Link href={`/watch/${t.id}`} className={`card poster lib-poster${grid ? ' poster--grid' : ''}`}>
       <div className="poster__art">
         <img src={t.poster} alt={t.name} loading="lazy" />
-        {tag && <span className="lib-tag">{tag}</span>}
+        {access !== undefined && <span className={`lib-tag${access <= 0 ? ' lib-tag--expired' : ''}`}>{accessLabel(access)}</span>}
       </div>
     </Link>
   )
+  const studio = studios[t.studioId]
+  if (access === undefined || !studio) return poster
+  return (
+    <div className={`lib-tile${grid ? ' lib-tile--grid' : ''}`}>
+      {poster}
+      <Link href={`/studio/${studio.id}`} className="lib-tile__studio">
+        {studio.name}
+      </Link>
+    </div>
+  )
 }
+
+/* Nothing yet: the Library and its My access page. */
+export const LIBRARY_EMPTY = (
+  <>
+    Nothing to watch here yet.
+    <br />
+    Unlock a title or join a Studio and it’ll appear here.
+  </>
+)
 
 /* What the Library lists, shared by the page and its "See all" pages. */
 export function useLibrary() {
@@ -41,21 +57,23 @@ export function useLibrary() {
   const saved = useSaved()
   const now = Date.now()
 
-  // Purchases: titles you bought a pass for (studios you joined have their own row below).
-  const purchases = Object.keys(viewing.passes)
+  // My access: titles you have a pass for (studios you joined have their own row below).
+  // Soonest to end first, then passes not started yet, then expired ones (kept, to renew).
+  const group = (ms: number) => (ms <= 0 ? 2 : isFinite(ms) ? 0 : 1)
+  const access = Object.keys(viewing.passes)
     .map((id) => titles[id])
     .filter((t): t is Title => !!t && !upcoming(t.id))
     .map((t) => ({ t, ms: accessLeft(viewing, t, now) }))
-    .filter((p): p is { t: Title; ms: number } => p.ms !== null && p.ms > 0)
-    .sort((a, b) => a.ms - b.ms)
+    .filter((p): p is { t: Title; ms: number } => p.ms !== null)
+    .sort((a, b) => group(a.ms) - group(b.ms) || a.ms - b.ms)
   const savedTitles = Object.values(titles).filter((t) => saved.has(t.id))
   const savedEpisodes = allEpisodes().filter((e) => saved.has(e.clip.id))
   const joined = Object.entries(viewing.subs).filter(([id, s]) => s.until > now && studios[id])
-  return { viewing, now, purchases, savedTitles, savedEpisodes, joined }
+  return { viewing, now, access, savedTitles, savedEpisodes, joined }
 }
 
 export default function Library() {
-  const { viewing, now, purchases, savedTitles, savedEpisodes, joined } = useLibrary()
+  const { viewing, now, access, savedTitles, savedEpisodes, joined } = useLibrary()
 
   const [loading, setLoading] = useState(false)
 
@@ -64,25 +82,25 @@ export default function Library() {
       <BalanceHeader balance={viewing.balance} onLoad={() => setLoading(true)} />
       {loading && <LoadBalance onClose={() => setLoading(false)} />}
 
-      {purchases.length === 0 && joined.length === 0 ? (
+      {access.length === 0 && joined.length === 0 ? (
         <EmptyState
-          icon={<img src="/assets/icon-purchases-empty.svg" alt="" />}
+          icon={<Icon name="library" />}
           action={
-            <ButtonLink href="/?tab=series" size="lg">
-              Explore Series
+            <ButtonLink href="/" size="lg">
+              Find something to watch
             </ButtonLink>
           }
         >
-          You haven’t made any purchases yet.
-          <br />
-          Unlock Media or Studios and they’ll appear here.
+          {LIBRARY_EMPTY}
         </EmptyState>
       ) : null}
 
       <div className="shelves lib-shelves">
-        <Shelf title="Purchases" to="/library/purchases">
-          {purchases.map((p) => (
-            <PosterTile key={p.t.id} t={p.t} tag={leftLabel(p.ms)} />
+        <ContinueWatching />
+
+        <Shelf title="My access" to="/library/access">
+          {access.map((p) => (
+            <PosterTile key={p.t.id} t={p.t} access={p.ms} />
           ))}
         </Shelf>
 
@@ -106,7 +124,7 @@ export default function Library() {
             </Link>
             <div className="sstudios__row">
               {joined.map(([id, sub]) => (
-                <StudioTile key={id} s={studios[id]} detail={sub.cancelled ? `Ends in ${leftLabel(sub.until - now)}` : `${leftLabel(sub.until - now)} left`} tone="warning" />
+                <StudioTile key={id} s={studios[id]} detail={`${sub.cancelled ? 'Ends' : 'Renews'} in ${timeLeft(sub.until - now)}`} tone="warning" />
               ))}
             </div>
           </section>

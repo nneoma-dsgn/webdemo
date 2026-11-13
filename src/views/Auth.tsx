@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { saveSession, usernameFromName, type Provider } from '../auth'
+import { saveSession, type Provider } from '../auth'
 import { browseGrid, icons, titles } from '../data/catalog'
 
 
@@ -23,11 +23,11 @@ export default function Auth({ mode }: { mode: 'signup' | 'login' }) {
     setBusy(provider)
     window.setTimeout(() => {
       if (mode === 'signup') {
-        saveSession({ provider, name, email, username: usernameFromName(name), onboarded: false })
+        saveSession({ provider, name, email, onboarded: false })
         router.replace('/onboarding')
       } else {
         // Prototype: a returning account that already finished onboarding.
-        saveSession({ provider, username: 'abeltesfaye', onboarded: true })
+        saveSession({ provider, onboarded: true })
         router.replace('/')
       }
     }, provider === 'google' ? 500 : 1200)

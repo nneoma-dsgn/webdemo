@@ -2,8 +2,9 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Phones on the Mac's network (the iPhone hotspot hands out 172.20.10.x) can load dev assets.
-  allowedDevOrigins: ['172.20.10.*'],
+  // Dev only: phones on the same local network (home Wi-Fi or an iPhone hotspot) can load the
+  // dev server's assets. Private address ranges only.
+  allowedDevOrigins: ['10.*.*.*', '172.*.*.*', '192.168.*.*'],
   devIndicators: { position: 'top-right' },
 }
 

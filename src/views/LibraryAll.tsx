@@ -8,15 +8,17 @@ import { JoinStudio } from '../components/JoinStudio'
 import Link from 'next/link'
 import { BackButton } from '../components/Nav'
 import { useMenu } from '../components/Menu'
+import { Icon } from '../components/Icon'
 import { cancelSub, planLabel, resumeSub, type Sub } from '../data/viewing'
-import { PosterTile, leftLabel, useLibrary } from './Library'
+import { LIBRARY_EMPTY, PosterTile, useLibrary } from './Library'
 import { EpisodeCard } from './Explore'
 
-/* "See all" behind each Library row (Figma WALLET): the full grid of purchases or saved
-   titles, or the studios you subscribe to (where you can cancel). Empty sections get the Library empty state. */
+/* "See all" behind each Library row (Figma WALLET): the full grid of what you have access to or
+   have saved, or the studios you subscribe to (where you can cancel). Empty sections get the
+   Library empty state. */
 
 const SECTIONS = {
-  purchases: 'Purchases',
+  access: 'My access',
   saved: 'Saved for later',
   studios: 'Studios',
 } as const
@@ -27,9 +29,9 @@ export default function LibraryAll() {
   const params = useParams<{ section: string }>()
   if (!params?.section || !(params.section in SECTIONS)) notFound()
   const section = params.section as Section
-  const { purchases, savedTitles, savedEpisodes, joined } = useLibrary()
+  const { access, savedTitles, savedEpisodes, joined } = useLibrary()
 
-  const count = section === 'purchases' ? purchases.length : section === 'saved' ? savedTitles.length + savedEpisodes.length : joined.length
+  const count = section === 'access' ? access.length : section === 'saved' ? savedTitles.length + savedEpisodes.length : joined.length
 
   return (
     <div className="page page--padded">
@@ -42,10 +44,10 @@ export default function LibraryAll() {
         <StudiosPage joined={joined} />
       ) : count === 0 ? (
         <EmptyState
-          icon={<img src="/assets/icon-purchases-empty.svg" alt="" />}
+          icon={<Icon name={section === 'saved' ? 'bookmark' : 'library'} />}
           action={
-            <ButtonLink href="/?tab=series" size="lg">
-              Explore Series
+            <ButtonLink href="/" size="lg">
+              Find something to watch
             </ButtonLink>
           }
         >
@@ -56,17 +58,13 @@ export default function LibraryAll() {
               Save titles to watch later and they’ll appear here.
             </>
           ) : (
-            <>
-              You haven’t made any purchases yet.
-              <br />
-              Unlock Media or Studios and they’ll appear here.
-            </>
+            LIBRARY_EMPTY
           )}
         </EmptyState>
-      ) : section === 'purchases' ? (
+      ) : section === 'access' ? (
         <div className="grid">
-          {purchases.map((p) => (
-            <PosterTile key={p.t.id} t={p.t} tag={leftLabel(p.ms)} />
+          {access.map((p) => (
+            <PosterTile key={p.t.id} t={p.t} access={p.ms} grid />
           ))}
         </div>
       ) : (
