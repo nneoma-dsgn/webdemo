@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSession, signOut, updateSession } from '../auth'
+import { signOut, updateSession } from '../auth'
 import { icons } from '../data/catalog'
 
 type Step = 'gender' | 'interests'
@@ -60,8 +60,13 @@ export default function Onboarding() {
             <button className="onb__back" onClick={back} aria-label="Back">
               <img src={icons.chevronLeft} alt="" width={24} height={24} />
             </button>
-            <span className="onb__count">
-              Step {i + 1} of {STEPS.length}
+            <span className="onb__count" aria-label={`Step ${i + 1} of ${STEPS.length}`}>
+              <span className="onb__count-full">
+                Step {i + 1} of {STEPS.length}
+              </span>
+              <span className="onb__count-short">
+                {i + 1}/{STEPS.length}
+              </span>
             </span>
             {step === 'interests' && (
               <button className="onb__skip" onClick={() => finish([])}>
@@ -119,7 +124,6 @@ function InterestsStep({ picks, setPicks, onDone }: { picks: string[]; setPicks:
 
   const shown = useMemo(() => TOPICS.filter((t) => t.toLowerCase().includes(q.trim().toLowerCase())), [q])
   const toggle = (label: string) => setPicks(picks.includes(label) ? picks.filter((p) => p !== label) : full ? picks : [...picks, label])
-
 
   return (
     <div className="onb__form onb__form--interests">
@@ -218,8 +222,3 @@ function GenderIcon({ id }: { id: string }) {
   )
 }
 
-/* Guard helper used by the router: onboarding only makes sense mid sign up. */
-export function needsOnboarding() {
-  const s = getSession()
-  return !!s && !s.onboarded
-}

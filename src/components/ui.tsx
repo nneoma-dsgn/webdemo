@@ -42,12 +42,14 @@ export function Divider({ className = '' }: { className?: string }) {
 /* Three styles, three sizes. primary: white pill, the main action. secondary: translucent grey
    pill, for everything else (works on black and over artwork). link: underlined text.
    Sizes: sm 40px, md 48px, lg 56px. */
-export type ButtonVariant = 'primary' | 'secondary' | 'link'
+export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'link'
 export type ButtonSize = 'sm' | 'md' | 'lg'
 type ButtonLook = { variant?: ButtonVariant; size?: ButtonSize; icon?: ReactNode; block?: boolean }
 
+const BTN = { primary: 'btn-white', secondary: 'btn-dark', accent: 'btn-accent' } as const
+
 export function buttonClass({ variant = 'primary', size = 'md', block }: ButtonLook, extra = '') {
-  const base = variant === 'link' ? 'ui-btn--link' : `${variant === 'primary' ? 'btn-white' : 'btn-dark'}${size === 'md' ? '' : ` btn-${variant === 'primary' ? 'white' : 'dark'}--${size}`}`
+  const base = variant === 'link' ? 'ui-btn--link' : `${BTN[variant]}${size === 'md' ? '' : ` ${BTN[variant]}--${size}`}`
   return `${base}${block ? ' ui-btn-block' : ''} ${extra}`.trim()
 }
 

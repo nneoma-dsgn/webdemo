@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { idForName, isSaved, savedToast, toggleSaved } from '../data/saved'
+import { isPhone } from './viewport'
 
 /* One dropdown for the whole app (card ⋯ menus, right-click, account menu) plus the toast.
    Open it with a title (the standard title menu) or a full spec of header + items. */
@@ -109,17 +110,20 @@ export function MenuProvider({ children }: { children: ReactNode }) {
   )
 }
 
+/* Phones get every menu as a bottom sheet (grabber, full-width rows, dimmed page behind). */
 function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
+  const [sheet] = useState(isPhone)
   const [pos, setPos] = useState({ y: placed.y, origin: placed.origin })
 
   // Flip above the anchor when there isn't room below.
   useLayoutEffect(() => {
+    if (sheet) return
     const h = ref.current?.offsetHeight ?? 0
     if (placed.anchorBottom + GAP + h > window.innerHeight - EDGE) {
       setPos({ y: Math.max(EDGE, placed.anchorTop - GAP - h), origin: placed.origin.replace('top', 'bottom') })
     }
-  }, [placed])
+  }, [placed, sheet])
 
   useEffect(() => {
     const items = () => Array.from(ref.current?.querySelectorAll<HTMLButtonElement>('.dd__item') ?? [])
@@ -148,22 +152,26 @@ function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) 
     const onScroll = () => dismiss()
     window.addEventListener('mousedown', onDown)
     window.addEventListener('keydown', onKey)
-    window.addEventListener('scroll', onScroll, true)
-    window.addEventListener('resize', onScroll)
+    // A sheet covers the page, so scrolling behind it doesn't close it.
+    if (!sheet) {
+      window.addEventListener('scroll', onScroll, true)
+      window.addEventListener('resize', onScroll)
+    }
     return () => {
       window.removeEventListener('mousedown', onDown)
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('scroll', onScroll, true)
       window.removeEventListener('resize', onScroll)
     }
-  }, [onClose, placed])
+  }, [onClose, placed, sheet])
 
   const { spec } = placed
   // Ticks sit at the right end of a row; only other icons get a column on the left.
   const hasIcons = spec.items.some((it) => it.kind !== 'separator' && it.icon && it.icon !== 'check')
 
-  return (
-    <div ref={ref} className="dd" role="menu" aria-label={spec.label} style={{ left: placed.x, top: pos.y, width: MENU_W, transformOrigin: pos.origin }}>
+  const body = (
+    <div ref={ref} className={`dd${sheet ? ' dd--sheet' : ''}`} role="menu" aria-label={spec.label} style={sheet ? undefined : { left: placed.x, top: pos.y, width: MENU_W, transformOrigin: pos.origin }}>
+      {sheet && <span className="dd__grab" aria-hidden />}
       {spec.header && <div className="dd__header">{spec.header}</div>}
       {spec.items.map((it) =>
         it.kind === 'separator' ? (
@@ -200,6 +208,14 @@ function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) 
         ),
       )}
     </div>
+  )
+  return sheet ? (
+    <>
+      <div className="dd-scrim" aria-hidden />
+      {body}
+    </>
+  ) : (
+    body
   )
 }
 

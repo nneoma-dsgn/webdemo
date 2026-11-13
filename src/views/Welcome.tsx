@@ -10,6 +10,7 @@ import { HeroVideo } from '../components/HeroVideo'
 import { Theater } from '../components/Theater'
 import { Faq, FinalCta, Footer, Reveal } from '../components/Marketing'
 import { Button } from '../components/ui'
+import { AppBanner } from '../components/Nav'
 
 /* Web version of the signed-out "Circo · Discover" screen (SSO SIGN UP - USER).
    The hero carries the Sign Up / Log In actions, so the header is just the logo. */
@@ -27,6 +28,7 @@ export default function Welcome() {
 
   return (
     <div className="page page--home page--welcome">
+      <AppBanner />
       <header className={`topnav${solid ? ' topnav--solid' : ''}`}>
         <Link href="/welcome" className="wordmark" aria-label="Circo">
           <img src="/assets/logo-circo.png" alt="Circo" width={92} height={35} />
@@ -38,7 +40,6 @@ export default function Welcome() {
             15s to 104s skips the production logo and the "in cinemas" end card. */}
         <HeroVideo videoId="pEUZVfeCU94" still={hero.still} start={15} end={104} />
         <div className="hero__scrim" />
-        <img className="hero__logo-m" src="/assets/logo-circo.png" alt="Circo" width={88} height={34} />
         <div className="hero__content">
           <h1 className="hero__title">{hero.name}</h1>
           <p className="hero__blurb">{hero.blurb}</p>

@@ -7,7 +7,7 @@ import { signOut } from '../auth'
 import { icons } from '../data/catalog'
 import { categories, category } from '../data/explore'
 import { useMenu } from './Menu'
-import { SegmentedControl } from './ui'
+import { ButtonLink, SegmentedControl } from './ui'
 import { NotificationBell } from './Notifications'
 
 /* Desktop and tablet: Netflix/Apple TV style top bar that is transparent over the
@@ -29,7 +29,9 @@ export function TopNav() {
   const home = pathname === '/'
 
   return (
-    <header className={`topnav${solid ? ' topnav--solid' : ''}`}>
+    // Phones keep only cast and notifications, and only over a hero (Home and Explore), as in the
+    // mobile design; the rest of the top bar moves to the bottom pill and the hero's own tabs.
+    <header className={`topnav${solid ? ' topnav--solid' : ''}${home || pathname.startsWith('/explore/') ? ' topnav--hero' : ''}`}>
       <Link href="/" className="wordmark" aria-label="Circo home">
         <img src="/assets/logo-circo.png" alt="Circo" width={92} height={35} />
       </Link>
@@ -38,7 +40,7 @@ export function TopNav() {
       <div className="topnav__right">
         <div className="capsule">
           {pathname !== '/search' && (
-            <Link href="/search" className="capsule__btn" aria-label="Search">
+            <Link href="/search" className="capsule__btn capsule__btn--search" aria-label="Search">
               <CapsuleIcon name="search" />
             </Link>
           )}
@@ -54,30 +56,98 @@ export function TopNav() {
   )
 }
 
-/* Phones: the floating "Navigation pill" from the mobile design. */
+/* Phones: how the page is scrolling, for chrome that steps aside on the way down. `down` is
+   true while scrolling down past the first 56px (small jitters ignored) and false again as
+   soon as you scroll up; `atTop` is true within the first 24px. */
+function usePageScroll() {
+  const [state, setState] = useState({ down: false, atTop: true })
+  useEffect(() => {
+    let last = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      const atTop = y < 24
+      if (Math.abs(y - last) < 6) {
+        setState((s) => (s.atTop === atTop ? s : { ...s, atTop }))
+        return
+      }
+      setState({ down: y > last && y > 56, atTop })
+      last = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return state
+}
+
+/* Phones: the floating "Navigation pill" from the mobile design. It shrinks while the page
+   scrolls down and comes back to full size as soon as you scroll up. */
 export function MobileNav() {
   const pathname = usePathname()
+  const { down: compact } = usePageScroll()
+
   return (
-    <nav className="mobilenav" aria-label="Primary">
+    <nav className={`mobilenav${compact ? ' mobilenav--compact' : ''}`} aria-label="Primary">
       <div className="mobilenav__pill">
         <Link href="/" className={`mobilenav__item${pathname === '/' ? ' active' : ''}`} aria-label="Home">
-          <img src={icons.house} alt="" width={28} height={28} />
+          <NavIcon name="house" active={pathname === '/'} />
         </Link>
         <Link href="/library" className={`mobilenav__item${pathname === '/library' ? ' active' : ''}`} aria-label="Library">
-          <img src={icons.library} alt="" width={28} height={28} />
+          <NavIcon name="library" active={pathname === '/library'} />
         </Link>
         <Link href="/search" className={`mobilenav__item${pathname === '/search' ? ' active' : ''}`} aria-label="Search">
-          <img src={icons.search} alt="" width={28} height={28} />
+          <NavIcon name="search" active={pathname === '/search'} />
+        </Link>
+        {/* Phones: the profile lives here and goes straight to Account (Library is the plus, and
+            Log Out is in Account); the top keeps cast and notifications. */}
+        <Link href="/account" className={`mobilenav__item${pathname.startsWith('/account') ? ' active' : ''}`} aria-label="Account">
+          <img className="mobilenav__avatar" src={icons.avatar} alt="" width={30} height={30} />
         </Link>
       </div>
     </nav>
   )
 }
 
+/* Phones: a "Get the app" bar at the top of signed-in pages and the welcome page (downloads
+   and offline viewing are app-only). Clear over a hero at the top of the page; it slides away
+   as the page scrolls down and comes back as soon as you scroll up. */
+// TODO: point at the App Store / Play Store listings once they're live.
+const APP_URL = '#'
+
+export function AppBanner() {
+  const { down: hidden, atTop: top } = usePageScroll()
+
+  return (
+    <div className={`appbanner${hidden ? ' appbanner--hidden' : ''}${top ? ' appbanner--top' : ''}`}>
+      <img src="/assets/logo-circo.png" alt="Circo" width={66} height={25} />
+      <ButtonLink href={APP_URL} variant="accent" size="sm" className="appbanner__cta">
+        Get the app
+      </ButtonLink>
+    </div>
+  )
+}
+
+/* Bottom pill icons (the mobile design's house, add-circle and search), drawn inline so the
+   current page's icon can be white and heavier and the rest grey. */
+const NAV_PATHS = {
+  house: ['M17.5 24.4991V15.1657C17.5 14.8563 17.3771 14.5596 17.1583 14.3408C16.9395 14.122 16.6428 13.9991 16.3333 13.9991H11.6667C11.3572 13.9991 11.0605 14.122 10.8417 14.3408C10.6229 14.5596 10.5 14.8563 10.5 15.1657V24.4991M3.5 11.6663C3.49992 11.3269 3.57389 10.9915 3.71675 10.6836C3.85962 10.3757 4.06793 10.1027 4.32717 9.88363L12.4938 2.88363C12.915 2.52769 13.4486 2.3324 14 2.3324C14.5514 2.3324 15.085 2.52769 15.5062 2.88363L23.6728 9.88363C23.9321 10.1027 24.1404 10.3757 24.2832 10.6836C24.4261 10.9915 24.5001 11.3269 24.5 11.6663V22.1663C24.5 22.7851 24.2542 23.3786 23.8166 23.8162C23.379 24.2538 22.7855 24.4996 22.1667 24.4996H5.83333C5.21449 24.4996 4.621 24.2538 4.18342 23.8162C3.74583 23.3786 3.5 22.7851 3.5 22.1663V11.6663Z'],
+  library: ['M9.33333 14H14M14 14H18.6667M14 14V9.33333M14 14V18.6667', 'M14 25.6667C20.4433 25.6667 25.6667 20.4433 25.6667 14C25.6667 7.55668 20.4433 2.33333 14 2.33333C7.55668 2.33333 2.33333 7.55668 2.33333 14C2.33333 20.4433 7.55668 25.6667 14 25.6667Z'],
+  search: ['M24.5002 24.5002L19.4369 19.4369M22.1667 12.8333C22.1667 17.988 17.988 22.1667 12.8333 22.1667C7.67868 22.1667 3.5 17.988 3.5 12.8333C3.5 7.67868 7.67868 3.5 12.8333 3.5C17.988 3.5 22.1667 7.67868 22.1667 12.8333Z'],
+}
+
+function NavIcon({ name, active }: { name: keyof typeof NAV_PATHS; active: boolean }) {
+  return (
+    <svg className="mobilenav__icon" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth={active ? 2.6 : 2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {NAV_PATHS[name].map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </svg>
+  )
+}
+
 /* Search and cast drawn at the same size, weight and colour (Lucide paths). */
 function CapsuleIcon({ name }: { name: 'search' | 'cast' }) {
   return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       {name === 'search' ? (
         <>
           <circle cx="10.5" cy="10.5" r="7.5" />
@@ -122,7 +192,8 @@ export function useExploreTab() {
     value: 'explore',
     label: (
       <span className="seg__more">
-        {current?.label ?? 'More'}
+        <span className="seg__more-full">{current?.label ?? 'More'}</span>
+        <span className="seg__more-short">More</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M6 9l6 6 6-6" />
         </svg>
@@ -144,7 +215,7 @@ export function useExploreTab() {
 
 function AccountMenu() {
   const router = useRouter()
-  const { open, toast } = useMenu()
+  const { open } = useMenu()
 
   const show = (el: HTMLElement) => {
     open(el, {

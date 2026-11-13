@@ -3,12 +3,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { browseGrid, icons, studios, titles } from '../data/catalog'
+import { browseGrid, icons, titles } from '../data/catalog'
 import { StudioTile } from '../components/Cards'
 import { EpisodeCard } from './Explore'
 import { didYouMean, isUpcoming, norm, search, type Hit } from '../data/search'
 import { Button } from '../components/ui'
-
 
 /* Recent searches, kept in this browser (newest first, a handful). */
 const RECENT_KEY = 'circo:recent-searches'
@@ -92,7 +91,7 @@ export default function Search() {
               {hits.some((h) => h.kind === 'title' || h.kind === 'episode') && (
                 <section className="ssection">
                   <div className="sgrid">
-                    {hits.map((h, i) => (h.kind === 'title' || h.kind === 'episode' ? <Thumb key={`${h.kind}-${i}`} hit={h} q={q} onOpen={() => remember(q)} /> : null))}
+                    {hits.map((h, i) => (h.kind === 'title' || h.kind === 'episode' ? <Thumb key={`${h.kind}-${i}`} hit={h} onOpen={() => remember(q)} /> : null))}
                   </div>
                 </section>
               )}
@@ -138,7 +137,7 @@ export default function Search() {
 
           <div className="sgrid">
             {browseGrid.map((id) => (
-              <Thumb key={id} hit={{ kind: 'title', t: titles[id], score: 0 }} q="" onOpen={() => {}} />
+              <Thumb key={id} hit={{ kind: 'title', t: titles[id], score: 0 }} onOpen={() => {}} />
             ))}
           </div>
 
@@ -148,8 +147,8 @@ export default function Search() {
   )
 }
 
-/* A title or episode as a landscape thumbnail with its name underneath. */
-function Thumb({ hit, q, onOpen }: { hit: Extract<Hit, { kind: 'title' | 'episode' }>; q: string; onOpen: () => void }) {
+/* A title or episode as its poster, with the date on anything coming soon. */
+function Thumb({ hit, onOpen }: { hit: Extract<Hit, { kind: 'title' | 'episode' }>; onOpen: () => void }) {
   const t = hit.t
   const soon = isUpcoming(t.id)
   const href = hit.kind === 'episode' ? `/watch/${t.id}?ep=${encodeURIComponent(`S1 · E${hit.n}`)}` : `/watch/${t.id}`
@@ -160,32 +159,5 @@ function Thumb({ hit, q, onOpen }: { hit: Extract<Hit, { kind: 'title' | 'episod
         {soon && <em className="sthumb__soon">{soon.when}</em>}
       </span>
     </Link>
-  )
-}
-
-/* Bold the part of the name that matches (accents ignored). */
-function Mark({ text, q }: { text: string; q: string }) {
-  const nq = norm(q)
-  if (!nq) return <>{text}</>
-  // Map each character of the original to its folded form to find the match position.
-  const folded = [...text].map((c) => norm(c) || ' ')
-  const flat = folded.join('')
-  const at = flat.indexOf(nq)
-  if (at < 0) return <>{text}</>
-  let pos = 0
-  let start = -1
-  let end = -1
-  folded.forEach((f, i) => {
-    if (start < 0 && pos >= at) start = i
-    pos += f.length
-    if (end < 0 && pos >= at + nq.length) end = i + 1
-  })
-  const chars = [...text]
-  return (
-    <>
-      {chars.slice(0, start).join('')}
-      <b>{chars.slice(start, end).join('')}</b>
-      {chars.slice(end).join('')}
-    </>
   )
 }

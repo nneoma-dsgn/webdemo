@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { USERNAME_MIN, getSession, signOut, updateSession, usernameHasBadChars, usernameTaken, type Session } from '../auth'
-import { icons, studios, titles } from '../data/catalog'
+import { studios, titles } from '../data/catalog'
 import { useBlocked, useMuted } from '../data/moderation'
 import { Button, EmptyState, List, ListRow, SegmentedControl, SelectField, TextField } from '../components/ui'
 import { useMenu } from '../components/Menu'

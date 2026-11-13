@@ -139,8 +139,6 @@ export const planLabel = (id: string) => plans.find((p) => p.id === id)?.label ?
 
 /* --- Balance --- */
 
-export const getBalance = () => snapshot().balance
-
 export function topUp(amount: number) {
   set((s) => ({ ...s, balance: s.balance + amount }))
 }

@@ -5,10 +5,10 @@ import { Button, Divider, EmptyState, List, ListRow, SegmentedControl, SelectFie
 
 /* Living reference for the Circo design system. Everything here is the real component. */
 
-/* The twelve core colours. Everything on screen should come from these. */
+/* The fourteen core colours. Everything on screen should come from these. */
 const COLOURS: { group: string; tokens: [string, string, string][] }[] = [
-  { group: 'Background', tokens: [['--bg-primary', 'Page', 'The page'], ['--surface-1', 'Surface', 'Panels and cards'], ['--bg-light', 'Light', 'Primary buttons']] },
-  { group: 'Text', tokens: [['--text-100', 'Primary', 'Headings, key text'], ['--text-200', 'Secondary', 'Body text'], ['--text-300', 'Muted', 'Meta, hints'], ['--text-on-light', 'On light', 'Text on white']] },
+  { group: 'Background', tokens: [['--bg-primary', 'Page', 'The page'], ['--surface-1', 'Surface', 'Panels and cards'], ['--surface-wash', 'Wash surface', 'Frosted bars on sign-up'], ['--bg-light', 'Light', 'Primary buttons']] },
+  { group: 'Text', tokens: [['--text-100', 'Primary', 'Headings, key text'], ['--text-200', 'Secondary', 'Body text'], ['--text-300', 'Muted', 'Meta, hints'], ['--text-400', 'Faint', 'Placeholders, fine print'], ['--text-on-light', 'On light', 'Text on white']] },
   { group: 'Brand and status', tokens: [['--accent', 'Accent', 'Brand, progress'], ['--danger', 'Danger', 'Errors'], ['--warning', 'Warning', 'Time running out'], ['--success', 'Success', 'Confirmed']] },
   { group: 'Lines', tokens: [['--stroke-strong', 'Line', 'Dividers, input lines']] },
 ]
@@ -93,7 +93,7 @@ export default function DesignSystem() {
 
       <Section title="Buttons">
         <Text variant="body-sm" tone="muted">
-          Three styles, three sizes. Primary for the one main action on a screen; secondary for everything else; link for low-key actions like Cancel.
+          Four styles, three sizes. Primary for the one main action on a screen; secondary for everything else; accent for promoting Circo itself (Get the app); link for low-key actions like Cancel.
         </Text>
         {(['lg', 'md', 'sm'] as const).map((size) => (
           <div key={size} className="ds__row">
@@ -103,6 +103,9 @@ export default function DesignSystem() {
             <Button size={size}>Primary</Button>
             <Button size={size} variant="secondary">
               Secondary
+            </Button>
+            <Button size={size} variant="accent">
+              Accent
             </Button>
             <Button size={size} disabled>
               Disabled

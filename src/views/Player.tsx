@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { notFound, useParams, useRouter, useSearchParams } from 'next/navigation'
 import { exploreEpisodes, exploreTitle } from '../data/explore'
-import { ALWAYS, films, upcoming, languagesFor, HICCUPS, roll, episodes, episodeThumb, featureFor, naira, studios, titles, trailers, type Title } from '../data/catalog'
+import { ALWAYS, icons, films, upcoming, languagesFor, HICCUPS, roll, episodes, episodeThumb, featureFor, naira, studios, titles, trailers, type Title } from '../data/catalog'
 import { accessLeft, setAudioLang, setQuality, setSubLang, type Quality, buyPass, extendPass, fakePassLeft, getProgress, joinStudio, saveProgress, clearProgress, startPass, useClock, useViewing } from '../data/viewing'
 import { Access } from '../components/Access'
 import { ComingSoon } from '../components/ComingSoon'
@@ -14,7 +14,8 @@ import { useMenu } from '../components/Menu'
 import { savedToast, useSaved } from '../data/saved'
 import { openMini } from '../data/mini'
 import { isBlocked, isMuted, toggleBlocked, toggleMuted } from '../data/moderation'
-import { Button } from '../components/ui'
+import { Button, Text } from '../components/ui'
+import { isPhone } from '../components/viewport'
 
 /* Circo video player. Loading screen after Netflix (title top-left, spinner centre); controls
    after the Circo mobile player (glass skip/play circles, red scrubber) and Apple TV / Netflix web
@@ -112,6 +113,10 @@ function PlayerView() {
   const [scrubbing, setScrubbing] = useState<number | null>(null)
   // Series only: Info / Episodes panel under the scrubber (Apple TV style).
   const [panel, setPanel] = useState<'info' | 'episodes' | null>(null)
+  // Phones: the details under the picture start folded behind an Info pill.
+  const [infoOpen, setInfoOpen] = useState(false)
+  // Phones, series: the details have been scrolled into (the picture is riding up / pinned).
+  const [browsing, setBrowsing] = useState(false)
   // The trailer has finished: offer a pass (public studio) or a subscription (private studio).
   const [ended, setEnded] = useState(false)
   // Paid in this session: the trailer plays through without asking again.
@@ -303,16 +308,49 @@ function PlayerView() {
     }
   }
 
+  /* Full screen, and on a phone held upright, landscape too. Where the browser can (Android,
+     desktop) it's real full screen plus an orientation lock. iPhone Safari can't put a page
+     element in full screen or lock rotation, so there the player turns itself sideways on
+     screen instead ("rotated"), until it's tapped again or the phone is actually turned. */
+  const [rotated, setRotated] = useState(false)
   const toggleFull = useCallback(() => {
-    if (document.fullscreenElement) document.exitFullscreen()
-    else root.current?.requestFullscreen?.()
-  }, [])
+    const orientation = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void>; unlock?: () => void }
+    if (document.fullscreenElement) {
+      orientation.unlock?.()
+      document.exitFullscreen()
+      return
+    }
+    const upright = isPhone() && window.matchMedia('(orientation: portrait)').matches
+    if (document.fullscreenEnabled && root.current?.requestFullscreen) {
+      root.current
+        .requestFullscreen()
+        .then(() => (upright ? orientation.lock?.('landscape') : undefined))
+        .catch(() => {})
+      return
+    }
+    if (upright || rotated) setRotated((r) => !r)
+  }, [rotated])
 
   useEffect(() => {
     const on = () => setFull(!!document.fullscreenElement)
     document.addEventListener('fullscreenchange', on)
     return () => document.removeEventListener('fullscreenchange', on)
   }, [])
+
+  // Menus open outside the player; while it's turned they turn with it (see .dd--sheet).
+  useEffect(() => {
+    document.body.classList.toggle('vp-rotated', rotated)
+    return () => document.body.classList.remove('vp-rotated')
+  }, [rotated])
+
+  // Turning the phone for real hands over to the actual landscape layout.
+  useEffect(() => {
+    if (!rotated) return
+    const mq = window.matchMedia('(orientation: landscape)')
+    const on = () => mq.matches && setRotated(false)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [rotated])
 
   // Picture-in-picture: hand the video to the floating mini player and go back to browsing.
   const toMini = () => {
@@ -457,13 +495,39 @@ function PlayerView() {
   }
 
   // One settings menu for the less-used controls; each row opens its own list in the same spot.
-  const settingsMenu = (el: HTMLElement) =>
+  // Phones have no audio & subtitles panel, so Audio and Subtitles join Quality and Speed here.
+  const settingsMenu = (el: HTMLElement) => {
+    const phone = isPhone()
     open(el, {
       label: 'Settings',
       header: <span className="dd__title">Settings</span>,
       items: [
         { id: 'quality', label: 'Quality', hint: QUALITIES.find((o) => o.q === quality)?.label, chevron: true, onSelect: () => window.setTimeout(() => qualityMenu(el), 0) },
         { id: 'speed', label: 'Playback speed', hint: speed === 1 ? 'Normal' : `${speed}×`, chevron: true, onSelect: () => window.setTimeout(() => speedMenu(el), 0) },
+        ...(phone
+          ? [
+              { id: 'audio', label: 'Audio', hint: audioSel, chevron: true, onSelect: () => window.setTimeout(() => audioMenu(el), 0) },
+              { id: 'subs', label: 'Subtitles', hint: subSel ?? 'Off', chevron: true, onSelect: () => window.setTimeout(() => subsMenu(el), 0) },
+            ]
+          : []),
+      ],
+    })
+  }
+
+  const audioMenu = (el: HTMLElement) =>
+    open(el, {
+      label: 'Audio',
+      header: <span className="dd__title">Audio</span>,
+      items: langs.audio.map((l) => ({ id: `a-${l}`, label: l, hint: l === langs.original ? 'Original' : undefined, icon: l === audioSel ? ('check' as const) : undefined, onSelect: () => pickAudio(l) })),
+    })
+
+  const subsMenu = (el: HTMLElement) =>
+    open(el, {
+      label: 'Subtitles',
+      header: <span className="dd__title">Subtitles</span>,
+      items: [
+        { id: 'sub-off', label: 'Off', icon: subSel === null ? ('check' as const) : undefined, onSelect: () => pickSub(null) },
+        ...langs.subtitles.map((l) => ({ id: `sub-${l}`, label: l, icon: l === subSel ? ('check' as const) : undefined, onSelect: () => pickSub(l) })),
       ],
     })
 
@@ -514,7 +578,49 @@ function PlayerView() {
 
   const shown = scrubbing ?? time
   const pct = duration ? (shown / duration) * 100 : 0
-  const hide = (hidden || (idle && playing && started)) && scrubbing === null && !panel && !langOpen
+  // Tapping the picture hides the controls; tapping again brings them back.
+  const tapPicture = () => {
+    if (hide) {
+      setHidden(false)
+      wake()
+    } else setHidden(true)
+  }
+
+  /* Phones, series: the details scroll from anywhere on the screen. The picture rides up with
+     them (--shift, a transform, updated once a frame) until it pins to the top. */
+  const scrollFrame = useRef(0)
+  const onDetailsScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget
+    cancelAnimationFrame(scrollFrame.current)
+    scrollFrame.current = requestAnimationFrame(() => {
+      const r = root.current
+      if (!r) return
+      const centred = (r.clientHeight - r.clientWidth * PHONE_PICTURE_RATIO) / 2
+      r.style.setProperty('--shift', `${-Math.min(el.scrollTop, Math.max(0, centred))}px`)
+      setBrowsing(el.scrollTop > 4)
+      wake()
+    })
+  }
+  // Over the picture, a tap is a tap on the picture (not on whatever has scrolled behind it).
+  const onDetailsTap = (e: React.MouseEvent) => {
+    const v = root.current?.querySelector('.vp__video')?.getBoundingClientRect()
+    if (!v || e.clientY > v.bottom) return
+    e.preventDefault()
+    e.stopPropagation()
+    tapPicture()
+  }
+
+  // A series' details, once scrolled into, stay up until the picture is tapped (no idle fade).
+  const hide = (hidden || (idle && playing && started && !browsing)) && scrubbing === null && !panel && !langOpen
+
+  // Hiding everything sends the picture back to the middle (CSS); ease that move, and the
+  // return, without slowing the picture down while it follows a scroll.
+  const [settling, setSettling] = useState(false)
+  useEffect(() => {
+    setSettling(true)
+    const t = window.setTimeout(() => setSettling(false), 400)
+    return () => window.clearTimeout(t)
+  }, [hide])
   // Coming soon is only ever a trailer: no episodes, no Info, no next episode, no Up Next.
   const series = t.kind === 'series' && !soon
   const studio = studios[t.studioId]
@@ -523,9 +629,21 @@ function PlayerView() {
   const epNum = Number(epLabel?.match(/(\d+)\s*$/)?.[1] ?? 1)
   const epPrefix = epLabel?.includes('S') && epLabel.includes('E') ? epLabel.replace(/E\s*\d+\s*$/, 'E') : 'EP '
   const episodeList = eps
-    ? eps.map((e, i) => ({ n: i + 1, label: `${epPrefix}${i + 1}`, name: e.title, mins: e.mins, blurb: e.blurb as string | undefined, art: episodeThumb(e.videoId) }))
-    : Array.from({ length: 8 }, (_, i) => ({ n: i + 1, label: `${epPrefix}${i + 1}`, name: i === 0 ? 'Pilot' : `Chapter ${i + 1}`, mins: 42 + ((i * 7) % 12), blurb: undefined as string | undefined, art: t.still }))
+    ? eps.map((e, i) => ({ n: i + 1, label: `${epPrefix}${i + 1}`, name: e.title, mins: e.mins, blurb: e.blurb as string | undefined, art: episodeThumb(e.videoId), season: ('season' in e && e.season) || 1 }))
+    : Array.from({ length: 8 }, (_, i) => ({ n: i + 1, label: `${epPrefix}${i + 1}`, name: i === 0 ? 'Pilot' : `Chapter ${i + 1}`, mins: 42 + ((i * 7) % 12), blurb: undefined as string | undefined, art: t.still, season: 1 }))
   const current = episodeList[epNum - 1] ?? episodeList[0]
+  // Seasons: the phone episode row shows one at a time, picked from a Season dropdown when
+  // there's more than one (otherwise it's just headed Episodes).
+  const seasons = Array.from(new Set(episodeList.map((e) => e.season))).sort((a, b) => a - b)
+  const [season, setSeason] = useState<number | null>(null)
+  const shownSeason = season ?? current.season
+  const seasonMenu = (el: HTMLElement) =>
+    open(el, {
+      label: 'Season',
+      items: seasons.map((n) => ({ id: `season-${n}`, label: `Season ${n}`, icon: n === shownSeason ? ('check' as const) : undefined, onSelect: () => setSeason(n) })),
+    })
+  // One meta line for the Info panel (desktop) and the details under the picture (phones).
+  const infoMeta = series ? `Season ${current.season} · Episode ${current.n} · ${current.mins} min` : `${t.year} · ${t.genre}`
   const next = episodeList[epNum]
   const nextBlurb = [
     'Old loyalties are tested when a new rule changes the game for everyone.',
@@ -546,7 +664,6 @@ function PlayerView() {
     : pick
       ? { kicker: 'You might like', title: pick.name, blurb: pick.blurb, art: pick.still, cta: `Play ${pick.kind === 'series' ? 'Series' : 'Film'}`, go: () => router.replace(`/watch/${pick.id}`) }
       : null
-  const left = duration ? duration - time : Infinity
   // Only once a film or episode has actually finished; trailers end on the access screen.
   const upNext = !!up && unlocked && featureMode && !stayed && started && ended
 
@@ -650,7 +767,7 @@ function PlayerView() {
   }, [passExpired, started, ended])
 
   return (
-    <div ref={root} className={`vp${hide ? ' vp--idle' : ''}${hide && idle ? ' vp--rest' : ''}${!started && clip ? ' vp--loading' : ''}${panel ? ' vp--panel' : ''}${(ended && (soon || (!featureMode && !paidHere))) || (halted && !unlocked) ? ' vp--ended' : ''}`} onMouseMove={onHover} onClick={wake}>
+    <div ref={root} className={`vp${series ? ' vp--series' : ''}${settling ? ' vp--settling' : ''}${rotated ? ' vp--rotated' : ''}${hide ? ' vp--idle' : ''}${hide && idle ? ' vp--rest' : ''}${!started && clip ? ' vp--loading' : ''}${panel ? ' vp--panel' : ''}${(ended && (soon || (!featureMode && !paidHere))) || (halted && !unlocked) ? ' vp--ended' : ''}`} onMouseMove={onHover} onClick={wake}>
       {/* Video, contained (letterboxed) rather than cropped. Rendered large and scaled down so
           YouTube's own overlays shrink with it. */}
       <div className={`vp__video${started ? ' is-on' : ''}`} aria-hidden>
@@ -662,15 +779,89 @@ function PlayerView() {
       <button
         className="vp__surface"
         aria-label={hide ? 'Show controls' : 'Hide controls'}
-        onClick={() => {
-          if (hide) {
-            setHidden(false)
-            wake()
-          } else setHidden(true)
-        }}
+        onClick={tapPicture}
         onDoubleClick={toggleFull}
         tabIndex={-1}
       />
+
+      {/* Phones: what's playing under the picture (title, blurb, studio) and, for a series, the
+          episodes to swipe through. Stays put while the controls fade. */}
+      {clip && !failed && !(ended && soon) && (
+        <div
+          className="vp-details"
+          onScroll={series ? onDetailsScroll : undefined}
+          onClickCapture={series ? onDetailsTap : undefined}
+        >
+          {series && <div className="vp-details__spacer" aria-hidden />}
+          <div className="vp-details__inner">
+            {/* Title with the same Info pill as desktop; Info opens the meta line, blurb and studio.
+                For a series it stays put under the pinned picture while the rest scrolls. */}
+            <div className="vp-details__head">
+              <Text variant="h3" as="h2" className="vp-details__title">
+                {series ? `${t.name} - ${current.name}` : t.name}
+              </Text>
+              <div className="vp__tabs vp__tabs--inline">
+                <button aria-expanded={infoOpen} className={infoOpen ? 'is-on' : ''} onClick={() => setInfoOpen((o) => !o)}>
+                  {infoOpen ? 'Hide' : 'Info'}
+                </button>
+              </div>
+            </div>
+            {infoOpen && (
+              <div className="vp-details__info">
+                <Text variant="body-sm" tone="muted" className="vp-details__meta">
+                  {infoMeta}
+                </Text>
+                <Text variant="body-sm" tone="secondary" className="vp-details__blurb">
+                  {(series && current.blurb) || t.blurb}
+                </Text>
+              </div>
+            )}
+            {studio && infoOpen && (
+              <div className="vp-details__studio">
+                <span className="vp-details__who">
+                  <img src={studio.logo} alt="" width={40} height={40} />
+                  <strong>{studio.name}</strong>
+                </span>
+                <Button size="sm" onClick={() => router.push(`/studio/${studio.id}`)}>
+                  See More
+                </Button>
+              </div>
+            )}
+            {series && (
+              <section className="vp-details__eps" aria-label="Episodes">
+                {seasons.length > 1 ? (
+                  <button className="vp-details__season" aria-haspopup="menu" onClick={(e) => seasonMenu(e.currentTarget)}>
+                    Season {shownSeason}
+                    <Svg d={['m6 9 6 6 6-6']} />
+                  </button>
+                ) : (
+                  <Text variant="body" as="h3" className="vp-details__eps-title">
+                    Episodes
+                  </Text>
+                )}
+                <div className="vp-details__eps-row">
+                  {episodeList.filter((e) => e.season === shownSeason).map((e) => (
+                    <button
+                      key={e.n}
+                      className="vp-details__ep"
+                      aria-current={e.n === epNum ? 'true' : undefined}
+                      onClick={() => router.replace(`/watch/${t.id}?ep=${encodeURIComponent(e.label)}`)}
+                    >
+                      <img src={t.poster} alt="" loading="lazy" />
+                      <Text variant="caption" tone="muted" as="span" className="vp-details__ep-n">
+                        Episode {e.n}
+                      </Text>
+                      <strong>
+                        {e.n}. {e.name}
+                      </strong>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Loading: title and episode top-left, spinner centre (until the first frame). */}
       {!started && clip && !failed && (
@@ -709,11 +900,11 @@ function PlayerView() {
             </svg>
           </span>
           <strong>Something went wrong</strong>
-          <p>
+          <Text variant="body" tone="secondary" className="vp-fail__text">
             {failed === 'gone'
               ? `${t.name} isn’t available to play right now. We’re looking into it.`
               : 'We couldn’t load this video. Check your connection and try again.'}
-          </p>
+          </Text>
           <div className="vp-fail__actions">
             <Button size="sm" icon={<Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />} onClick={() => setAttempt((a) => a + 1)}>
               Retry
@@ -735,21 +926,29 @@ function PlayerView() {
       {/* --- Chrome --- */}
       <div className="vp__top">
         <button className="vp__icon" onClick={exit} aria-label="Back">
-          <Svg d={['M19 12H5', 'm12 19-7-7 7-7']} />
+          <span className="vp-desk">
+            <Svg d={['M19 12H5', 'm12 19-7-7 7-7']} />
+          </span>
+          <img className="vp-phone" src={icons.chevronLeft} alt="" width={24} height={24} />
         </button>
         <div className="vp__top-right">
-          <button className="vp__icon" onClick={toMini} aria-label="Picture in picture" title="Picture in picture">
+          {/* Not on phones: there's no room for a floating window on a small screen. */}
+          <button className="vp__icon vp__pip" onClick={toMini} aria-label="Picture in picture" title="Picture in picture">
             <Svg d={['M21 10V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5', 'M14 14h7v6h-7z']} />
           </button>
           <button className="vp__icon" onClick={() => toast('Looking for devices nearby')} aria-label="Cast to device">
-            <Svg d={['M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6', 'M2 12a9 9 0 0 1 8 8', 'M2 16a5 5 0 0 1 4 4', 'M2 20h.01']} />
+            <span className="vp-desk">
+              <Svg d={['M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6', 'M2 12a9 9 0 0 1 8 8', 'M2 16a5 5 0 0 1 4 4', 'M2 20h.01']} />
+            </span>
+            <img className="vp-phone" src={icons.cast} alt="" width={24} height={24} />
           </button>
           <button className="vp__icon" onClick={(e) => moreMenu(e.currentTarget)} aria-label="More options">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <svg className="vp-desk" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <circle cx="5" cy="12" r="1.8" />
               <circle cx="12" cy="12" r="1.8" />
               <circle cx="19" cy="12" r="1.8" />
             </svg>
+            <img className="vp-phone" src={icons.morePlayer} alt="" width={24} height={24} />
           </button>
         </div>
       </div>
@@ -757,11 +956,15 @@ function PlayerView() {
       {started && (
         <div className="vp__center">
           <button className="vp__skip" onClick={() => seekBy(-10)} aria-label="Back 10 seconds">
-            <SkipIcon dir={-1} />
+            <span className="vp-desk">
+              <SkipIcon dir={-1} />
+            </span>
+            <img className="vp-phone" src={icons.rotateCcw} alt="" width={32} height={32} />
           </button>
           <button className="vp__play" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}>
+            {playing && <img className="vp-phone" src={icons.pause} alt="" width={24} height={32} />}
             {playing ? (
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <svg className="vp-desk" width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <rect x="6" y="4.5" width="4" height="15" rx="1.2" />
                 <rect x="14" y="4.5" width="4" height="15" rx="1.2" />
               </svg>
@@ -772,7 +975,10 @@ function PlayerView() {
             )}
           </button>
           <button className="vp__skip" onClick={() => seekBy(10)} aria-label="Forward 10 seconds">
-            <SkipIcon dir={1} />
+            <span className="vp-desk">
+              <SkipIcon dir={1} />
+            </span>
+            <img className="vp-phone" src={icons.rotateCw} alt="" width={32} height={32} />
           </button>
         </div>
       )}
@@ -893,9 +1099,7 @@ function PlayerView() {
       {slow && (
         <div className="vp-slow" role="status">
           <Svg d={['M5 12.55a11 11 0 0 1 14.08 0', 'M1.42 9a16 16 0 0 1 21.16 0', 'M8.53 16.11a6 6 0 0 1 6.95 0', 'M12 20h.01']} />
-          <span>
-            <strong>Unstable internet connection.</strong> Playback may pause.
-          </span>
+          <strong>Internet connection unstable</strong>
         </div>
       )}
 
@@ -925,6 +1129,22 @@ function PlayerView() {
       )}
 
       <div className="vp__bottom" ref={bottom}>
+        {/* Phones: elapsed / total, then settings (Quality, Speed, Audio, Subtitles) and full
+            screen, along the bottom edge of the picture. */}
+        <div className="vp__edge vp-phone">
+          <span>
+            {fmt(shown)} / {fmt(duration)}
+          </span>
+          <span className="vp__edge-tools">
+            <button onClick={(e) => settingsMenu(e.currentTarget)} aria-label="Settings">
+              <Svg d={SETTINGS_ICON} />
+            </button>
+            {/* Expand (corners out) and collapse (corners in), drawn so they share settings' weight. */}
+            <button onClick={toggleFull} aria-label={full || rotated ? 'Exit full screen' : 'Full screen'}>
+              <Svg d={full || rotated ? COLLAPSE_ICON : EXPAND_ICON} />
+            </button>
+          </span>
+        </div>
         <div className="vp__scrub">
           <input
             type="range"
@@ -960,8 +1180,8 @@ function PlayerView() {
             <strong>{t.name}</strong>
             {clip && !series && !soon && (
               <div className="vp__tabs vp__tabs--inline">
-                <button aria-pressed={panel === 'info'} className={panel === 'info' ? 'is-on' : ''} onClick={() => setPanel(panel === 'info' ? null : 'info')}>
-                  Info
+                <button aria-expanded={panel === 'info'} className={panel === 'info' ? 'is-on' : ''} onClick={() => setPanel(panel === 'info' ? null : 'info')}>
+                  {panel === 'info' ? 'Hide' : 'Info'}
                 </button>
               </div>
             )}
@@ -1016,14 +1236,10 @@ function PlayerView() {
               <Svg d={['M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z', 'M7 13h3', 'M13 13h4', 'M7 16h8']} />
             </button>
             <button className="vp__icon" onClick={(e) => settingsMenu(e.currentTarget)} aria-label="Settings" title="Settings">
-              <Svg d={['M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z']} />
+              <Svg d={SETTINGS_ICON} />
             </button>
             <button className="vp__icon" onClick={toggleFull} aria-label={full ? 'Exit full screen' : 'Full screen'} title="Full screen">
-              {full ? (
-                <Svg d={['M8 3v3a2 2 0 0 1-2 2H3', 'M21 8h-3a2 2 0 0 1-2-2V3', 'M3 16h3a2 2 0 0 1 2 2v3', 'M16 21v-3a2 2 0 0 1 2-2h3']} />
-              ) : (
-                <Svg d={['M8 3H5a2 2 0 0 0-2 2v3', 'M21 8V5a2 2 0 0 0-2-2h-3', 'M3 16v3a2 2 0 0 0 2 2h3', 'M16 21h3a2 2 0 0 0 2-2v-3']} />
-              )}
+              <Svg d={full ? COLLAPSE_ICON : EXPAND_ICON} />
             </button>
           </div>
         </div>
@@ -1033,7 +1249,7 @@ function PlayerView() {
           <div className="vp__tabs" role="tablist" aria-label="Episode details">
             {(['info', 'episodes'] as const).map((k) => (
               <button key={k} role="tab" aria-selected={panel === k} className={panel === k ? 'is-on' : ''} onClick={() => setPanel(panel === k ? null : k)}>
-                {k === 'info' ? 'Info' : 'Episodes'}
+                {k === 'info' ? (panel === 'info' ? 'Hide' : 'Info') : 'Episodes'}
               </button>
             ))}
           </div>
@@ -1042,7 +1258,7 @@ function PlayerView() {
         {panel === 'info' && (
           <div className="vp__panel vp__info">
             <div className="vp__info-main">
-              <span className="vp__info-eyebrow">{series ? `Season 1 · Episode ${current.n} · ${current.mins} min` : `${t.year} · ${t.genre} · ${t.rating}`}</span>
+              <span className="vp__info-eyebrow">{infoMeta}</span>
               <h3 className="vp__info-title">{series ? current.name : t.name}</h3>
               <p className="vp__info-blurb">{(series && current.blurb) || t.blurb}</p>
               <div className="vp__info-actions">
@@ -1123,6 +1339,14 @@ function clockLeft(ms: number) {
   const s = Math.max(0, Math.ceil(ms / 1000))
   return s >= 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : `${s}s`
 }
+
+/* The phone picture's height for its width: the mobile design's 430 x 286 frame (the CSS
+   --vp-h is the same ratio). */
+const PHONE_PICTURE_RATIO = 286 / 430
+
+const EXPAND_ICON = ['M8 3H5a2 2 0 0 0-2 2v3', 'M21 8V5a2 2 0 0 0-2-2h-3', 'M3 16v3a2 2 0 0 0 2 2h3', 'M16 21h3a2 2 0 0 0 2-2v-3']
+const COLLAPSE_ICON = ['M8 3v3a2 2 0 0 1-2 2H3', 'M21 8h-3a2 2 0 0 1-2-2V3', 'M3 16h3a2 2 0 0 1 2 2v3', 'M16 21v-3a2 2 0 0 1 2-2h3']
+const SETTINGS_ICON = ['M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z']
 
 function Svg({ d }: { d: string[] }) {
   return (

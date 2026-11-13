@@ -44,15 +44,6 @@ button {
   outline-offset: 3px;
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
-
 main {
   min-height: 100vh;
 }
@@ -60,7 +51,8 @@ main {
 /* ---------- Buttons ---------- */
 
 .btn-white,
-.btn-dark {
+.btn-dark,
+.btn-accent {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -85,7 +77,8 @@ main {
 }
 
 .btn-white--sm,
-.btn-dark--sm {
+.btn-dark--sm,
+.btn-accent--sm {
   height: 40px;
   padding: 0 18px;
   font-size: var(--fs-body-sm);
@@ -102,22 +95,20 @@ main {
   background: rgba(255, 255, 255, 0.22);
 }
 
+/* Accent: brand pink, for promoting Circo itself (Get the app). */
+.btn-accent {
+  background: var(--accent);
+  color: var(--text-100);
+}
+
+.btn-accent:hover {
+  filter: brightness(1.1);
+}
+
 .btn-white:active,
-.btn-dark:active {
+.btn-dark:active,
+.btn-accent:active {
   transform: scale(0.97);
-}
-
-.icon-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  transition: background 0.2s;
-}
-
-.icon-btn:hover {
-  background: var(--glass-soft);
 }
 
 .glass {
@@ -141,12 +132,6 @@ main {
   transition: background 0.2s, color 0.2s;
 }
 
-.pill--on {
-  background: var(--glass-strong);
-  color: var(--text-100);
-  backdrop-filter: blur(6px);
-}
-
 .back {
   display: grid;
   place-items: center;
@@ -161,18 +146,6 @@ main {
 
 .back:hover {
   background: var(--bg-400);
-}
-
-.chip {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  background: var(--chip-dark);
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-semibold);
-  line-height: 16px;
 }
 
 .badge {
@@ -254,8 +227,8 @@ main {
   display: inline-flex;
   align-items: center;
   border-radius: var(--radius-full);
-  font-size: var(--fs-body-sm);
-  font-weight: var(--fw-medium);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
   color: rgba(255, 255, 255, 0.6);
   transition: color 0.25s;
 }
@@ -314,11 +287,6 @@ main {
 
 .capsule .avatar:hover {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6);
-}
-
-.topnav__right .icon-btn img[width='28'] {
-  width: 22px;
-  height: 22px;
 }
 
 .avatar {
@@ -400,8 +368,7 @@ main {
   flex-wrap: wrap;
 }
 
-.hero__play,
-.hero__logo-m {
+.hero__play {
   display: none;
 }
 
@@ -418,10 +385,6 @@ main {
 
 .page--home .shelves {
   margin-top: clamp(-50px, -3vw, -20px);
-}
-
-.shelves--flush {
-  margin-top: 8px;
 }
 
 .shelf {
@@ -610,6 +573,11 @@ a.shelf__head:hover .shelf__chevron {
   width: 100%;
 }
 
+/* In a See all grid the card takes the column's width. */
+.coming--grid {
+  width: auto;
+}
+
 .coming__when {
   margin: 0;
   font-size: var(--fs-caption);
@@ -617,51 +585,6 @@ a.shelf__head:hover .shelf__chevron {
   line-height: 19px;
   text-align: center;
   color: var(--text-300);
-}
-
-/* ---------- Studio row ---------- */
-
-.studio-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 0;
-}
-
-.studio-row__logo {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  object-fit: contain;
-  background: #000;
-  flex: none;
-}
-
-.studio-row__text {
-  display: flex;
-  flex-direction: column;
-  margin-right: auto;
-}
-
-.studio-row__name {
-  font-size: var(--fs-body);
-  font-weight: var(--fw-semibold);
-  line-height: 24px;
-}
-
-.studio-row__note {
-  font-size: var(--fs-caption);
-  color: var(--accent);
-}
-
-.studio-list {
-  padding: 0 var(--gutter);
-  max-width: calc(720px + 2 * var(--gutter));
-}
-
-.studio-list .studio-row,
-.results .studio-row {
-  border-bottom: 1px solid var(--stroke-default);
 }
 
 /* ---------- Title + studio backdrops ---------- */
@@ -729,168 +652,11 @@ a.shelf__head:hover .shelf__chevron {
   letter-spacing: var(--tracking);
 }
 
-.title-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
-}
-
 .title-blurb {
   margin: 0;
   font-size: clamp(14px, 1.2vw, 17px);
   line-height: 1.5;
   color: var(--text-200);
-}
-
-.backdrop__content .studio-row {
-  align-self: flex-start;
-  gap: 16px;
-  margin-top: 4px;
-}
-
-.backdrop__content .studio-row__text {
-  margin-right: 8px;
-}
-
-/* ---------- Player ---------- */
-
-.player {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: #000;
-  display: grid;
-  place-items: center;
-  cursor: default;
-}
-
-.player--idle {
-  cursor: none;
-}
-
-.player__frame {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.player__top,
-.player__bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  padding: 24px var(--gutter);
-  transition: opacity 0.4s;
-}
-
-.player__top {
-  top: 0;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
-}
-
-.player__heading {
-  display: flex;
-  flex-direction: column;
-  margin-right: auto;
-  font-size: var(--fs-h3);
-}
-
-.player__heading span {
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
-}
-
-.player__bottom {
-  bottom: 0;
-  padding-bottom: 32px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-}
-
-.player__center {
-  position: absolute;
-  width: 72px;
-  height: 72px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-full);
-  background: var(--glass-dark);
-  backdrop-filter: blur(6px);
-  transition: opacity 0.4s, transform 0.2s var(--ease);
-}
-
-.player__center:hover {
-  transform: scale(1.06);
-}
-
-.player--idle .player__top,
-.player--idle .player__bottom,
-.player--idle .player__center {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.player__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 12px;
-}
-
-.player__skips {
-  display: flex;
-  gap: 16px;
-}
-
-.player__skips .icon-btn {
-  width: 48px;
-  height: 48px;
-}
-
-.player__time {
-  font-size: var(--fs-body-sm);
-  font-variant-numeric: tabular-nums;
-  color: var(--text-200);
-  min-width: 56px;
-}
-
-.player__time:last-child {
-  text-align: right;
-}
-
-/* Scrubber: accent track + accent knob, matching the mobile series header. */
-.scrubber input {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 12px;
-  margin: 0;
-  background: linear-gradient(to right, var(--accent) var(--p), rgba(255, 255, 255, 0.5) var(--p)) center / 100% 2px no-repeat;
-  cursor: pointer;
-}
-
-.scrubber input:hover {
-  background-size: 100% 4px;
-}
-
-.scrubber input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--accent);
-}
-
-.scrubber input::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--accent);
 }
 
 /* ---------- Padded pages (search, grids) ---------- */
@@ -899,7 +665,7 @@ a.shelf__head:hover .shelf__chevron {
   padding: calc(var(--nav-h) + 24px) 0 96px;
 }
 
-.page--padded > :not(.shelves):not(.studio-list) {
+.page--padded > :not(.shelves) {
   margin-left: var(--gutter);
   margin-right: var(--gutter);
 }
@@ -907,13 +673,6 @@ a.shelf__head:hover .shelf__chevron {
 .page-title {
   margin: 0 0 20px;
   font-size: clamp(28px, 3vw, 40px);
-  font-weight: var(--fw-bold);
-  letter-spacing: var(--tracking);
-}
-
-.section-label {
-  margin: 32px 0 14px;
-  font-size: var(--fs-h3);
   font-weight: var(--fw-bold);
   letter-spacing: var(--tracking);
 }
@@ -936,6 +695,12 @@ a.shelf__head:hover .shelf__chevron {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(clamp(104px, 13vw, 200px), 1fr));
   gap: 12px;
+}
+
+/* Coming-soon cards carry a date and a Remind me button, so columns stay wide enough for it. */
+.grid.grid--coming {
+  grid-template-columns: repeat(auto-fill, minmax(max(140px, 13vw), 1fr));
+  row-gap: var(--space-6);
 }
 
 .searchbar {
@@ -995,39 +760,6 @@ a.shelf__head:hover .shelf__chevron {
 .results {
   max-width: 720px;
   margin-top: 16px;
-}
-
-.result {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--stroke-default);
-}
-
-.result__thumb {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-  flex: none;
-}
-
-.result__text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-right: auto;
-}
-
-.result__title {
-  font-size: var(--fs-body);
-  font-weight: var(--fw-medium);
-}
-
-.result__meta {
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
 }
 
 .empty {
@@ -1122,7 +854,7 @@ a.shelf__head:hover .shelf__chevron {
     right: 0;
     bottom: 0;
     display: block;
-    padding: 8px 19px 20px;
+    padding: 8px 19px 8px;
     background: linear-gradient(to bottom, rgba(4, 4, 4, 0), var(--bg-primary) 60%);
   }
 
@@ -1143,8 +875,46 @@ a.shelf__head:hover .shelf__chevron {
     border-radius: var(--radius-full);
   }
 
+  .mobilenav__item {
+    color: var(--text-300);
+  }
+
   .mobilenav__item.active {
     background: var(--bg-400);
+    color: var(--text-100);
+  }
+
+  .mobilenav__avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  /* Scrolling down: a slimmer, narrower pill with smaller icons. */
+  .mobilenav__pill {
+    margin: 0 auto;
+    max-width: 100%;
+    transition:
+      height 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+      max-width 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+      padding 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .mobilenav__item img,
+  .mobilenav__icon {
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .mobilenav--compact .mobilenav__pill {
+    height: 54px;
+    max-width: 260px;
+    padding: 5px;
+  }
+
+  .mobilenav--compact .mobilenav__item img,
+  .mobilenav--compact .mobilenav__icon {
+    transform: scale(0.8);
   }
 
   .hero {
@@ -1191,21 +961,25 @@ a.shelf__head:hover .shelf__chevron {
     display: none;
   }
 
-  /* Signed-out Discover: both CTAs stay, side by side as in the design. */
+  /* Signed-out Discover: both CTAs stay, side by side as in the design, even on the narrowest
+     phones (stacked, they'd run into the first row). */
+  .hero__actions--welcome {
+    flex-wrap: nowrap;
+  }
+
   .hero__actions--welcome .btn-white {
     display: inline-flex;
     flex: 1.3;
   }
 
-  .page--welcome .topnav {
-    display: none;
+  .hero__actions--welcome button {
+    min-width: 0;
+    padding: 0 12px;
+    white-space: nowrap;
   }
 
-  .page--welcome .hero__logo-m {
-    display: block;
-    position: absolute;
-    top: 52px;
-    left: 18px;
+  .page--welcome .topnav {
+    display: none;
   }
 
   .hero__actions .btn-dark {
@@ -1234,6 +1008,11 @@ a.shelf__head:hover .shelf__chevron {
     padding-bottom: 120px;
   }
 
+  /* Signed out there's no bottom nav to clear, and the FAQ follows with its own spacing. */
+  .page--welcome .shelves {
+    padding-bottom: 0;
+  }
+
   .shelf__title {
     font-size: var(--fs-h3);
   }
@@ -1251,8 +1030,9 @@ a.shelf__head:hover .shelf__chevron {
     display: none;
   }
 
+  /* Clear of the Get the app bar (--nav-h), with a little room. */
   .page-back {
-    top: 52px;
+    top: calc(var(--nav-h) + var(--space-3));
     left: 16px;
   }
 
@@ -1273,18 +1053,15 @@ a.shelf__head:hover .shelf__chevron {
     font-size: var(--fs-h2);
   }
 
+  /* Clear the Get the app bar (--nav-h) when it's there. */
   .page--padded {
-    padding-top: 56px;
+    padding-top: max(56px, calc(var(--nav-h) + var(--space-4)));
     padding-bottom: 120px;
   }
 
   .grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 9px;
-  }
-
-    .player__frame {
-    object-fit: contain;
   }
 
   .toast {
@@ -1341,10 +1118,13 @@ a.shelf__head:hover .shelf__chevron {
   inset: 0;
 }
 
+/* contain: paint as well as overflow, because iOS Safari doesn't clip the oversized,
+   transformed YouTube iframe and lets the page pan sideways into it. */
 .hero-video__frame {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  contain: paint;
   opacity: 0;
   transition: opacity 0.25s ease;
   pointer-events: none;
@@ -1393,8 +1173,7 @@ a.shelf__head:hover .shelf__chevron {
 .hero__scrim,
 .hero__content,
 .hero__tabs,
-.hero__play,
-.hero__logo-m {
+.hero__play {
   z-index: 1;
 }
 
@@ -1712,6 +1491,7 @@ a.shelf__head:hover .shelf__chevron {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  contain: paint;
   opacity: 0;
   transition: opacity 0.25s ease;
   pointer-events: none;
@@ -1833,26 +1613,127 @@ a.shelf__head:hover .shelf__chevron {
   transition: transform 0.2s linear;
 }
 
+.screen__wide {
+  display: none;
+}
+
+/* Phones: the pinned screen is a tall frame like the spotlight's (430:550, the video cropped
+   to fill it) that grows to the full width, with Watch Now and the rest of the queue stacked
+   under it, mid-screen. */
 @media (max-width: 767px) {
+  /* Long enough to grow into focus and hold a moment; no stepping through titles. */
   .spot-pin {
-    height: calc(100vh + 110vh);
+    height: calc(100vh + 80vh);
   }
 
+  /* The title gives way once the screen is in focus. */
+  .spot__head {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .theater.is-focus .spot__head {
+    opacity: 0;
+  }
+
+  .theater__stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  /* Short phones cap the height so Watch Now and the queue still fit under it. */
+  .screen {
+    position: relative;
+    inset: auto;
+    width: calc(100% - 2 * var(--ix));
+    aspect-ratio: 430 / 550;
+    max-height: calc(100vh - var(--nav-h) - 260px);
+    border-radius: var(--r);
+    clip-path: none;
+    container-type: size;
+  }
+
+  .screen__blur,
+  .screen__poster {
+    display: none;
+  }
+
+  .screen__wide {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Cover the frame at 16:9 whatever its shape, with the spotlight's 3x render; zoomed a
+     little more (net 1.44) and weighted to crop the bottom, so burned-in subtitles stay out. */
+  .screen__video iframe {
+    width: calc(max(100cqw, 177.78cqh) * 3);
+    height: calc(max(100cqh, 56.25cqw) * 3);
+    transform: translate(-50%, -50%) scale(0.48);
+    transform-origin: 50% 40%;
+  }
+
+  /* Like the spotlight: the picture fades out at the bottom, into whatever glow is behind it,
+     with Watch Now on the fade. */
+  .screen {
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+
+  .screen__sound {
+    top: 12px;
+    right: 12px;
+    bottom: auto;
+    left: auto;
+    width: 38px;
+    height: 38px;
+  }
+
+  /* The large button from the scale (as .btn-white--lg), pulled up onto the screen's bottom
+     edge: its 56px, 20px up from the edge, past the gap. */
   .screen__cta {
-    height: 42px;
-    padding: 0 20px;
-    bottom: calc(var(--ib) + 96px);
-    right: 50%;
-    transform: translateX(50%);
+    position: relative;
+    z-index: 2;
+    right: auto;
+    bottom: auto;
+    height: 56px;
+    margin-top: -96px;
+    padding: 0 var(--space-8);
   }
 
+  /* Swipeable row, edge to edge, starting on the gutter. */
   .queue {
-    bottom: calc(var(--ib) + 16px);
-    max-width: calc(100% - 32px);
+    position: static;
+    transform: none;
+    margin-top: 24px;
+    width: 100%;
+    max-width: none;
+    padding: 4px var(--gutter);
+    gap: 8px;
+    overflow-x: auto;
+    scroll-padding: 0 var(--gutter);
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    border-radius: 0;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .queue::-webkit-scrollbar {
+    display: none;
   }
 
   .queue__item {
-    width: 40px;
+    flex: 0 0 64px;
+    width: 64px;
+    scroll-snap-align: start;
   }
 }
 
@@ -1867,43 +1748,6 @@ body.spot-focus .page--welcome .shelves > :not(.spot-pin),
 body.spot-focus .page--welcome .faq,
 body.spot-focus .page--welcome .cta-wrap {
   opacity: 0.25;
-}
-
-@media (max-width: 767px) {
-  .spot-pin {
-    height: calc(100vh + 90vh);
-  }
-
-  .spot__head,
-  .theater__stage {
-    width: calc(100% - 32px);
-  }
-
-  .screen {
-    border-radius: 14px;
-  }
-
-  .screen__cta {
-    right: 12px;
-    bottom: 12px;
-    height: 40px;
-    padding: 0 18px;
-  }
-
-  .queue {
-    position: static;
-    transform: none;
-    margin-top: 10px;
-    padding: 0;
-    background: none;
-    backdrop-filter: none;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .queue__item {
-    width: calc((100% - 18px) / 4);
-  }
 }
 
 /* ---------- Closing sign-up banner ---------- */
@@ -2703,12 +2547,6 @@ body.spot-focus .page--welcome .cta-wrap {
   }
 }
 
-@keyframes dot-fill {
-  from {
-    transform: scaleX(0);
-  }
-}
-
 /* Carousel hero: draggable, and keyboard-focusable for arrow keys. */
 .hero--carousel {
   touch-action: pan-y;
@@ -2893,22 +2731,6 @@ body.spot-focus .page--welcome .cta-wrap {
 
 .vp__icon.is-on {
   color: var(--accent);
-}
-
-.vp__speed span {
-  font-size: var(--fs-body-sm);
-  font-weight: var(--fw-bold);
-}
-
-/* Quality badge: a small outlined label (Auto / HD / SD). */
-.vp__quality span {
-  padding: 3px 6px;
-  border: 1.5px solid currentColor;
-  border-radius: 6px;
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-bold);
-  letter-spacing: 0.04em;
-  line-height: 1;
 }
 
 .vp__center {
@@ -3439,7 +3261,7 @@ body.spot-focus .page--welcome .cta-wrap {
 .vp__ep-play {
   width: 9px;
   height: 11px;
-  fill: #fff;
+  fill: var(--text-100);
 }
 
 .vp__ep-label {
@@ -3591,32 +3413,6 @@ body.spot-focus .page--welcome .cta-wrap {
   font-size: var(--fs-body-sm);
   color: var(--text-300);
   text-align: center;
-}
-
-/* Pass perks, separated by dots. */
-.vp-access__perks {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 12px;
-  margin-top: 20px;
-  list-style: none;
-  font-size: var(--fs-body-sm);
-  color: var(--text-200);
-}
-
-.vp-access__perks li {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.vp-access__perks li + li::before {
-  content: '';
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--text-300);
 }
 
 /* What a studio subscription unlocks: a small fan of posters and a count, as the subtitle. */
@@ -3904,29 +3700,6 @@ body.spot-focus .page--welcome .cta-wrap {
   }
 }
 
-.vp-access__replay {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 24px;
-  padding: 8px 12px;
-  border-radius: 100px;
-  font-size: var(--fs-body);
-  font-weight: var(--fw-medium);
-  color: var(--text-200);
-  transition: color 0.2s, background 0.2s;
-}
-
-.vp-access__replay:hover {
-  color: var(--text-100);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.vp-access__replay svg {
-  width: 16px;
-  height: 16px;
-}
-
 /* Ticket: glass body with a perforation and a half-circle notch top and bottom. The body is
    masked so the notches are real cut-outs; the rings redraw the border around them. */
 .ticket {
@@ -4115,7 +3888,7 @@ body.spot-focus .page--welcome .cta-wrap {
 
 .reveal__c circle {
   fill: none;
-  stroke: #fff;
+  stroke: var(--text-100);
   stroke-width: 4;
   stroke-linecap: round;
   transform: rotate(40deg);
@@ -4544,66 +4317,6 @@ body.spot-focus .page--welcome .cta-wrap {
   color: #ffc46b;
 }
 
-/* Balance is short: pick a top-up amount, charged to the card on file. */
-.vp-topup {
-  width: 100%;
-  margin-top: 12px;
-  padding: 14px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  animation: upnext-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.vp-topup__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: var(--fs-body-sm);
-}
-
-.vp-topup__head span {
-  font-size: var(--fs-caption);
-  color: var(--text-300);
-}
-
-.vp-topup__amounts {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.vp-topup__amounts button {
-  flex: 1;
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  font-size: var(--fs-body-sm);
-  font-weight: var(--fw-semibold);
-  color: var(--text-200);
-  font-variant-numeric: tabular-nums;
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
-}
-
-.vp-topup__amounts button:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.32);
-}
-
-.vp-topup__amounts button.is-on {
-  border-color: rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-100);
-}
-
-.vp-topup__after {
-  display: block;
-  margin-top: 10px;
-  font-size: var(--fs-caption);
-  color: var(--text-300);
-  font-variant-numeric: tabular-nums;
-}
-
 /* Payment failed: what happened, that nothing was taken, and another way to pay. */
 .vp-payfail {
   display: flex;
@@ -4641,100 +4354,6 @@ body.spot-focus .page--welcome .cta-wrap {
   color: var(--text-100);
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-
-/* Receipt after the reveal, top left. */
-.receipt {
-  position: absolute;
-  top: 88px;
-  left: var(--gutter);
-  z-index: 7;
-  width: min(340px, calc(100% - 32px));
-  padding: 16px;
-  border-radius: 18px;
-  background: rgba(16, 16, 19, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-  animation: upnext-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.receipt__head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.receipt__head strong {
-  margin-right: auto;
-  font-size: var(--fs-body);
-}
-
-.receipt__tick {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #22c55e;
-  color: #04170a;
-}
-
-.receipt__close {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  color: var(--text-300);
-}
-
-.receipt__close:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-100);
-}
-
-.receipt__rows {
-  margin: 14px 0 0;
-  border-top: 1px dashed rgba(255, 255, 255, 0.16);
-  padding-top: 10px;
-}
-
-.receipt__rows div {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 4px 0;
-  font-size: var(--fs-body-sm);
-}
-
-.receipt__rows dt {
-  color: var(--text-300);
-}
-
-.receipt__rows dd {
-  margin: 0;
-  text-align: right;
-  color: var(--text-100);
-  font-variant-numeric: tabular-nums;
-}
-
-.receipt__rows .receipt__balance {
-  margin-top: 6px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  font-weight: var(--fw-bold);
-}
-
-.receipt__balance dt {
-  color: var(--text-100);
-}
-
-.receipt__ref {
-  display: block;
-  margin-top: 10px;
-  font-size: var(--fs-caption);
-  letter-spacing: 0.06em;
-  color: var(--text-300);
 }
 
 /* Pulsing ring for live dots (pass warning). */
@@ -4776,12 +4395,12 @@ body.spot-focus .page--welcome .cta-wrap {
   font-weight: var(--fw-bold);
 }
 
-.vp-fail p {
+/* Body text (medium, secondary) with a little more air than the page default. */
+.vp-fail__text {
   max-width: 600px;
   margin: 8px 0 0;
-  font-size: var(--fs-body);
-  line-height: 1.5;
-  color: var(--text-300);
+  line-height: 1.6;
+  letter-spacing: 0;
 }
 
 .vp-fail__actions {
@@ -4843,6 +4462,7 @@ body.spot-focus .page--welcome .cta-wrap {
   max-width: calc(100% - 32px);
   padding: 12px 18px 12px 14px;
   border-radius: 14px;
+  white-space: nowrap;
   translate: -50% 0;
   background: rgba(28, 28, 30, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -5081,6 +4701,16 @@ body.spot-focus .page--welcome .cta-wrap {
   margin: 0;
 }
 
+/* With the Info pill beside the title, centre them on each other (baseline alignment left the
+   title sitting high against the pill). */
+.vp__title:has(.vp__tabs--inline) {
+  align-items: center;
+}
+
+.vp__title:has(.vp__tabs--inline) strong {
+  line-height: 1.2;
+}
+
 /* ---------- Shows / Series switch: fade out, swap, fade in ---------- */
 
 .feed-fade {
@@ -5093,91 +4723,6 @@ body.spot-focus .page--welcome .cta-wrap {
 }
 
 /* ---------- Search ---------- */
-
-.result {
-  color: inherit;
-}
-
-.result__main {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-  color: inherit;
-}
-
-/* Landscape thumbnails read better for titles than squares. */
-.result__thumb {
-  width: 112px;
-  height: 63px;
-}
-
-.result__thumb--studio {
-  width: 63px;
-  border-radius: 50%;
-  object-fit: contain;
-  background: #000;
-}
-
-.result__title b {
-  font-weight: var(--fw-bold);
-  color: var(--text-100);
-}
-
-.result__soon {
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 100px;
-  background: rgba(255, 0, 79, 0.16);
-  font-size: var(--fs-caption);
-  font-style: normal;
-  font-weight: var(--fw-semibold);
-  color: #ff6b93;
-}
-
-a.result:hover .result__title,
-.result__main:hover .result__title {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.search-section {
-  margin-bottom: 28px;
-}
-
-.search-section__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chips .chip {
-  position: static;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 100px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: var(--fs-body-sm);
-  font-weight: var(--fw-medium);
-  color: var(--text-200);
-  transition: background 0.2s, color 0.2s;
-}
-
-.chips .chip:hover {
-  background: rgba(255, 255, 255, 0.14);
-  color: var(--text-100);
-}
 
 .search-empty {
   display: flex;
@@ -5290,6 +4835,11 @@ a.result:hover .result__title,
   }
 }
 
+/* Room between the phone search field and the results under it. */
+.searchbar.search-mobile-only {
+  margin-bottom: var(--space-6);
+}
+
 /* Search results and browse: a grid of landscape thumbnails; studios as round avatars. */
 .sgrid {
   display: grid;
@@ -5336,29 +4886,6 @@ a.result:hover .result__title,
   font-weight: var(--fw-semibold);
 }
 
-.sthumb__title {
-  margin-top: 8px;
-  font-size: var(--fs-body);
-  font-weight: var(--fw-semibold);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sthumb__title b {
-  color: var(--text-100);
-  font-weight: var(--fw-bold);
-}
-
-.sthumb__meta {
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
-}
-
-.sstudios {
-  margin-top: 36px;
-}
-
 .sstudios__row {
   display: flex;
   flex-wrap: wrap;
@@ -5399,13 +4926,6 @@ a.result:hover .result__title,
   margin-top: 36px;
 }
 
-.ssection__count {
-  margin-left: 6px;
-  font-size: 0.75em;
-  font-weight: var(--fw-medium);
-  color: var(--text-300);
-}
-
 /* ---------- Skeleton loaders (everywhere except the video player) ---------- */
 
 @keyframes skel-shimmer {
@@ -5420,9 +4940,7 @@ a.result:hover .result__title,
 .poster__art,
 .cw__media,
 .sthumb__art,
-.result__thumb,
 .sstudio img,
-.studio-row__logo,
 .vp__studio img,
 .vp__ep-art,
 .upnext__art,
@@ -5683,112 +5201,52 @@ a.result:hover .result__title,
   font-weight: var(--fw-bold);
 }
 
-.acct__sub {
-  margin: 32px 0 12px;
-  font-size: var(--fs-body);
-  font-weight: var(--fw-semibold);
-  color: var(--text-200);
-}
-
-.acct__card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.acct__card > div {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.acct__profile img {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-}
-
-.acct__profile strong {
-  font-size: var(--fs-h3);
-}
-
-.acct__profile span,
-.acct__label {
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
-}
-
-.acct__balance strong {
-  font-size: var(--fs-h1);
-  font-weight: var(--fw-bold);
-  font-variant-numeric: tabular-nums;
-}
-
-.acct__poster {
-  width: 36px;
-  aspect-ratio: 2 / 3;
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-.acct__link {
-  font-size: var(--fs-body-sm);
-  font-weight: var(--fw-semibold);
-  color: var(--text-100);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.acct__empty,
-.acct__note {
-  margin: 0 0 12px;
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
-}
-
-.acct__switch {
-  position: relative;
-  flex: none;
-  width: 44px;
-  height: 26px;
-  border-radius: 100px;
-  background: rgba(255, 255, 255, 0.18);
-  transition: background 0.2s;
-}
-
-.acct__switch::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--text-100);
-  transition: transform 0.2s var(--ease);
-}
-
-.acct__switch.is-on {
-  background: var(--success);
-}
-
-.acct__switch.is-on::after {
-  transform: translateX(18px);
-}
-
 /* Phones: the list first, then the chosen section with a back link. */
 @media (max-width: 767px) {
+  /* minmax(0, …) lets long menu text wrap instead of pushing the page wider than the screen. */
   .acct__layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
+  /* Spaced as the mobile design (Account Settings): rows edge to edge, 90px tall (more when the
+     description wraps), icon 24px in and level with the title, text from 62px, chevron 19px in
+     from the right, a hairline across the full width between rows. */
   .acct__nav {
     position: static;
+    margin: 0 calc(-1 * var(--gutter));
+  }
+
+  .acct__item {
+    min-height: 90px;
+    padding: 22px 19px 22px var(--space-6);
+    border-radius: 0;
+  }
+
+  .acct__item::after {
+    left: 0;
+    right: 0;
+    background: var(--bg-200);
+  }
+
+  .acct__item:last-child::after,
+  .acct__item:hover::after,
+  .acct__item:has(+ .acct__item:hover)::after {
+    opacity: 1;
+  }
+
+  .acct__text {
+    min-width: 0;
+  }
+
+  .acct__text span {
+    white-space: normal;
+    line-height: 22px;
+  }
+
+  /* Rows without a description (Log Out): icon centred with the title. */
+  .acct__item--out .acct__icon {
+    align-self: center;
+    margin-top: 0;
   }
 
   .acct__layout:not(.has-section) .acct__panel,
@@ -5847,44 +5305,6 @@ a.result:hover .result__title,
   flex-direction: column;
   gap: 14px;
   padding: 0 var(--gutter);
-}
-
-.lib-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding: 72px var(--gutter) 24px;
-  text-align: center;
-}
-
-.lib-empty p {
-  margin: 0;
-  font-size: var(--fs-body);
-  line-height: 1.45;
-  color: var(--text-300);
-}
-
-.acct__libcard {
-  color: inherit;
-  transition: background 0.2s;
-}
-
-.acct__libcard:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.acct__libcard strong {
-  font-size: var(--fs-body);
-}
-
-.acct__libcard span {
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
-}
-
-.acct__note--tab {
-  margin: 14px 0 16px;
 }
 
 /* The section sits on a dark grey panel. */
@@ -5977,10 +5397,12 @@ a.result:hover .result__title,
   gap: var(--space-2);
 }
 
+/* Narrow screens stack the card and centre it: balance, then Load Balance. */
 @media (max-width: 900px) {
-  .lib-a {
+  .ui-surface.lib-a {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
   }
 }
 
@@ -6071,6 +5493,21 @@ a.result:hover .result__title,
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+/* Phones: the tab always reads More (the full category name doesn't fit beside the icons). */
+.seg__more-short {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .seg__more-full {
+    display: none;
+  }
+
+  .seg__more-short {
+    display: inline;
+  }
 }
 
 /* Explore episodes: the thumbnail, then the episode title with season and episode. */
@@ -6361,9 +5798,9 @@ a.result:hover .result__title,
   padding: var(--space-3) var(--space-3) var(--space-4);
 }
 
-.notif__head strong {
+/* The dropdown's title: the shared h3, at body size. */
+.notif__head .t-h3 {
   font-size: var(--fs-body);
-  font-weight: var(--fw-bold);
 }
 
 .notif__list {
@@ -6425,4 +5862,825 @@ a.result:hover .result__title,
 
 .notif__panel .notif__empty {
   padding: var(--space-8) var(--space-4) var(--space-10);
+}
+
+/* Notifications page: the same list as the dropdown, at full length. */
+.notif-page .notif__list {
+  max-height: none;
+  overflow: visible;
+}
+
+/* ---------- Phones: top-right icons over the hero, menus as bottom sheets ---------- */
+
+.dd__grab,
+.dd-scrim {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .topnav.topnav--hero {
+    display: flex;
+    position: absolute;
+    left: auto;
+    right: 16px;
+    height: auto;
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+  }
+
+  .topnav--hero .wordmark,
+  .topnav--hero .seg,
+  .topnav--hero .navsearch,
+  .topnav--hero .capsule__btn--search {
+    display: none;
+  }
+
+  /* Tighter tabs so a longer label (Podcasts, Stand-up Comedy) still clears the icons. */
+  .hero__tabs .seg__tab {
+    padding: 0 var(--space-3);
+  }
+
+  /* Compact, as in the design: bare cast and notification icons, no capsule around them. The
+     profile moves to the bottom pill. */
+  .topnav--hero .capsule {
+    gap: 10px;
+    padding: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .topnav--hero .capsule__sep,
+  .topnav--hero .account {
+    display: none;
+  }
+
+  /* White icons, each in its own see-through grey circle. */
+  .topnav--hero .capsule__btn {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    color: var(--text-100);
+    background: var(--glass-soft);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .topnav--hero .capsule__btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .topnav--hero .notif__dot {
+    top: 8px;
+    right: 9px;
+    width: 9px;
+    height: 9px;
+  }
+
+  /* The dots sit a little lower; the hero's mute moves down level with them, out of the
+     icons' way. */
+  .hero__dots {
+    bottom: calc(var(--hero-bottom) - 22px);
+  }
+
+  .hero-video__sound {
+    top: auto;
+    bottom: calc(var(--hero-bottom) - 30px);
+  }
+
+  .dd-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 240;
+    background: rgba(0, 0, 0, 0.55);
+    animation: ui-dialog-in 0.2s ease;
+  }
+
+  /* A floating sheet, as in the design: inset from the sides and the bottom, rounded all
+     round, solid so the page doesn't show through. */
+  .dd.dd--sheet {
+    position: fixed;
+    inset: auto 12px calc(12px + env(safe-area-inset-bottom)) 12px;
+    top: auto;
+    width: auto;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 10px 8px 12px;
+    border-radius: 28px;
+    background: #1c1c1e;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transform-origin: bottom center;
+    animation: dd-sheet-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .dd__grab {
+    display: block;
+    width: 40px;
+    height: 5px;
+    margin: 0 auto 10px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Sheet rows: full width, a hairline between, a little taller to tap. */
+  .dd--sheet .dd__item {
+    min-height: 56px;
+    border-radius: 0;
+    font-size: var(--fs-body);
+  }
+
+  .dd--sheet .dd__item + .dd__item {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+}
+
+@keyframes dd-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+/* ---------- Phones: Get the app, pinned to the top ---------- */
+
+.appbanner {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* The banner is the phone's top bar: everything that clears --nav-h clears it too. */
+  :root:has(.appbanner) {
+    --nav-h: calc(56px + env(safe-area-inset-top));
+    /* Where pinned things stop: under the banner, or the top edge while it's slid away. */
+    --pin-top: var(--nav-h);
+  }
+
+  :root:has(.appbanner--hidden) {
+    --pin-top: 0px;
+  }
+
+  .appbanner {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: var(--nav-h);
+    padding: env(safe-area-inset-top) var(--gutter) 0;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--stroke-subtle);
+    transition:
+      transform 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+      background 0.2s,
+      border-color 0.2s;
+  }
+
+  /* Over a hero at the top of the page: no bar, just the logo and the button on the picture. */
+  :root:has(.hero) .appbanner--top {
+    background: transparent;
+    border-bottom-color: transparent;
+  }
+
+  .appbanner--hidden {
+    transform: translateY(-100%);
+  }
+
+  .acct__sticky {
+    top: var(--pin-top);
+    transition: top 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .appbanner img {
+    flex: none;
+    height: 25px;
+    width: auto;
+  }
+
+  .appbanner__cta {
+    margin-left: auto;
+  }
+
+  /* The hero runs under the banner, so its tabs and icons drop below it; above the bottom pill,
+     below the banner, so the icons scroll under it. */
+  .hero__tabs {
+    top: calc(var(--nav-h) + 14px);
+  }
+
+  .topnav.topnav--hero {
+    top: calc(var(--nav-h) + 16px);
+    z-index: 150;
+  }
+
+  .toast {
+    top: calc(var(--pin-top) + 12px);
+  }
+}
+
+/* The narrowest phones (320px): tighter tabs and slightly smaller cast and notification
+   buttons so they don't run into each other. */
+@media (max-width: 359px) {
+  .hero__tabs {
+    left: 10px;
+  }
+
+  .hero__tabs .seg__tab {
+    padding: 0 var(--space-2);
+    font-size: var(--fs-body-sm);
+  }
+
+  .topnav.topnav--hero {
+    right: 10px;
+  }
+
+  .topnav--hero .capsule {
+    gap: 6px;
+  }
+
+  .topnav--hero .capsule__btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .topnav--hero .capsule__btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ---------- Video player on phones (Circo Mobile Designs: Play Video) ---------- */
+
+/* Each control carries both icon sets; phones show the design's, larger screens the rest. */
+.vp-phone {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* The title already sits under the picture, so the loading screen doesn't repeat it. */
+  .vp-desk,
+  .vp__times,
+  .vp__row,
+  .vp__tabs,
+  .vp__loading-title {
+    display: none;
+  }
+
+  img.vp-phone {
+    display: block;
+  }
+
+  .vp__icon.vp-phone {
+    display: grid;
+  }
+
+  /* Top: back on the left; cast, settings and more on the right, each a round glass button. */
+  .vp__top {
+    padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) 0;
+    background: none;
+  }
+
+  .vp__top-right {
+    gap: var(--space-4);
+  }
+
+  .vp__top .vp__icon,
+  .vp__skip,
+  .vp__play {
+    padding: 0;
+    border-radius: var(--radius-full);
+    background: var(--chip-dark);
+    border: 1px solid var(--stroke-default);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .vp__top .vp__icon {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+
+  .vp__top .vp__icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Centre of the picture: back 10, play / pause, forward 10. */
+  .vp__center {
+    gap: 36px;
+  }
+
+  .vp__skip {
+    width: 54px;
+    height: 54px;
+  }
+
+  .vp__play {
+    width: 70px;
+    height: 70px;
+  }
+
+  /* The picture: full width at the design's 430:286, centred; the video crops to fill it. */
+  /* The picture sits centred at --vp-top. A series moves it, and everything on it, up by
+     --shift (set from the player as its details scroll, at most to the top of the screen): a
+     transform, so following a scroll costs no layout. */
+  .vp {
+    --vp-h: calc(100vw * 286 / 430);
+    --vp-top: calc(50% - var(--vp-h) / 2);
+    --shift: 0px;
+  }
+
+  .vp__video {
+    top: var(--vp-top);
+    bottom: auto;
+    width: 100vw;
+    height: var(--vp-h);
+    margin: 0;
+    container-type: size;
+    transform: translateY(var(--shift));
+  }
+
+  .vp__center,
+  .vp__buffer {
+    top: calc(var(--vp-top) + var(--vp-h) / 2);
+    bottom: auto;
+    transform: translateY(calc(-50% + var(--shift)));
+  }
+
+  /* Loading spinner and tap-to-play sit on the picture, wherever it is. */
+  .vp__loading {
+    top: var(--vp-top);
+    bottom: auto;
+    height: var(--vp-h);
+    transform: translateY(var(--shift));
+  }
+
+  .vp__video iframe {
+    width: calc(max(100cqw, 177.78cqh) * 3);
+    height: calc(max(100cqh, 56.25cqw) * 3);
+  }
+
+  /* The bottom bar becomes the picture's bottom edge: time and full screen, then the progress
+     line across the full width. */
+  .vp__bottom {
+    top: calc(var(--vp-top) + var(--vp-h) - 60px);
+    bottom: auto;
+    height: 60px;
+    transform: translateY(var(--shift));
+    padding: 0;
+    background: none;
+  }
+
+  .vp__edge.vp-phone {
+    position: absolute;
+    top: 13px;
+    left: var(--space-3);
+    right: var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tap areas touch; the icons themselves sit 22px apart. */
+  .vp__edge-tools {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-right: -11px;
+  }
+
+  /* Settings and expand / collapse: bare icons, a size up and heavier, each in an invisible
+     44px tap area (which the row lets spill over its edges). */
+  .vp__edge button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: -4px 0;
+  }
+
+  .vp__edge button svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 2.4;
+  }
+
+  /* A 32px-tall touch strip around the 2px line, so the knob is easy to catch. */
+  .vp__scrub {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 43px;
+  }
+
+  .vp__scrub input {
+    display: block;
+    height: 32px;
+  }
+
+  .vp__scrub input::-webkit-slider-runnable-track,
+  .vp__scrub:hover input::-webkit-slider-runnable-track {
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(to right, var(--accent) var(--p), rgba(255, 255, 255, 0.5) var(--p));
+  }
+
+  .vp__scrub input::-moz-range-track {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .vp__scrub input::-moz-range-progress {
+    height: 2px;
+  }
+
+  /* A bigger seek knob, easy to grab with a thumb. */
+  .vp__scrub input::-webkit-slider-thumb,
+  .vp__scrub:hover input::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+    margin-top: -7px;
+    transform: none;
+  }
+
+  .vp__scrub input::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Under the picture: title, blurb, studio and (series) episodes, sitting at the bottom of the
+     screen; it scrolls on its own when there's more than fits. */
+  .vp-details {
+    position: absolute;
+    top: calc(50% + var(--vp-h) / 2 + var(--space-4));
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+  }
+
+  .vp--ended .vp-details {
+    display: none;
+  }
+
+  /* Series: the details fill the screen and scroll from anywhere on it, the picture included
+     (they lie over it, so a drag there is theirs). A spacer holds them just under the centred
+     picture; as they scroll the picture rides up and pins to the top, and a mask hides any
+     details that scroll up over it. The controls sit above both. */
+  .vp--series .vp-details {
+    --cut: calc(var(--vp-top) + var(--vp-h) + var(--shift));
+    top: 0;
+    z-index: 2;
+    padding-bottom: 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent var(--cut), #000 var(--cut));
+    mask-image: linear-gradient(to bottom, transparent var(--cut), #000 var(--cut));
+  }
+
+  .vp--series .vp__video {
+    z-index: 1;
+    will-change: transform;
+  }
+
+  .vp--series .vp__top,
+  .vp--series .vp__center,
+  .vp--series .vp__bottom,
+  .vp--series .vp__loading,
+  .vp--series .vp__buffer {
+    z-index: 3;
+    will-change: transform;
+  }
+
+  /* Only the buttons and the seek line take touches; a drag anywhere else scrolls. */
+  .vp--series .vp__top,
+  .vp--series .vp__bottom,
+  .vp--series .vp__edge {
+    pointer-events: none;
+  }
+
+  .vp--series .vp__top button,
+  .vp--series .vp__edge button,
+  .vp--series .vp__scrub {
+    pointer-events: auto;
+  }
+
+  .vp--series .vp-details__spacer {
+    flex: none;
+    height: calc(50vh + var(--vp-h) / 2 + var(--space-2));
+    height: calc(50dvh + var(--vp-h) / 2 + var(--space-2));
+  }
+
+  /* At least a screen's worth under the pinned picture, so it can always scroll up to the top. */
+  .vp--series .vp-details__inner {
+    flex: none;
+    min-height: calc(100vh - var(--vp-h) - var(--space-2));
+    min-height: calc(100dvh - var(--vp-h) - var(--space-2));
+    margin-top: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Everything tapped away: the picture goes back to the middle of the screen (the details
+     keep their scroll, so it returns to its pinned place when they come back). The move is
+     eased only right after hiding or showing, never while it follows a scroll. */
+  .vp--series.vp--idle,
+  .vp--rotated {
+    --shift: 0px !important;
+  }
+
+  .vp--settling .vp__video,
+  .vp--settling .vp__loading,
+  .vp--settling .vp__buffer,
+  .vp--settling .vp__center,
+  .vp--settling .vp__bottom {
+    transition: transform 0.35s ease, opacity 0.35s ease;
+  }
+
+  /* Season picker in place of the Episodes heading, when there's more than one season. */
+  .vp-details__season {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    align-self: flex-start;
+    margin: 0 var(--space-4);
+    padding: 7px var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--bg-200);
+    border: 1px solid var(--stroke-default);
+    font-size: var(--fs-body-sm);
+    font-weight: var(--fw-medium);
+    line-height: 21px;
+  }
+
+  .vp-details__season svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Tapping the picture away (or leaving it idle) leaves only the movie: the details go too. */
+  .vp-details {
+    transition: opacity 0.35s ease;
+  }
+
+  .vp--idle .vp-details {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .vp-details__inner {
+    margin-top: auto;
+  }
+
+  .vp-details__info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 var(--space-4) 10px;
+  }
+
+  .vp-details__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 10px var(--space-4) 6px;
+  }
+
+  /* Series: the title row pins just under the pinned picture; the rest scrolls beneath it. */
+  .vp--series .vp-details__head {
+    position: sticky;
+    top: var(--vp-h);
+    z-index: 1;
+    background: #000; /* the player's own black, so the pinned row doesn't show as a band */
+  }
+
+  .vp-details__head .vp__tabs {
+    display: flex;
+    flex: none;
+  }
+
+  .vp-details .vp-details__title {
+    min-width: 0;
+    font-weight: var(--fw-semibold);
+    line-height: 24px;
+  }
+
+  .vp-details__blurb {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 20px;
+  }
+
+  .vp-details__studio {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .vp-details__who {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .vp-details__who img {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    object-fit: contain;
+  }
+
+  .vp-details__who strong {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    line-height: 24px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .vp-details__eps {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    padding-top: var(--space-2);
+  }
+
+  /* A section label under the title: a step down in size from it, so the two don't read alike. */
+  .vp-details .vp-details__eps-title {
+    padding: 0 var(--space-4);
+    font-weight: var(--fw-semibold);
+  }
+
+  .vp-details__eps-row {
+    display: flex;
+    gap: var(--space-3);
+    padding: 10px var(--space-4) var(--space-6);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding: 0 var(--space-4);
+    scrollbar-width: none;
+  }
+
+  .vp-details__eps-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Episode card: poster, "Episode n", then the episode's title, on a raised tile. */
+  .vp-details__ep {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border-radius: var(--radius-xl);
+    background: var(--bg-200);
+    border: 1px solid var(--stroke-subtle);
+    box-shadow: var(--shadow-card);
+    text-align: left;
+    scroll-snap-align: start;
+  }
+
+  .vp-details__ep img {
+    width: 156px;
+    height: 218px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+  }
+
+  .vp-details__ep-n {
+    display: flex;
+    align-items: center;
+    height: 24px;
+  }
+
+  .vp-details__ep strong {
+    width: 156px;
+    margin-top: -4px;
+    font-size: var(--fs-body-sm);
+    font-weight: var(--fw-medium);
+    line-height: 21px;
+  }
+}
+
+/* iPhone "landscape": the whole player turned a quarter-turn on screen (Safari can't lock the
+   rotation), laid out like real landscape: the picture letterboxed to fill the screen, the
+   details gone, the time row and progress line along the bottom. */
+@media (max-width: 767px) {
+  .vp.vp--rotated {
+    --vp-h: 100vw;
+    inset: auto;
+    top: 0;
+    left: 0;
+    width: 100vh;
+    width: 100dvh;
+    height: 100vw;
+    transform-origin: top left;
+    transform: translateX(100vw) rotate(90deg);
+  }
+
+  .vp--rotated .vp__video {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Contained rather than cropped, like any full-screen film. */
+  .vp--rotated .vp__video iframe {
+    width: calc(min(100cqw, 177.78cqh) * 3);
+    height: calc(min(100cqh, 56.25cqw) * 3);
+  }
+
+  .vp--rotated .vp-details {
+    display: none;
+  }
+
+  .vp--rotated .vp__top {
+    padding-left: max(var(--space-4), env(safe-area-inset-top));
+    padding-right: max(var(--space-4), env(safe-area-inset-bottom));
+  }
+
+  .vp--rotated .vp__bottom {
+    top: auto;
+    bottom: var(--space-3);
+  }
+}
+
+/* Phones: no picture-in-picture in the player. */
+@media (max-width: 767px) {
+  .vp__pip {
+    display: none;
+  }
+}
+
+/* While the player is turned sideways on an iPhone (.vp--rotated), its menus turn with it and
+   become a panel down the right-hand side of that landscape view, sliding in from the right.
+   Laid out in the landscape frame (W = 100dvh wide, H = 100vw tall), then given the player's
+   quarter-turn. */
+@media (max-width: 767px) {
+  body.vp-rotated .dd.dd--sheet {
+    --side-w: min(360px, 62dvh);
+    inset: auto;
+    top: 0;
+    left: 0;
+    width: var(--side-w);
+    height: 100vw;
+    max-height: none;
+    padding: max(var(--space-4), env(safe-area-inset-left)) var(--space-2) var(--space-4);
+    border-radius: 28px 0 0 28px;
+    transform-origin: top left;
+    transform: translateX(100vw) rotate(90deg) translateX(calc(100dvh - var(--side-w)));
+    animation: dd-side-in 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  body.vp-rotated .dd--sheet .dd__grab {
+    display: none;
+  }
+}
+
+@keyframes dd-side-in {
+  from {
+    transform: translateX(100vw) rotate(90deg) translateX(100dvh);
+  }
+}
+
+/* Phones: a tighter access screen, for public (pass) and private (plans) studios alike. The
+   "Your video pass" / "Choose your access" eyebrow is desktop only (the title already says it;
+   "Your pass has ended" stays everywhere), the title is section size, the tickets shorter. */
+@media (max-width: 767px) {
+  .vp-access__eyebrow--desktop {
+    display: none;
+  }
+
+  .vp-access__title {
+    margin: var(--space-1) 0 var(--space-4);
+    font-size: var(--fs-h2);
+  }
+
+  .ticket {
+    min-height: 88px;
+  }
+}
+
+/* Phones: descriptions under a page title (studio, title pages) a size up, to body text. */
+@media (max-width: 767px) {
+  .title-blurb {
+    font-size: var(--fs-body);
+  }
 }

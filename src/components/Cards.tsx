@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { icons, studios, titles, type Title } from '../data/catalog'
+import { icons, type Title } from '../data/catalog'
 import { useMenu } from './Menu'
 import { usePreview } from './Preview'
-import { Button, ButtonLink } from './ui'
+import { Button } from './ui'
 
 /* Cards navigate to their destination when given one; without one they're a focusable tile.
    Posters default to the player, so a tap opens the title without waiting for the preview. */
@@ -149,9 +149,9 @@ export function ContinueCard({ t, accessHours, progress, ep, onRemove }: { t: Ti
 }
 
 /* "Coming to Circo" card: poster with fade, release line and Remind me. */
-export function ComingCard({ t, when, label, reminded, onRemind, to }: { t: Title; when: string; label?: string[]; reminded: boolean; onRemind: () => void; to?: string }) {
+export function ComingCard({ t, when, label, reminded, onRemind, to, grid }: { t: Title; when: string; label?: string[]; reminded: boolean; onRemind: () => void; to?: string; grid?: boolean }) {
   return (
-    <div className="coming">
+    <div className={`coming${grid ? ' coming--grid' : ''}`}>
       <Tile to={to ?? `/watch/${t.id}`} className="card poster">
         <div className="poster__art">
           <img src={t.poster} alt="" loading="lazy" />
@@ -188,25 +188,6 @@ export function ComingCard({ t, when, label, reminded, onRemind, to }: { t: Titl
     </div>
   )
 }
-
-
-export function StudioRow({ id, note }: { id: string; note?: string }) {
-  const s = studios[id]
-  return (
-    <div className="studio-row">
-      <img className="studio-row__logo" src={s.logo} alt="" />
-      <div className="studio-row__text">
-        <span className="studio-row__name">{s.name}</span>
-        {note && <span className="studio-row__note">{note}</span>}
-      </div>
-      <ButtonLink href={`/studio/${s.id}`} size="sm">
-        See More
-      </ButtonLink>
-    </div>
-  )
-}
-
-export const byId = (id: string) => titles[id]
 
 /* A studio as a round logo with its name and one line under it (title count, days left).
    Used by search results and the Library. */

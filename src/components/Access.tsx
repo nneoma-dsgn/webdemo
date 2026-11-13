@@ -114,7 +114,7 @@ export function Access({ t, studio, expired, onPlay }: { t: Title; studio?: Stud
 
   return (
     <div className="vp-access__inner">
-      <span className="vp-access__eyebrow">{expired ? 'Your pass has ended' : isPass ? 'Your video pass' : 'Choose your access'}</span>
+      <span className={`vp-access__eyebrow${expired ? '' : ' vp-access__eyebrow--desktop'}`}>{expired ? 'Your pass has ended' : isPass ? 'Your video pass' : 'Choose your access'}</span>
       <h2 className="vp-access__title">{expired ? 'Keep Watching' : isPass ? 'Continue Watching' : `Join ${studioName}`}</h2>
       {!isPass && catalog.length > 0 && (
         <p className="vp-access__catalog">
@@ -173,7 +173,6 @@ export function Access({ t, studio, expired, onPlay }: { t: Title; studio?: Stud
           </span>
         </button>
       </div>
-
 
       {stage === 'failed' && failure && (
         <div className="vp-payfail" role="alert">
@@ -253,59 +252,6 @@ function Ticket({ label, price, per, badge, selected, onSelect }: { label: strin
     </button>
   ) : (
     <div className={cls}>{body}</div>
-  )
-}
-
-/* After paying: what was bought, how it was paid, and the balance left. */
-export function ReceiptCard({ r, onClose }: { r: Receipt; onClose: () => void }) {
-  useEffect(() => {
-    const t = window.setTimeout(onClose, 12000)
-    return () => window.clearTimeout(t)
-  }, [onClose])
-  return (
-    <div className="receipt" role="status" aria-label="Payment receipt">
-      <div className="receipt__head">
-        <span className="receipt__tick" aria-hidden>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12.5l4.5 4.5L19 7.5" />
-          </svg>
-        </span>
-        <strong>Payment confirmed</strong>
-        <button className="receipt__close" onClick={onClose} aria-label="Close receipt">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
-            <path d="M18 6 6 18" />
-            <path d="M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      <dl className="receipt__rows">
-        <div>
-          <dt>{r.item}</dt>
-          <dd>{naira(r.amount)}</dd>
-        </div>
-        <div>
-          <dt>Title</dt>
-          <dd>{r.title}</dd>
-        </div>
-        {r.topUp && (
-          <div>
-            <dt>Topped up</dt>
-            <dd>+{naira(r.topUp)}</dd>
-          </div>
-        )}
-        <div>
-          <dt>Paid with</dt>
-          <dd>{r.paidWith}</dd>
-        </div>
-        {r.balance !== undefined && (
-          <div className="receipt__balance">
-            <dt>New balance</dt>
-            <dd>{naira(r.balance)}</dd>
-          </div>
-        )}
-      </dl>
-      <span className="receipt__ref">Ref {r.ref}</span>
-    </div>
   )
 }
 

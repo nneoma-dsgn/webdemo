@@ -70,7 +70,6 @@
     linear-gradient(to bottom, rgba(10, 10, 10, 0.6), rgba(10, 10, 10, 0.2) 40%, rgba(10, 10, 10, 0.8));
 }
 
-
 .login__panel {
   position: relative;
   z-index: 1;
@@ -184,29 +183,10 @@
   margin-top: 8px;
 }
 
-.auth__or {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: var(--fs-body-sm);
-  color: var(--text-300);
-}
-
-.auth__or::before,
-.auth__or::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--stroke-strong);
-}
-
-
-
 /* ---------- Auth controls ---------- */
 
 .btn-sso,
-.btn-ghost,
-.btn-primary {
+.btn-ghost {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -236,28 +216,9 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
-.btn-primary {
-  margin-top: 8px;
-  background: var(--bg-light);
-  color: var(--text-on-light);
-  font-weight: var(--fw-semibold);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--text-200);
-}
-
-.btn-primary:active:not(:disabled),
 .btn-sso:active {
   transform: scale(0.98);
 }
-
-.btn-primary:disabled {
-  background: #5a5a5a;
-  color: #2a2a2a;
-  cursor: not-allowed;
-}
-
 
 .link {
   font-weight: var(--fw-medium);
@@ -269,45 +230,7 @@
   text-underline-offset: 3px;
 }
 
-.link--muted {
-  align-self: flex-start;
-  font-size: var(--fs-body-sm);
-  color: var(--text-200);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* OTP: six underlined cells, as in the mobile verification screens. */
-
-
-
-
-
-
-
-
-
-
-
 
 .spinner {
   width: 28px;
@@ -316,13 +239,6 @@
   border-top-color: var(--text-100);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-}
-
-.spinner--dark {
-  width: 20px;
-  height: 20px;
-  border-color: rgba(0, 0, 0, 0.15);
-  border-top-color: var(--text-on-light);
 }
 
 @keyframes spin {
@@ -356,8 +272,6 @@
   }
 }
 
-
-
 /* ---------- Worth Seeing (SSO) ---------- */
 
 .auth--sso {
@@ -386,15 +300,13 @@
   font-size: var(--fs-caption);
   line-height: 21px;
   text-align: center;
-  color: #707070;
+  color: var(--text-400);
 }
 
 .auth__legal a {
   color: var(--text-100);
   font-weight: var(--fw-medium);
 }
-
-
 
 .auth__legal a:hover {
   text-decoration: underline;
@@ -416,8 +328,6 @@
 .qr:hover {
   transform: scale(1.02);
 }
-
-
 
 .qr__wait {
   display: inline-flex;
@@ -465,11 +375,6 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--stroke-default);
-}
-
-.onb__bar .link--muted {
-  align-self: center;
-  font-size: var(--fs-body);
 }
 
 .onb__main {
@@ -525,6 +430,10 @@
   font-weight: var(--fw-semibold);
 }
 
+.onb__count-short {
+  display: none;
+}
+
 .onb__skip:hover {
   color: var(--text-200);
 }
@@ -554,17 +463,17 @@
   gap: 10px;
   height: 48px;
   margin-top: 36px;
-  border-bottom: 1px solid var(--stroke-strong);
+  border-bottom: 1px solid var(--input-line);
   transition: border-color 0.2s;
 }
 
 .uline:focus-within {
-  border-bottom-color: #6a6a6a;
+  border-bottom-color: var(--input-line-focus);
 }
 
 .uline--error,
 .uline--error:focus-within {
-  border-bottom-color: #da3c3c;
+  border-bottom-color: var(--danger);
 }
 
 .uline input {
@@ -582,29 +491,7 @@
 }
 
 .uline input::placeholder {
-  color: #707070;
-}
-
-.onb__help,
-.onb__error {
-  margin: 16px 0 0;
-  font-size: var(--fs-body-sm);
-  font-weight: var(--fw-medium);
-  line-height: 21px;
-}
-
-.onb__help {
-  color: var(--text-300);
-}
-
-.onb__error {
-  display: flex;
-  gap: 4px;
-  color: var(--danger);
-}
-
-.onb__error img {
-  flex: none;
+  color: var(--text-400);
 }
 
 /* "Component 3" (active) / grey (inactive) pill from the designs. */
@@ -629,7 +516,7 @@
 }
 
 .btn-next:disabled {
-  background: #707070;
+  background: var(--text-400);
   color: var(--text-300);
   cursor: not-allowed;
 }
@@ -639,12 +526,6 @@
   height: 18px;
   border-width: 2px;
 }
-
-
-
-
-
-
 
 .pill-search {
   display: flex;
@@ -689,34 +570,56 @@
   color: var(--text-300);
 }
 
-
-
-
 .topics__empty {
   margin: 0;
   font-size: var(--fs-body-sm);
-  color: #707070;
+  color: var(--text-400);
 }
-
-
-
-
-
-
-
-
-
 
 /* ---------- Phones: match the mobile screens ---------- */
 
 @media (max-width: 960px) {
+  /* Sign in and sign up never scroll on phones: exactly the visible screen (dvh, so Safari's
+     bars are accounted for), the page itself locked, no rubber-band. */
+  html:has(.login),
+  html:has(.login) body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  /* The strips behind Safari's address bar and toolbar show the root background: give it the
+     screen's own wash so they blend in instead of showing the app's black. */
+  html:has(.login),
+  html:has(.login) body {
+    background: var(--circo-wash);
+  }
+
+  .login,
+  .login__panel {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  .login__body {
+    min-height: 0;
+    padding: 0;
+    align-items: stretch;
+  }
+
   .auth--sso {
-    min-height: calc(100vh - 160px);
+    min-height: 0;
     justify-content: space-between;
   }
 
+  .login__body > .auth--sso {
+    padding-bottom: 24px;
+  }
+
+  /* About a fifth of the way down, closing up on short screens. */
   .auth--sso .auth__hero {
-    margin-top: 18vh;
+    margin-top: clamp(16px, min(18dvh, 100dvh - 400px), 160px);
   }
 
   .auth--sso .auth__sub,
@@ -745,8 +648,55 @@
     margin-bottom: 20px;
   }
 
+}
+
+/* Phones: a small 1/2 on the right, Skip (when there is one) after it. */
+@media (max-width: 960px) {
   .onb__count {
-    margin-left: 44px;
+    margin-left: auto;
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .onb__count-full {
+    display: none;
+  }
+
+  .onb__count-short {
+    display: inline;
+  }
+
+  .onb__skip {
+    position: static;
+    margin-left: 16px;
+  }
+
+  /* Fills what's left under the bar (not the global main's full screen, which overflowed). */
+  .onb__main {
+    min-height: 0;
+  }
+}
+
+/* Phones: the gender step never scrolls, and on taller phones the choices come down from the
+   top a little (nothing extra up to a regular-size phone, up to 160px on the tallest). */
+@media (max-width: 960px) {
+  html:has(.onb--gender),
+  html:has(.onb--gender) body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  .onb--gender {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  .onb--gender .onb__form {
+    margin-top: clamp(0px, (100dvh - 700px) * 0.6, 160px);
   }
 }
 
@@ -766,35 +716,13 @@
   padding-bottom: 200px;
 }
 
-
-
-
-
-@keyframes chip-in {
-  from {
-    opacity: 0;
-    transform: scale(0.85);
-  }
-}
-
-
-
 /* Text tiles: the row style from the design, laid out as a grid. */
-
-
-
-
-
-
-
-
-
 
 .topics__empty {
   grid-column: 1 / -1;
   margin: 0;
   font-size: var(--fs-body-sm);
-  color: #707070;
+  color: var(--text-400);
 }
 
 /* Bottom bar: no fill, just a hairline above the count and button. */
@@ -840,7 +768,7 @@
   .onb__dock-inner {
     grid-template-columns: 1fr;
     gap: 12px 14px;
-    padding: 14px 20px 24px;
+    padding: 14px 20px calc(24px + env(safe-area-inset-bottom));
   }
 
   .onb__dock .btn-next {
@@ -872,6 +800,16 @@
   background: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+
+/* Phones: frosted in the wash's low maroon, so chips scrolling underneath blur out instead of
+   showing through the count and the button. */
+@media (max-width: 960px) {
+  .onb__dock {
+    background: var(--surface-wash);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  }
 }
 
 @media (max-width: 960px) {
@@ -1089,9 +1027,7 @@
   opacity: 1;
 }
 
-
-.onb__sub,
-.onb__help {
+.onb__sub {
   color: #c4c4c8;
 }
 
