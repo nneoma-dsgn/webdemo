@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { feeds, icons, titleFor, titles, upcoming } from '../data/catalog'
-import { ComingCard, ContinueCard, PosterCard } from '../components/Cards'
+import { ComingCard, PosterCard } from '../components/Cards'
+import { ContinueWatching } from '../components/ContinueWatching'
 import { Shelf } from '../components/Shelf'
 import { useMenu } from '../components/Menu'
 import { HeroVideo } from '../components/HeroVideo'
 import { useReminders } from '../data/reminders'
 import { savedToast, useSaved } from '../data/saved'
-import { accessLeft, clearProgress, useViewing } from '../data/viewing'
 import { Button, ButtonLink, SegmentedControl } from '../components/ui'
 import { useExploreTab } from '../components/Nav'
 
@@ -37,23 +37,13 @@ export default function Home() {
   const explore = useExploreTab()
   const reminders = useReminders()
   const saved = useSaved()
-  const [removed, setRemoved] = useState<Set<string>>(new Set())
   // Shows and Series are separate feeds, each with its own hero carousel and shelves.
   const feed = feeds[tab]
   // See-all pages open on the same tab's titles.
   const q = tab === 'series' ? '?tab=series' : ''
-  // Continue Watching: only what you've actually been watching, latest first.
-  const viewing = useViewing()
+  // Continue Watching follows the tab. Explore's shows count too: a podcast series sits with
+  // Series, a single video with Shows.
   const kind = tab === 'series' ? 'series' : 'show'
-  const watched = Object.entries(viewing.progress)
-    // Explore's shows count too: a podcast series sits with Series, a single video with Shows.
-    .filter(([id]) => titleFor(id)?.kind === kind)
-    .sort((a, b) => b[1].at - a[1].at)
-    .map(([id, p]) => {
-      const ms = accessLeft(viewing, titleFor(id)!)
-      return { id, ep: p.ep, progress: p.d ? p.t / p.d : 0, accessHours: ms === null ? 0 : isFinite(ms) ? ms / 36e5 : 24 }
-    })
-  const continueRow = watched
   const [slide, setSlide] = useState(0)
   useEffect(() => setSlide(0), [tab])
   const n = feed.heroes.length
@@ -152,27 +142,7 @@ export default function Home() {
           ))}
         </Shelf>
 
-        {/* Hidden until you've started something. */}
-        {continueRow.some((c) => !removed.has(c.id)) && (
-          <Shelf title="Continue Watching">
-            {continueRow
-              .filter((c) => !removed.has(c.id))
-              .map((c) => (
-                <ContinueCard
-                  key={c.id}
-                  t={titleFor(c.id)!}
-                  accessHours={c.accessHours}
-                  progress={c.progress}
-                  ep={c.ep}
-                  onRemove={() => {
-                    clearProgress(c.id)
-                    setRemoved((r) => new Set(r).add(c.id))
-                    toast(`Removed ${titleFor(c.id)?.name} from Continue Watching`)
-                  }}
-                />
-              ))}
-          </Shelf>
-        )}
+        <ContinueWatching include={(id) => titleFor(id)?.kind === kind} />
 
         <Shelf title={feed.middle.title} to={`/browse/${feed.middle.id}${q}`}>
           {feed.middle.items.map((id) => (

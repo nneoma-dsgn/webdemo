@@ -6,7 +6,6 @@ import { signOut, updateSession } from '../auth'
 import { icons } from '../data/catalog'
 
 type Step = 'gender' | 'interests'
-// No username step: it's made from the name the sign-in provider gives us.
 const STEPS: Step[] = ['gender', 'interests']
 
 /* Topics from the Select Interests screens, plus a few streaming-specific ones for the web. */
@@ -27,7 +26,7 @@ const TOPICS = [
 const MIN_PICKS = 3
 const MAX_PICKS = 5
 
-/* Onboarding after SSO sign up: Select Gender, Select Interests (the username comes from SSO).
+/* Onboarding after SSO sign up: Select Gender, then Select Interests.
    Netflix-style chrome: a step counter on every step. Back on step 1 returns to the SSO
    choice, dropping the half-created session so that screen is reachable again. */
 export default function Onboarding() {

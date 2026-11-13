@@ -3,6 +3,7 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ComponentProps, type ElementType, type HTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useMenu } from './Menu'
+import { Icon } from './Icon'
 
 /* Circo design system: the shared building blocks. Use these instead of styling text, buttons
    and fields per page. Tokens (colour, type, spacing, radius) live in tokens.css; styles in
@@ -23,7 +24,7 @@ export function Text({ variant = 'body', tone, as, className = '', ...rest }: HT
 
 /* ---------- Tag (pill on artwork) ---------- */
 
-export function Tag({ tone = 'default', className = '', ...rest }: HTMLAttributes<HTMLSpanElement> & { tone?: 'default' | 'accent' | 'warning' }) {
+export function Tag({ tone = 'default', className = '', ...rest }: HTMLAttributes<HTMLSpanElement> & { tone?: 'default' | 'accent' | 'warning' | 'light' }) {
   return <span className={`ui-tag${tone === 'default' ? '' : ` ui-tag--${tone}`} ${className}`.trim()} {...rest} />
 }
 
@@ -73,7 +74,7 @@ export function ButtonLink({ variant, size, icon, block, className = '', childre
 }
 
 /* Field states. Default / focus / filled come from the input itself; the rest you set:
-   status="checking" (spinner, e.g. username availability), "success" (green tick), and
+   status="checking" (spinner, e.g. checking a code), "success" (green tick), and
    error="message" (red line and message). disabled dims the field. */
 export type FieldStatus = 'checking' | 'success'
 type FieldShell = { label?: string; hint?: ReactNode; error?: ReactNode; status?: FieldStatus; trailing?: ReactNode; className?: string }
@@ -168,6 +169,41 @@ export function EmptyState({ icon, children, action, className = '' }: { icon: R
   )
 }
 
+/* ---------- Disclosure ---------- */
+
+/* A card that opens to show more: an icon, a title and a sub line. With children it shows a
+   chevron and opens to them (controlled: `open`, `onToggle`); without, it's a plain card with
+   an optional `trailing` element on the right, such as a tag. */
+export function Disclosure({ leading, title, sub, trailing, open = false, onToggle, children }: { leading?: ReactNode; title: ReactNode; sub?: ReactNode; trailing?: ReactNode; open?: boolean; onToggle?: () => void; children?: ReactNode }) {
+  const opens = children !== undefined
+  const head = (
+    <>
+      {leading && <span className="ui-disclosure__lead">{leading}</span>}
+      <span className="ui-disclosure__text">
+        <strong>{title}</strong>
+        {sub && <span>{sub}</span>}
+      </span>
+      {opens ? (
+        <Icon name="chevron-down" size={22} className="ui-disclosure__chev" />
+      ) : (
+        trailing
+      )}
+    </>
+  )
+  return (
+    <Surface level={2} pad="none" className={`ui-disclosure${open ? ' is-open' : ''}`}>
+      {opens ? (
+        <button className="ui-disclosure__head" aria-expanded={open} onClick={onToggle}>
+          {head}
+        </button>
+      ) : (
+        <div className="ui-disclosure__head">{head}</div>
+      )}
+      {opens && open && <div className="ui-disclosure__body">{children}</div>}
+    </Surface>
+  )
+}
+
 /* ---------- List ---------- */
 
 /* Rows separated by hairlines, the one list style everywhere (account details, settings,
@@ -225,7 +261,25 @@ export function ListRow({ label, title, sub, empty, leading, action, onClick, ch
 /* A centred panel over a dimmed page: title, close ✕, then whatever the flow needs.
    Escape or a click on the backdrop closes it, unless busy (e.g. mid-payment). */
 export function Dialog({ title, onClose, busy, children, className = '' }: { title: string; onClose: () => void; busy?: boolean; children: ReactNode; className?: string }) {
+  const overlay = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
+
+  // Phones: iOS lays its keyboard over the page instead of resizing it, so measure how much of
+  // the screen it covers (--keyboard) and lift the sheet above it.
+  useEffect(() => {
+    const vv = window.visualViewport
+    const el = overlay.current
+    if (!vv || !el) return
+    const fit = () => el.style.setProperty('--keyboard', `${Math.max(0, window.innerHeight - vv.height - vv.offsetTop)}px`)
+    fit()
+    vv.addEventListener('resize', fit)
+    vv.addEventListener('scroll', fit)
+    return () => {
+      vv.removeEventListener('resize', fit)
+      vv.removeEventListener('scroll', fit)
+    }
+  }, [])
+
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null
     panel.current?.querySelector<HTMLElement>('input, button:not(.ui-dialog__close)')?.focus()
@@ -239,7 +293,7 @@ export function Dialog({ title, onClose, busy, children, className = '' }: { tit
     }
   }, [busy, onClose])
   return (
-    <div className="ui-dialog" onMouseDown={(e) => e.target === e.currentTarget && !busy && onClose()}>
+    <div ref={overlay} className="ui-dialog" onMouseDown={(e) => e.target === e.currentTarget && !busy && onClose()}>
       <div ref={panel} className={`ui-dialog__panel ${className}`.trim()} role="dialog" aria-modal="true" aria-label={title}>
         <div className="ui-dialog__head">
           <Text variant="h3" as="h2">

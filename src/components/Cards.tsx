@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { icons, type Title } from '../data/catalog'
+import { accessLabel } from '../data/viewing'
 import { useMenu } from './Menu'
 import { usePreview } from './Preview'
 import { Button } from './ui'
@@ -72,22 +73,9 @@ export function PosterCard({ t, grid, to, menu = true }: { t: Title; grid?: bool
   )
 }
 
-/* Time left on bought access, as the chip reads it: under a day in hours, then days,
-   weeks and months. */
-export function accessLeft(hours: number) {
-  const n = (v: number, unit: string) => `${v} ${unit}${v === 1 ? '' : 's'} left`
-  if (hours <= 0) return 'Access ended'
-  if (hours < 1) return n(Math.max(1, Math.round(hours * 60)), 'min')
-  if (hours < 24) return n(Math.floor(hours), 'hr')
-  const days = Math.floor(hours / 24)
-  if (days < 14) return n(days, 'day')
-  if (days < 60) return n(Math.floor(days / 7), 'week')
-  return n(Math.floor(days / 30), 'month')
-}
-
 /* Continue Watching card (Apple TV "Up Next" style): 16:9 art with the access chip; the episode,
    title and progress line sit on the art. The chip is the only "left" on the card. */
-export function ContinueCard({ t, accessHours, progress, ep, onRemove }: { t: Title; accessHours: number; progress: number; ep?: string; onRemove?: () => void }) {
+export function ContinueCard({ t, accessMs, progress, ep, onRemove }: { t: Title; accessMs: number; progress: number; ep?: string; onRemove?: () => void }) {
   const { open, toast } = useMenu()
   const pct = Math.round(progress * 100)
   const menu = (anchor: HTMLElement | { x: number; y: number }) =>
@@ -117,7 +105,7 @@ export function ContinueCard({ t, accessHours, progress, ep, onRemove }: { t: Ti
             <circle cx="12" cy="12" r="9" />
             <path d="M12 7v5l3 2" />
           </svg>
-          {accessLeft(accessHours)}
+          {accessLabel(accessMs)}
         </span>
         <button
           className="card__more cw__more"

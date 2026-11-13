@@ -49,7 +49,7 @@ const FAQS = [
   },
   {
     q: 'How do I sign up?',
-    a: 'Continue with Google or Apple, pick a username and tell us what you like. It takes under a minute and there is no password to remember.',
+    a: 'Continue with Google or Apple and tell us what you like. It takes under a minute and there is no password to remember.',
   },
   {
     q: 'I make films. Can I publish on Circo?',

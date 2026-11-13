@@ -135,6 +135,30 @@ export function accessLeft(s: State, t: Title, now = Date.now()): number | null 
   return left > 0 ? left : 0
 }
 
+/* Time left as a duration: "45 mins", "1 hr", "3 days", "2 weeks", "4 months". */
+export function timeLeft(ms: number) {
+  const n = (v: number, unit: string) => `${v} ${unit}${v === 1 ? '' : 's'}`
+  const h = ms / 36e5
+  if (h < 1) return n(Math.max(1, Math.round(ms / 6e4)), 'min')
+  if (h < 24) return n(Math.floor(h), 'hr')
+  const days = Math.floor(h / 24)
+  if (days < 14) return n(days, 'day')
+  if (days < 60) return n(Math.floor(days / 7), 'week')
+  return n(Math.floor(days / 30), 'month')
+}
+
+/* Where a viewer's access stands, in words that can't be misread: "Not started" (a pass that
+   starts on first play), "18 hrs left", "Expires tomorrow", "3 days left" or "Expired". */
+export function accessLabel(ms: number, now = Date.now()) {
+  if (!isFinite(ms)) return 'Not started'
+  if (ms <= 0) return 'Expired'
+  if (ms < 24 * 36e5) return `${timeLeft(ms)} left`
+  const tomorrow = new Date(now)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  if (new Date(now + ms).toDateString() === tomorrow.toDateString()) return 'Expires tomorrow'
+  return `${timeLeft(ms)} left`
+}
+
 export const planLabel = (id: string) => plans.find((p) => p.id === id)?.label ?? 'Subscription'
 
 /* --- Balance --- */

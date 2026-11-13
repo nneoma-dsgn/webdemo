@@ -15,7 +15,9 @@ import { savedToast, useSaved } from '../data/saved'
 import { openMini } from '../data/mini'
 import { isBlocked, isMuted, toggleBlocked, toggleMuted } from '../data/moderation'
 import { Button, Text } from '../components/ui'
+import { ICON_PATHS, Icon } from '../components/Icon'
 import { isPhone } from '../components/viewport'
+import { CastScanner } from '../components/CastScanner'
 
 /* Circo video player. Loading screen after Netflix (title top-left, spinner centre); controls
    after the Circo mobile player (glass skip/play circles, red scrubber) and Apple TV / Netflix web
@@ -336,6 +338,10 @@ function PlayerView() {
     document.addEventListener('fullscreenchange', on)
     return () => document.removeEventListener('fullscreenchange', on)
   }, [])
+
+  // Phones: Cast opens the code scanner; elsewhere it looks for devices on the network.
+  const [scanning, setScanning] = useState(false)
+  const cast = () => (isPhone() ? setScanning(true) : toast('Looking for devices nearby'))
 
   // Menus open outside the player; while it's turned they turn with it (see .dd--sheet).
   useEffect(() => {
@@ -832,7 +838,7 @@ function PlayerView() {
                 {seasons.length > 1 ? (
                   <button className="vp-details__season" aria-haspopup="menu" onClick={(e) => seasonMenu(e.currentTarget)}>
                     Season {shownSeason}
-                    <Svg d={['m6 9 6 6 6-6']} />
+                    <Icon name="chevron-down" weight={1.9} />
                   </button>
                 ) : (
                   <Text variant="body" as="h3" className="vp-details__eps-title">
@@ -906,7 +912,7 @@ function PlayerView() {
               : 'We couldn’t load this video. Check your connection and try again.'}
           </Text>
           <div className="vp-fail__actions">
-            <Button size="sm" icon={<Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />} onClick={() => setAttempt((a) => a + 1)}>
+            <Button size="sm" icon={<Icon name="replay" weight={1.9} />} onClick={() => setAttempt((a) => a + 1)}>
               Retry
             </Button>
             <Button variant="secondary" size="sm" onClick={exit}>
@@ -923,22 +929,24 @@ function PlayerView() {
         </div>
       )}
 
+      {scanning && <CastScanner onClose={() => setScanning(false)} />}
+
       {/* --- Chrome --- */}
       <div className="vp__top">
         <button className="vp__icon" onClick={exit} aria-label="Back">
           <span className="vp-desk">
-            <Svg d={['M19 12H5', 'm12 19-7-7 7-7']} />
+            <Icon name="arrow-left" weight={1.9} />
           </span>
           <img className="vp-phone" src={icons.chevronLeft} alt="" width={24} height={24} />
         </button>
         <div className="vp__top-right">
           {/* Not on phones: there's no room for a floating window on a small screen. */}
           <button className="vp__icon vp__pip" onClick={toMini} aria-label="Picture in picture" title="Picture in picture">
-            <Svg d={['M21 10V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5', 'M14 14h7v6h-7z']} />
+            <Icon name="pip" weight={1.9} />
           </button>
-          <button className="vp__icon" onClick={() => toast('Looking for devices nearby')} aria-label="Cast to device">
+          <button className="vp__icon" onClick={cast} aria-label="Cast to device">
             <span className="vp-desk">
-              <Svg d={['M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6', 'M2 12a9 9 0 0 1 8 8', 'M2 16a5 5 0 0 1 4 4', 'M2 20h.01']} />
+              <Icon name="cast" weight={1.9} />
             </span>
             <img className="vp-phone" src={icons.cast} alt="" width={24} height={24} />
           </button>
@@ -1022,7 +1030,7 @@ function PlayerView() {
       {/* Replay and close stay pinned top right over the checkout, however tall it gets. */}
       {((ended && !soon && !featureMode && !paidHere) || (halted && !unlocked)) && !reveal && (
         <div className="vp-access__top">
-          <Button variant="secondary" size="sm" icon={<Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />} onClick={replay}>
+          <Button variant="secondary" size="sm" icon={<Icon name="replay" weight={1.9} />} onClick={replay}>
             Replay Teaser
           </Button>
           <button className="vp-access__close" onClick={exit} aria-label="Close">
@@ -1067,7 +1075,7 @@ function PlayerView() {
             Extend 24h · {naira(t.passPrice)}
           </Button>
           <button className="vp-passwarn__close" onClick={() => setWarnClosed(true)} aria-label="Dismiss">
-            <Svg d={['M18 6 6 18', 'M6 6l12 12']} />
+            <Icon name="close" weight={1.9} />
           </button>
         </div>
       )}
@@ -1098,7 +1106,7 @@ function PlayerView() {
       {/* Toast-style, from the top; clears itself. */}
       {slow && (
         <div className="vp-slow" role="status">
-          <Svg d={['M5 12.55a11 11 0 0 1 14.08 0', 'M1.42 9a16 16 0 0 1 21.16 0', 'M8.53 16.11a6 6 0 0 1 6.95 0', 'M12 20h.01']} />
+          <Icon name="wifi" weight={1.9} />
           <strong>Internet connection unstable</strong>
         </div>
       )}
@@ -1137,11 +1145,11 @@ function PlayerView() {
           </span>
           <span className="vp__edge-tools">
             <button onClick={(e) => settingsMenu(e.currentTarget)} aria-label="Settings">
-              <Svg d={SETTINGS_ICON} />
+              <Icon name="settings" weight={1.9} />
             </button>
             {/* Expand (corners out) and collapse (corners in), drawn so they share settings' weight. */}
             <button onClick={toggleFull} aria-label={full || rotated ? 'Exit full screen' : 'Full screen'}>
-              <Svg d={full || rotated ? COLLAPSE_ICON : EXPAND_ICON} />
+              <Icon name={full || rotated ? 'collapse' : 'expand'} weight={1.9} />
             </button>
           </span>
         </div>
@@ -1195,9 +1203,9 @@ function PlayerView() {
             <div className="vp__volume">
               <button className="vp__icon" onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'}>
                 {muted || volume === 0 ? (
-                  <Svg d={['M11 5L6 9H2v6h4l5 4V5z', 'M23 9l-6 6', 'M17 9l6 6']} />
+                  <Icon name="mute" weight={1.9} />
                 ) : (
-                  <Svg d={['M11 5L6 9H2v6h4l5 4V5z', 'M15.5 8.5a5 5 0 0 1 0 7', 'M19 5a10 10 0 0 1 0 14']} />
+                  <Icon name="volume" weight={1.9} />
                 )}
               </button>
               <input
@@ -1213,7 +1221,7 @@ function PlayerView() {
             {series && (
               <div className="vp__next">
                 <button className="vp__icon" onClick={() => (next ? goNext() : toast('That’s the last episode'))} aria-label="Next episode">
-                  <Svg d={['M6 4l10 8-10 8V4z', 'M19 5v14']} />
+                  <Icon name="skip-next" weight={1.9} />
                 </button>
                 {next && (
                   <div className="vp__next-card" role="tooltip">
@@ -1233,13 +1241,13 @@ function PlayerView() {
               </div>
             )}
             <button ref={langBtn} className={`vp__icon${subSel ? ' is-on' : ''}`} onClick={() => setLangOpen((o) => !o)} aria-label="Audio and subtitles" aria-expanded={langOpen} title="Audio & subtitles">
-              <Svg d={['M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z', 'M7 13h3', 'M13 13h4', 'M7 16h8']} />
+              <Icon name="subtitles" weight={1.9} />
             </button>
             <button className="vp__icon" onClick={(e) => settingsMenu(e.currentTarget)} aria-label="Settings" title="Settings">
-              <Svg d={SETTINGS_ICON} />
+              <Icon name="settings" weight={1.9} />
             </button>
             <button className="vp__icon" onClick={toggleFull} aria-label={full ? 'Exit full screen' : 'Full screen'} title="Full screen">
-              <Svg d={full ? COLLAPSE_ICON : EXPAND_ICON} />
+              <Icon name={full ? 'collapse' : 'expand'} weight={1.9} />
             </button>
           </div>
         </div>
@@ -1264,7 +1272,7 @@ function PlayerView() {
               <div className="vp__info-actions">
                 <Button
                   size="sm"
-                  icon={<Svg d={['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5']} />}
+                  icon={<Icon name="replay" weight={1.9} />}
                   onClick={() => {
                     player.current?.seekTo?.(0, true)
                     player.current?.playVideo?.()
@@ -1285,10 +1293,10 @@ function PlayerView() {
                   aria-label={saved.has(t.id) ? 'Saved for later' : 'Watch later'}
                   title={saved.has(t.id) ? 'Saved for later' : 'Watch later'}
                 >
-                  <Svg d={saved.has(t.id) ? ['M5 12.5l4.5 4.5L19 7.5'] : ['M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z']} />
+                  <Icon name={saved.has(t.id) ? 'check' : 'bookmark'} weight={1.9} />
                 </button>
                 <button className="vp__info-round" onClick={() => toast('Link copied')} aria-label="Share" title="Share">
-                  <Svg d={['M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8', 'M16 6l-4-4-4 4', 'M12 2v13']} />
+                  <Icon name="share" weight={1.9} />
                 </button>
               </div>
             </div>
@@ -1296,7 +1304,7 @@ function PlayerView() {
               <button className="vp__studio" onClick={() => router.push(`/studio/${studio.id}`)} aria-label={`Visit ${studio.name}`}>
                 <img src={studio.logo} alt="" />
                 <span className="vp__studio-name">{studio.name}</span>
-                <Svg d={['M9 6l6 6-6 6']} />
+                <Icon name="chevron-right" weight={1.9} />
               </button>
             )}
           </div>
@@ -1344,26 +1352,14 @@ function clockLeft(ms: number) {
    --vp-h is the same ratio). */
 const PHONE_PICTURE_RATIO = 286 / 430
 
-const EXPAND_ICON = ['M8 3H5a2 2 0 0 0-2 2v3', 'M21 8V5a2 2 0 0 0-2-2h-3', 'M3 16v3a2 2 0 0 0 2 2h3', 'M16 21h3a2 2 0 0 0 2-2v-3']
-const COLLAPSE_ICON = ['M8 3v3a2 2 0 0 1-2 2H3', 'M21 8h-3a2 2 0 0 1-2-2V3', 'M3 16h3a2 2 0 0 1 2 2v3', 'M16 21v-3a2 2 0 0 1 2-2h3']
-const SETTINGS_ICON = ['M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z']
-
-function Svg({ d }: { d: string[] }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      {d.map((x) => (
-        <path key={x} d={x} />
-      ))}
-    </svg>
-  )
-}
 
 function SkipIcon({ dir }: { dir: 1 | -1 }) {
   return (
     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <g transform={dir === 1 ? 'translate(24 0) scale(-1 1)' : undefined}>
-        <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
-        <path d="M3 3v5h5" />
+        {ICON_PATHS.replay.map((d) => (
+          <path key={d} d={d} />
+        ))}
       </g>
       <text x="12" y="15.6" textAnchor="middle" fontSize="7.2" fontWeight="700" fill="currentColor" stroke="none">
         10

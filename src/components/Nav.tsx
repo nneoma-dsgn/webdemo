@@ -8,6 +8,9 @@ import { icons } from '../data/catalog'
 import { categories, category } from '../data/explore'
 import { useMenu } from './Menu'
 import { ButtonLink, SegmentedControl } from './ui'
+import { Icon } from './Icon'
+import { CastScanner } from './CastScanner'
+import { isPhone } from './viewport'
 import { NotificationBell } from './Notifications'
 
 /* Desktop and tablet: Netflix/Apple TV style top bar that is transparent over the
@@ -18,6 +21,9 @@ export function TopNav() {
   const params = useSearchParams()
   const tab = params.get('tab') ?? 'shows'
   const { toast } = useMenu()
+  // Phones: Cast opens the code scanner; elsewhere it looks for devices on the network.
+  const [scanning, setScanning] = useState(false)
+  const cast = () => (isPhone() ? setScanning(true) : toast('Looking for devices nearby'))
 
   useEffect(() => {
     const on = () => setSolid(window.scrollY > 24)
@@ -44,7 +50,7 @@ export function TopNav() {
               <CapsuleIcon name="search" />
             </Link>
           )}
-          <button className="capsule__btn" aria-label="Cast to device" onClick={() => toast('Looking for devices nearby')}>
+          <button className="capsule__btn" aria-label="Cast to device" onClick={cast}>
             <CapsuleIcon name="cast" />
           </button>
           <NotificationBell />
@@ -52,6 +58,7 @@ export function TopNav() {
           <AccountMenu />
         </div>
       </div>
+      {scanning && <CastScanner onClose={() => setScanning(false)} />}
     </header>
   )
 }
@@ -88,19 +95,23 @@ export function MobileNav() {
   return (
     <nav className={`mobilenav${compact ? ' mobilenav--compact' : ''}`} aria-label="Primary">
       <div className="mobilenav__pill">
-        <Link href="/" className={`mobilenav__item${pathname === '/' ? ' active' : ''}`} aria-label="Home">
+        <Link href="/" className={`mobilenav__item${pathname === '/' ? ' active' : ''}`}>
           <NavIcon name="house" active={pathname === '/'} />
+          <span className="mobilenav__label">Home</span>
         </Link>
-        <Link href="/library" className={`mobilenav__item${pathname === '/library' ? ' active' : ''}`} aria-label="Library">
+        <Link href="/library" className={`mobilenav__item${pathname === '/library' ? ' active' : ''}`}>
           <NavIcon name="library" active={pathname === '/library'} />
+          <span className="mobilenav__label">Library</span>
         </Link>
-        <Link href="/search" className={`mobilenav__item${pathname === '/search' ? ' active' : ''}`} aria-label="Search">
-          <NavIcon name="search" active={pathname === '/search'} />
+        <Link href="/search" className={`mobilenav__item${pathname === '/search' ? ' active' : ''}`}>
+          <NavIcon name="search-nav" active={pathname === '/search'} />
+          <span className="mobilenav__label">Search</span>
         </Link>
-        {/* Phones: the profile lives here and goes straight to Account (Library is the plus, and
+        {/* Phones: the profile lives here and goes straight to Account (Library has its own tab, and
             Log Out is in Account); the top keeps cast and notifications. */}
-        <Link href="/account" className={`mobilenav__item${pathname.startsWith('/account') ? ' active' : ''}`} aria-label="Account">
+        <Link href="/account" className={`mobilenav__item${pathname.startsWith('/account') ? ' active' : ''}`}>
           <img className="mobilenav__avatar" src={icons.avatar} alt="" width={30} height={30} />
+          <span className="mobilenav__label">Account</span>
         </Link>
       </div>
     </nav>
@@ -126,43 +137,15 @@ export function AppBanner() {
   )
 }
 
-/* Bottom pill icons (the mobile design's house, add-circle and search), drawn inline so the
-   current page's icon can be white and heavier and the rest grey. */
-const NAV_PATHS = {
-  house: ['M17.5 24.4991V15.1657C17.5 14.8563 17.3771 14.5596 17.1583 14.3408C16.9395 14.122 16.6428 13.9991 16.3333 13.9991H11.6667C11.3572 13.9991 11.0605 14.122 10.8417 14.3408C10.6229 14.5596 10.5 14.8563 10.5 15.1657V24.4991M3.5 11.6663C3.49992 11.3269 3.57389 10.9915 3.71675 10.6836C3.85962 10.3757 4.06793 10.1027 4.32717 9.88363L12.4938 2.88363C12.915 2.52769 13.4486 2.3324 14 2.3324C14.5514 2.3324 15.085 2.52769 15.5062 2.88363L23.6728 9.88363C23.9321 10.1027 24.1404 10.3757 24.2832 10.6836C24.4261 10.9915 24.5001 11.3269 24.5 11.6663V22.1663C24.5 22.7851 24.2542 23.3786 23.8166 23.8162C23.379 24.2538 22.7855 24.4996 22.1667 24.4996H5.83333C5.21449 24.4996 4.621 24.2538 4.18342 23.8162C3.74583 23.3786 3.5 22.7851 3.5 22.1663V11.6663Z'],
-  library: ['M9.33333 14H14M14 14H18.6667M14 14V9.33333M14 14V18.6667', 'M14 25.6667C20.4433 25.6667 25.6667 20.4433 25.6667 14C25.6667 7.55668 20.4433 2.33333 14 2.33333C7.55668 2.33333 2.33333 7.55668 2.33333 14C2.33333 20.4433 7.55668 25.6667 14 25.6667Z'],
-  search: ['M24.5002 24.5002L19.4369 19.4369M22.1667 12.8333C22.1667 17.988 17.988 22.1667 12.8333 22.1667C7.67868 22.1667 3.5 17.988 3.5 12.8333C3.5 7.67868 7.67868 3.5 12.8333 3.5C17.988 3.5 22.1667 7.67868 22.1667 12.8333Z'],
+/* Bottom pill icons: the current page's is white and heavier. Weights are on the design's 28
+   grid (2, or 2.6 when current), given to Icon on its 24 grid. */
+function NavIcon({ name, active }: { name: 'house' | 'library' | 'search-nav'; active: boolean }) {
+  return <Icon name={name} size={28} weight={((active ? 2.6 : 2) * 24) / 28} className="mobilenav__icon" />
 }
 
-function NavIcon({ name, active }: { name: keyof typeof NAV_PATHS; active: boolean }) {
-  return (
-    <svg className="mobilenav__icon" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth={active ? 2.6 : 2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      {NAV_PATHS[name].map((d) => (
-        <path key={d} d={d} />
-      ))}
-    </svg>
-  )
-}
-
-/* Search and cast drawn at the same size, weight and colour (Lucide paths). */
+/* Search and cast in the top bar: same size, weight and colour. */
 function CapsuleIcon({ name }: { name: 'search' | 'cast' }) {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      {name === 'search' ? (
-        <>
-          <circle cx="10.5" cy="10.5" r="7.5" />
-          <path d="m21 21-5.2-5.2" />
-        </>
-      ) : (
-        <>
-          <path d="M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6" />
-          <path d="M2 12a9 9 0 0 1 8 8" />
-          <path d="M2 16a5 5 0 0 1 4 4" />
-          <path d="M2 20h.01" />
-        </>
-      )}
-    </svg>
-  )
+  return <Icon name={name} size={23} weight={2.2} />
 }
 
 /* Segmented tab switcher: one frosted capsule, with a highlight that glides to the active tab. */
@@ -226,7 +209,7 @@ function AccountMenu() {
         { kind: 'separator', id: 's1' },
         {
           id: 'signout',
-          label: 'Sign Out',
+          label: 'Log Out',
           icon: 'logout',
           danger: true,
           onSelect: () => {

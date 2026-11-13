@@ -191,6 +191,12 @@
   color: var(--warning);
 }
 
+/* Light: white with dark text, for a quiet label on a dark card ("This device"). */
+.ui-tag--light {
+  background: var(--bg-light);
+  color: var(--text-on-light);
+}
+
 /* ---------- Surface: panel / card backgrounds ---------- */
 
 .ui-surface {
@@ -204,6 +210,67 @@
 .ui-surface--pad-sm { padding: var(--space-4); }
 .ui-surface--pad-md { padding: var(--space-6); }
 .ui-surface--pad-lg { padding: var(--space-8) var(--space-8) var(--space-10); }
+
+/* ---------- Disclosure: a card that opens to show more ---------- */
+
+.ui-surface.ui-disclosure {
+  border-radius: var(--radius-md);
+  border-color: var(--stroke-default);
+}
+
+.ui-disclosure__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  text-align: left;
+  color: var(--text-200);
+}
+
+.ui-disclosure__lead {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+
+.ui-disclosure__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ui-disclosure__text strong {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-100);
+}
+
+.ui-disclosure__text span {
+  font-size: var(--fs-caption);
+  color: var(--text-300);
+}
+
+.ui-disclosure__chev {
+  flex: none;
+  color: var(--text-300);
+  transition: transform 0.2s;
+}
+
+.ui-disclosure.is-open .ui-disclosure__chev {
+  transform: rotate(180deg);
+}
+
+/* Lines up under the title, past the icon. */
+.ui-disclosure__body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4) calc(var(--space-4) + 22px + var(--space-3));
+}
 
 /* ---------- Divider ---------- */
 
@@ -286,6 +353,14 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4);
+}
+
+/* Full-width examples stacked one under another (cards, disclosures). */
+.ds__stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 480px;
 }
 
 .ds__fields {
@@ -480,15 +555,19 @@
   from { opacity: 0; transform: translateY(16px) scale(0.98); }
 }
 
-/* Phones: the dialog becomes a bottom sheet. */
+/* Phones: the dialog becomes a bottom sheet, sitting on top of the keyboard when one is up
+   (--keyboard, measured by the Dialog). */
 @media (max-width: 767px) {
   .ui-dialog {
     place-items: end stretch;
-    padding: 0;
+    padding: 0 0 var(--keyboard, 0px);
+    transition: padding-bottom 0.25s ease;
   }
 
   .ui-dialog__panel {
     width: 100%;
+    max-height: calc(100dvh - var(--keyboard, 0px) - var(--space-6));
+    overflow-y: auto;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
   }

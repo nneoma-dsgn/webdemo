@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Divider, EmptyState, List, ListRow, SegmentedControl, SelectField, Surface, Tag, Text, TextField, type TextVariant, type Tone } from '../components/ui'
+import { Button, Disclosure, Divider, EmptyState, List, ListRow, SegmentedControl, SelectField, Surface, Tag, Text, TextField, type TextVariant, type Tone } from '../components/ui'
 
 /* Living reference for the Circo design system. Everything here is the real component. */
 
@@ -30,6 +30,7 @@ const SPACE = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16]
 export default function DesignSystem() {
   const [gender, setGender] = useState('')
   const [seg, setSeg] = useState('muted')
+  const [disclosed, setDisclosed] = useState(false)
   return (
     <div className="page page--padded ds">
       <Text variant="h1">Design system</Text>
@@ -126,13 +127,13 @@ export default function DesignSystem() {
 
       <Section title="Fields">
         <div className="ds__fields">
-          <TextField label="Default" placeholder="Username" />
-          <TextField label="Filled" defaultValue="abeltesfaye" />
-          <TextField label="With a hint" defaultValue="abeltesfaye" hint="Letters and numbers, at least 3." />
-          <TextField label="Checking" defaultValue="abeltesfaye" status="checking" />
-          <TextField label="Success" defaultValue="abeltesfaye" status="success" hint="That username is free." />
-          <TextField label="Error" defaultValue="jonbellion" error="This username has been taken." />
-          <TextField label="Disabled" defaultValue="abeltesfaye" disabled />
+          <TextField label="Default" placeholder="Promo code" />
+          <TextField label="Filled" defaultValue="CIRCO25" />
+          <TextField label="With a hint" defaultValue="CIRCO25" hint="Letters and numbers, as printed." />
+          <TextField label="Checking" defaultValue="CIRCO25" status="checking" />
+          <TextField label="Success" defaultValue="CIRCO25" status="success" hint="That code works." />
+          <TextField label="Error" defaultValue="OLDCODE" error="That code has expired." />
+          <TextField label="Disabled" defaultValue="CIRCO25" disabled />
           <SelectField
             label="Select"
             placeholder="Select your gender"
@@ -165,6 +166,23 @@ export default function DesignSystem() {
           <ListRow title="Link row with sub text" sub="A short line about where it goes" onClick={() => {}} />
           <ListRow label="Label" title="Read-only value" />
         </List>
+      </Section>
+
+      <Section title="Disclosure">
+        <Text variant="body-sm" tone="muted">
+          A card that opens to show more (a device, an item with details and an action). Without content to open, it takes a trailing tag instead of the chevron.
+        </Text>
+        <div className="ds__stack">
+          <Disclosure title="Card with a tag" sub="Doesn’t open" trailing={<Tag tone="light">This device</Tag>} />
+          <Disclosure title="Card that opens" sub="Tap to show more" open={disclosed} onToggle={() => setDisclosed((o) => !o)}>
+            <Text variant="body-sm" tone="muted">
+              Details go here
+            </Text>
+            <Button variant="secondary" size="sm">
+              Action
+            </Button>
+          </Disclosure>
+        </div>
       </Section>
 
       <Section title="Thumbnail placeholder">
@@ -201,6 +219,7 @@ export default function DesignSystem() {
           <Tag>3 days</Tag>
           <Tag tone="accent">Best value · Save 75%</Tag>
           <Tag tone="warning">Pass ends soon</Tag>
+          <Tag tone="light">This device</Tag>
         </div>
       </Section>
 

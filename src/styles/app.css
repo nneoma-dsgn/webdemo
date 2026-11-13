@@ -868,15 +868,23 @@ a.shelf__head:hover .shelf__chevron {
     border: 1px solid var(--stroke-default);
   }
 
+  /* Icon over its label; the current page's pair is white on the highlight. */
   .mobilenav__item {
     flex: 1;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
     border-radius: var(--radius-full);
+    color: var(--text-300);
   }
 
-  .mobilenav__item {
-    color: var(--text-300);
+  .mobilenav__label {
+    font-size: 11px;
+    font-weight: var(--fw-semibold);
+    line-height: 13px;
+    letter-spacing: 0;
   }
 
   .mobilenav__item.active {
@@ -915,6 +923,11 @@ a.shelf__head:hover .shelf__chevron {
   .mobilenav--compact .mobilenav__item img,
   .mobilenav--compact .mobilenav__icon {
     transform: scale(0.8);
+  }
+
+  /* The slim pill is icons only. */
+  .mobilenav--compact .mobilenav__label {
+    display: none;
   }
 
   .hero {
@@ -5186,6 +5199,38 @@ body.spot-focus .page--welcome .cta-wrap {
   color: #ff5a5a;
 }
 
+/* Devices: a stack of Disclosure cards (ui.css). */
+/* (.acct__panel .devices__intro outranks the shared text style's margin reset.) */
+.acct__panel .devices__intro {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+}
+
+.devices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Where and when a device was last used: one line with a dot between; on phones, the date
+   drops to its own line. */
+.devices__where span + span::before {
+  content: ' · ';
+}
+
+@media (max-width: 767px) {
+  .devices__where span {
+    display: block;
+  }
+
+  .devices__where span + span::before {
+    content: none;
+  }
+}
+
+.devices__all {
+  margin-top: var(--space-6);
+}
+
 .acct__panel {
   min-width: 0;
   padding: 8px 0 60px;
@@ -5300,6 +5345,37 @@ body.spot-focus .page--welcome .cta-wrap {
   color: var(--text-100);
 }
 
+/* Ended access: the same chip in the danger colour, so it reads at a glance. */
+.lib-tag--expired {
+  background: var(--danger);
+}
+
+/* An access poster with its studio underneath (a link back to it). */
+.lib-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: var(--poster-w);
+}
+
+.lib-tile .poster,
+.lib-tile--grid {
+  width: auto;
+}
+
+.lib-tile__studio {
+  overflow: hidden;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--text-300);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lib-tile__studio:hover {
+  color: var(--text-100);
+}
+
 .lib-studios {
   display: flex;
   flex-direction: column;
@@ -5403,6 +5479,45 @@ body.spot-focus .page--welcome .cta-wrap {
     flex-direction: column;
     align-items: center;
     text-align: center;
+  }
+}
+
+/* Phones: the balance is one compact row (balance left, Load Balance right), so what you can
+   watch comes first. The button takes the small size; the glow and ring go. */
+@media (max-width: 767px) {
+  .lib-a {
+    margin-top: calc(var(--nav-h) + var(--space-4));
+  }
+
+  .ui-surface.lib-a {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    text-align: left;
+  }
+
+  .ui-surface.lib-a::after {
+    display: none;
+  }
+
+  .lib-a .lib-amt--lg {
+    margin: 0;
+    font-size: var(--fs-h3);
+  }
+
+  .lib-a .lib-amt--lg span {
+    font-size: var(--fs-body-sm);
+  }
+
+  /* As .btn-white--sm. */
+  .lib-a .btn-white {
+    flex: none;
+    height: 40px;
+    padding: 0 18px;
+    font-size: var(--fs-body-sm);
   }
 }
 
@@ -6116,8 +6231,10 @@ body.spot-focus .page--welcome .cta-wrap {
 
 /* ---------- Video player on phones (Circo Mobile Designs: Play Video) ---------- */
 
-/* Each control carries both icon sets; phones show the design's, larger screens the rest. */
-.vp-phone {
+/* Each control carries both icon sets; phones show the design's, larger screens the rest. The
+   details under the picture are phones only too (desktop has its Info and Episodes panels). */
+.vp-phone,
+.vp-details {
   display: none;
 }
 
@@ -6682,5 +6799,127 @@ body.spot-focus .page--welcome .cta-wrap {
 @media (max-width: 767px) {
   .title-blurb {
     font-size: var(--fs-body);
+  }
+}
+
+/* ---------- Cast scanner (phones): a camera-style viewfinder for another screen's Link device code ---------- */
+
+.scanner {
+  position: fixed;
+  inset: 0;
+  z-index: 450;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-6);
+  background: radial-gradient(ellipse at center, #1c1c1f, #000 70%);
+  animation: ui-dialog-in 0.2s ease;
+}
+
+.scanner__close {
+  position: absolute;
+  top: calc(var(--space-3) + env(safe-area-inset-top));
+  left: var(--space-4);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--chip-dark);
+  border: 1px solid var(--stroke-default);
+  color: var(--text-100);
+}
+
+.scanner__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(260px, 70vw);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Viewfinder corners. */
+.scanner__corner {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border: 0 solid var(--text-100);
+  transition: border-color 0.3s;
+}
+
+.scanner__corner--tl { top: 0; left: 0; border-width: 4px 0 0 4px; border-top-left-radius: var(--radius-xl); }
+.scanner__corner--tr { top: 0; right: 0; border-width: 4px 4px 0 0; border-top-right-radius: var(--radius-xl); }
+.scanner__corner--bl { bottom: 0; left: 0; border-width: 0 0 4px 4px; border-bottom-left-radius: var(--radius-xl); }
+.scanner__corner--br { bottom: 0; right: 0; border-width: 0 4px 4px 0; border-bottom-right-radius: var(--radius-xl); }
+
+.scanner__frame--connecting .scanner__corner {
+  border-color: var(--success);
+}
+
+.scanner__frame--failed .scanner__corner {
+  border-color: var(--danger);
+}
+
+/* The sweeping line while it looks. */
+.scanner__line {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 10%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 16px 2px rgba(255, 0, 79, 0.6);
+  animation: scanner-sweep 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes scanner-sweep {
+  to {
+    top: 90%;
+  }
+}
+
+/* The tick once found, the warning if connecting fails. */
+.scanner__mark {
+  animation: ui-dialog-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.scanner__frame--connecting .scanner__mark {
+  color: var(--success);
+}
+
+.scanner__frame--failed .scanner__mark {
+  color: var(--danger);
+}
+
+.scanner__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(320px, 100%);
+}
+
+/* (.scanner__text .scanner__hint outranks the shared text style's regular weight.) */
+.scanner__text .scanner__hint {
+  font-weight: var(--fw-medium);
+}
+
+.scanner__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 320px;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanner__line {
+    top: 50%;
+    animation: none;
   }
 }

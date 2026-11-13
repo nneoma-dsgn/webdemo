@@ -326,8 +326,6 @@ export type Feed = {
   /* Hero carousel: featured titles with a clip each (rotates on the signed-in home). */
   heroes: { id: string; videoId: string; start: number; end: number }[]
   mustSee: string[]
-  /* accessHours: time left on the access the user bought (24 hrs, 1 day, 7 days, 1 month or 1 year). */
-  continueWatching: { id: string; accessHours: number; progress: number; ep?: string }[]
   middle: Shelf
   coming: { id: string; when: string; label?: string[] }[]
   all: string[]
@@ -345,12 +343,6 @@ export const feeds: Record<'shows' | 'series', Feed> = {
       { id: 'dune', videoId: 'U2Qp5pL3ovA', start: 40, end: 75 },
     ],
     mustSee: ['blackbook', 'tribe', 'barbie', 'anikulapo', 'spiderverse', 'dune', 'mamiwata', 'gangs', 'oppenheimer', 'ijogbon', 'lionheart', 'wedding'],
-    continueWatching: [
-      { id: 'tribe', accessHours: 17, progress: 0.55 },
-      { id: 'dune', accessHours: 5, progress: 0.3 },
-      { id: 'citation', accessHours: 576, progress: 0.82 },
-      { id: 'gangs', accessHours: 120, progress: 0.12 },
-    ],
     middle: { id: 'nollywood', title: 'Nollywood Hits', items: ofKind('show').filter((id) => titles[id].origin === 'ng') },
     coming: [
       { id: 'funmilayo', when: 'Coming 27 November' },
@@ -369,13 +361,6 @@ export const feeds: Record<'shows' | 'series', Feed> = {
       { id: 'lastofus', videoId: 'wk5vOCcASHg', start: 20, end: 55 },
     ],
     mustSee: ['shogun', 'squid', 'shameless', 'farfromhome', 'abbott', 'severance', 'strangerthings', 'skinnygirl', 'lastofus', 'smartmoney', 'shanty', 'bear', 'theoffice', 'bloodsisters', 'moneyheist', 'wednesday'],
-    continueWatching: [
-      { id: 'silo', accessHours: 72, progress: 0.6, ep: 'S1 · E4' },
-      { id: 'bloodsisters', accessHours: 11, progress: 0.3, ep: 'EP 2' },
-      { id: 'bear', accessHours: 7200, progress: 0.8, ep: 'S2 · E7' },
-      { id: 'shanty', accessHours: 144, progress: 0.15, ep: 'EP 5' },
-      { id: 'moneyheist', accessHours: 21, progress: 0.45, ep: 'S3 · E1' },
-    ],
     middle: { id: 'binge', title: 'Binge-worthy', items: ['strangerthings', 'shameless', 'friends', 'moneyheist', 'shogun', 'b99', 'bridgerton', 'farfromhome', 'modernfamily', 'lastofus', 'parksrec', 'shanty', 'severance', 'freshprince', 'bloodsisters', 'squid'] },
     coming: [
       { id: 'wednesday', when: 'More episodes soon' },
