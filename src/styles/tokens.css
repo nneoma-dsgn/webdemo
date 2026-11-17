@@ -49,6 +49,7 @@
   --fs-h1: 32px; /* page titles, big numbers */
   --fs-h2: 24px; /* section and panel titles */
   --fs-h3: 20px; /* shelf headings, card titles */
+  --fs-h4: 18px; /* phone player title */
   --fs-body: 16px; /* reading text, row titles, inputs, buttons */
   --fs-body-sm: 14px; /* secondary text, small buttons */
   --fs-caption: 12px; /* meta lines, hints, tags, labels */

@@ -6606,9 +6606,22 @@ body.spot-focus .page--welcome .cta-wrap {
     flex: none;
   }
 
+  /* Smaller pill beside the title; Hide keeps Info's look rather than turning white. */
+  .vp-details__head .vp__tabs button {
+    height: 28px;
+    padding: 0 14px;
+    border-radius: 8px;
+  }
+
+  .vp-details__head .vp__tabs button.is-on {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-200);
+  }
+
   .vp-details .vp-details__title {
     min-width: 0;
-    font-weight: var(--fw-semibold);
+    font-size: var(--fs-h4);
+    font-weight: var(--fw-bold);
     line-height: 24px;
   }
 
