@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useLayoutEffect, useRef, useState, type ButtonHT
 import Link from 'next/link'
 import { useMenu } from './Menu'
 import { Icon } from './Icon'
+import { useSheetDrag } from './sheetDrag'
 
 /* Circo design system: the shared building blocks. Use these instead of styling text, buttons
    and fields per page. Tokens (colour, type, spacing, radius) live in tokens.css; styles in
@@ -260,9 +261,11 @@ export function ListRow({ label, title, sub, empty, leading, action, onClick, ch
 
 /* A centred panel over a dimmed page: title, close ✕, then whatever the flow needs.
    Escape or a click on the backdrop closes it, unless busy (e.g. mid-payment). */
+/* Phones show a Dialog as a bottom sheet; it drags down to close like the menus. */
 export function Dialog({ title, onClose, busy, children, className = '' }: { title: string; onClose: () => void; busy?: boolean; children: ReactNode; className?: string }) {
   const overlay = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
+  useSheetDrag(panel, onClose, { enabled: !busy })
 
   // Phones: iOS lays its keyboard over the page instead of resizing it, so measure how much of
   // the screen it covers (--keyboard) and lift the sheet above it.

@@ -5245,6 +5245,26 @@ body.spot-focus .page--welcome .cta-wrap {
   .devices__where span + span::before {
     content: none;
   }
+
+  /* Log out sits under the details: a line across the whole card, then the action as centred
+     text (as on Studios' subscription cards). The body's left inset lines text up with the
+     title, so the negative margins take the line back out to the card's edges. */
+  .devices .ui-disclosure__body {
+    flex-wrap: wrap;
+    padding-bottom: 0;
+  }
+
+  .devices .devices__logout {
+    flex: 1 0 100%;
+    height: auto;
+    margin: 0 calc(-1 * var(--space-4)) 0 calc(-1 * (var(--space-4) + 22px + var(--space-3)));
+    padding: 14px var(--space-4);
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0;
+    background: none;
+    justify-content: center;
+  }
 }
 
 .devices__all {

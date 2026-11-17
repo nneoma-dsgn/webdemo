@@ -50,7 +50,7 @@ export default function Studio() {
             <PosterCard key={x} t={titles[x]} />
           ))}
         </Shelf>
-        <Shelf title="Coming to Circo">
+        <Shelf title="Coming to this Studio">
           {mine.map((x) => upcoming(x)).filter((c): c is NonNullable<typeof c> => !!c).map((c) => (
             <ComingCard
               key={c.id}

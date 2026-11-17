@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { idForName, isSaved, savedToast, toggleSaved } from '../data/saved'
 import { isPhone } from './viewport'
+import { useSheetDrag } from './sheetDrag'
 import { Icon, type IconName } from './Icon'
 
 /* One dropdown for the whole app (card ⋯ menus, right-click, account menu) plus the toast.
@@ -114,8 +115,11 @@ export function MenuProvider({ children }: { children: ReactNode }) {
 /* Phones get every menu as a bottom sheet (grabber, full-width rows, dimmed page behind). */
 function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
+  const scrim = useRef<HTMLDivElement>(null)
   const [sheet] = useState(isPhone)
   const [pos, setPos] = useState({ y: placed.y, origin: placed.origin })
+  const getScrim = useCallback(() => scrim.current, [])
+  useSheetDrag(ref, onClose, { enabled: sheet, backdrop: getScrim })
 
   // Flip above the anchor when there isn't room below.
   useLayoutEffect(() => {
@@ -212,7 +216,7 @@ function Dropdown({ placed, onClose }: { placed: Placed; onClose: () => void }) 
   )
   return sheet ? (
     <>
-      <div className="dd-scrim" aria-hidden />
+      <div ref={scrim} className="dd-scrim" aria-hidden />
       {body}
     </>
   ) : (

@@ -260,7 +260,7 @@ function SafetyPanel() {
 
 /* Devices (after Netflix's Manage Access and Devices): a Disclosure card per device with when it
    was last used. The one you're on is marked and doesn't open (Log Out signs it out); open any
-   other for where and exactly when, and Log out. */
+   other for where and exactly when, and Log out (on phones, under a line across the card). */
 function Devices() {
   const { toast } = useMenu()
   const [current, setCurrent] = useState<Device | null>(null)
@@ -288,7 +288,7 @@ function Devices() {
               <span>{d.place}</span>
               <span>{new Date(d.at).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
             </Text>
-            <Button variant="secondary" size="sm" onClick={() => signOutOf(d)}>
+            <Button variant="secondary" size="sm" className="devices__logout" onClick={() => signOutOf(d)}>
               Log out
             </Button>
           </Disclosure>
