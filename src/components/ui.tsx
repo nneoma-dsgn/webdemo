@@ -331,7 +331,7 @@ export function SegmentedControl({ options, value, onChange, label, className = 
       setPill(el ? { x: el.offsetLeft, w: el.offsetWidth } : null)
     }
     measure()
-    // Tabs change width when a label does (More becomes "Stand-up Comedy"), so watch them too.
+    // Tabs change width when a label does (More becomes "Education & Tutorial"), so watch them too.
     const ro = new ResizeObserver(measure)
     wrap.current?.querySelectorAll('.seg__tab').forEach((t) => ro.observe(t))
     window.addEventListener('resize', measure)

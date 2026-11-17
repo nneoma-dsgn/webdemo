@@ -1309,6 +1309,7 @@ a.shelf__head:hover .shelf__chevron {
   color: var(--text-300);
 }
 
+/* Site footer (from circleandclique.org). */
 .footer {
   border-top: 1px solid var(--stroke-default);
   padding: 56px var(--gutter) 32px;
@@ -1316,43 +1317,52 @@ a.shelf__head:hover .shelf__chevron {
   font-size: var(--fs-body-sm);
 }
 
+.footer ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .footer__top {
   display: grid;
-  grid-template-columns: minmax(200px, 1fr) 3fr;
+  grid-template-columns: minmax(200px, 1fr) 2fr;
   gap: 48px;
 }
 
 .footer__brand img {
+  display: block;
   width: 92px;
   height: auto;
 }
 
 .footer__brand p {
-  margin: 14px 0 0;
-  max-width: 240px;
-  line-height: 1.5;
+  margin: 20px 0 0;
+  max-width: 260px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .footer__cols {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
 }
 
 .footer__col h3 {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   font-size: var(--fs-body-sm);
   font-weight: var(--fw-semibold);
   color: var(--text-100);
 }
 
-.footer__col ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.footer__col li + li {
+  margin-top: 10px;
+}
+
+.footer__cols a,
+.footer__fold a {
+  font-size: 15px;
+  color: var(--text-200);
 }
 
 .footer a:hover {
@@ -1361,36 +1371,140 @@ a.shelf__head:hover .shelf__chevron {
 
 .footer__bottom {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 16px 28px;
-  margin-top: 48px;
+  margin-top: 56px;
   padding-top: 24px;
   border-top: 1px solid var(--stroke-default);
-  font-size: var(--fs-body-sm);
+  font-size: 13px;
+  color: var(--text-400);
 }
 
-.footer__legal {
+.footer__bottom p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin: 0;
+}
+
+.footer__bottom p a {
+  color: var(--text-300);
+}
+
+.footer__social {
   display: flex;
   gap: 20px;
 }
 
-.footer__locale {
-  margin-left: auto;
+.footer__social a {
+  display: grid;
+  place-items: center;
+  color: var(--text-300);
+}
+
+.footer__social svg {
+  width: 18px;
+  height: 18px;
+}
+
+.footer .footer__social--top,
+.footer__fold {
+  display: none;
 }
 
 @media (max-width: 767px) {
-  .footer__top,
-  .footer__cols {
-    grid-template-columns: 1fr 1fr;
+  /* Phones: socials as white tiles, the columns as folding sections. */
+  .footer {
+    padding-top: 40px;
   }
 
-  .footer__brand {
-    grid-column: 1 / -1;
+  .footer__top {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 
-  .footer__locale {
-    margin-left: 0;
+  .footer__cols,
+  .footer .footer__social--bottom {
+    display: none;
+  }
+
+  .footer .footer__social--top {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+    padding: 24px 0;
+    border-top: 1px solid var(--stroke-default);
+    border-bottom: 1px solid var(--stroke-default);
+  }
+
+  .footer__social--top a {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--text-100);
+    color: var(--text-on-light);
+  }
+
+  .footer__social--top svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .footer__fold {
+    display: block;
+  }
+
+  .footer__fold details {
+    border-bottom: 1px solid var(--stroke-default);
+  }
+
+  .footer__fold summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-semibold);
+    color: var(--text-100);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .footer__fold summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .footer__fold summary svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+  }
+
+  .footer__fold details[open] summary svg {
+    transform: rotate(180deg);
+  }
+
+  .footer__fold ul {
+    padding-bottom: 20px;
+  }
+
+  .footer__fold li + li {
+    margin-top: 12px;
+  }
+
+  /* The last folding section's line already closes the list. */
+  .footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 0;
+    border-top: 0;
+  }
+
+  .footer__bottom p {
+    flex-direction: column;
+    line-height: 1.6;
   }
 
   .faq__q {
@@ -6050,7 +6164,7 @@ body.spot-focus .page--welcome .cta-wrap {
     display: none;
   }
 
-  /* Tighter tabs so a longer label (Podcasts, Stand-up Comedy) still clears the icons. */
+  /* Tighter tabs so a longer label (Reality Show, Education & Tutorial) still clears the icons. */
   .hero__tabs .seg__tab {
     padding: 0 var(--space-3);
   }

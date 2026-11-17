@@ -527,55 +527,6 @@
   border-width: 2px;
 }
 
-.pill-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 48px;
-  margin-top: 20px;
-  padding: 0 16px;
-  border-radius: 100px;
-  background: var(--bg-200);
-  border: 1px solid transparent;
-  transition: border-color 0.2s;
-}
-
-.pill-search:focus-within {
-  border-color: var(--stroke-strong);
-}
-
-.pill-search img {
-  opacity: 0.7;
-}
-
-.pill-search input {
-  flex: 1;
-  min-width: 0;
-  background: none;
-  border: 0;
-  outline: 0;
-  color: var(--text-100);
-  font: inherit;
-  font-size: var(--fs-body);
-  letter-spacing: inherit;
-}
-
-.pill-search input::placeholder {
-  color: var(--text-300);
-}
-
-.pill-search__clear {
-  font-size: var(--fs-h3);
-  line-height: 1;
-  color: var(--text-300);
-}
-
-.topics__empty {
-  margin: 0;
-  font-size: var(--fs-body-sm);
-  color: var(--text-400);
-}
-
 /* ---------- Phones: match the mobile screens ---------- */
 
 @media (max-width: 960px) {
@@ -716,14 +667,6 @@
   padding-bottom: 200px;
 }
 
-/* Text tiles: the row style from the design, laid out as a grid. */
-
-.topics__empty {
-  grid-column: 1 / -1;
-  margin: 0;
-  font-size: var(--fs-body-sm);
-  color: var(--text-400);
-}
 
 /* Bottom bar: no fill, just a hairline above the count and button. */
 .onb__dock {
@@ -1015,18 +958,7 @@
   animation: spin 0.9s linear infinite;
 }
 
-/* Search pill and picks hint get the same lift. */
-.pill-search {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.pill-search input::placeholder,
-.pill-search img {
-  color: #c4c4c8;
-  opacity: 1;
-}
-
+/* The hint gets a little lift. */
 .onb__sub {
   color: #c4c4c8;
 }

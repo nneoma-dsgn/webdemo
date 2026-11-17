@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { CONTENT_CATEGORIES } from '../data/categories'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signOut, updateSession } from '../auth'
 import { icons } from '../data/catalog'
@@ -8,21 +9,8 @@ import { icons } from '../data/catalog'
 type Step = 'gender' | 'interests'
 const STEPS: Step[] = ['gender', 'interests']
 
-/* Topics from the Select Interests screens, plus a few streaming-specific ones for the web. */
-const TOPICS = [
-  'Entertainment & Gossip',
-  'Communities',
-  'Food & Cooking',
-  'Business & Money',
-  'Politics',
-  'Movie & Drama',
-  'Music',
-  'Comedy',
-  'Documentaries',
-  'Sports',
-  'Kids & Family',
-  'Tech & Gaming',
-]
+/* Interests are Circo's categories (data/categories.ts): pick the kinds of thing you watch. */
+const TOPICS = CONTENT_CATEGORIES.map((c) => c.label)
 const MIN_PICKS = 3
 const MAX_PICKS = 5
 
@@ -117,11 +105,9 @@ function GenderStep({ value, onPick }: { value: string | null; onPick: (g: strin
 }
 
 function InterestsStep({ picks, setPicks, onDone }: { picks: string[]; setPicks: (p: string[]) => void; onDone: () => void }) {
-  const [q, setQ] = useState('')
   const full = picks.length >= MAX_PICKS
   const ready = picks.length >= MIN_PICKS
 
-  const shown = useMemo(() => TOPICS.filter((t) => t.toLowerCase().includes(q.trim().toLowerCase())), [q])
   const toggle = (label: string) => setPicks(picks.includes(label) ? picks.filter((p) => p !== label) : full ? picks : [...picks, label])
 
   return (
@@ -129,19 +115,10 @@ function InterestsStep({ picks, setPicks, onDone }: { picks: string[]; setPicks:
       <h1 className="onb__title">Select Interests</h1>
       <p className="onb__sub">What do you like? Select between 3-5</p>
 
-      <label className="pill-search">
-        <img src={icons.searchSm} alt="" width={16} height={16} />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" aria-label="Search interests" />
-        {q && (
-          <button type="button" className="pill-search__clear" onClick={() => setQ('')} aria-label="Clear search">
-            ×
-          </button>
-        )}
-      </label>
 
-      {/* Topics as pills: a picked pill turns solid white, so the selection reads at a glance. */}
-      <div className="pills" role="group" aria-label="Topics">
-        {shown.map((label) => {
+      {/* Categories as pills: a picked pill turns solid white, so the selection reads at a glance. */}
+      <div className="pills" role="group" aria-label="Categories">
+        {TOPICS.map((label) => {
           const on = picks.includes(label)
           return (
             <button key={label} className={`pick${on ? ' is-on' : ''}`} onClick={() => toggle(label)} disabled={!on && full} aria-pressed={on}>
@@ -155,7 +132,6 @@ function InterestsStep({ picks, setPicks, onDone }: { picks: string[]; setPicks:
             </button>
           )
         })}
-        {!shown.length && <p className="topics__empty">No topics match “{q}”.</p>}
       </div>
 
       <div className="onb__dock">
@@ -176,20 +152,17 @@ function InterestsStep({ picks, setPicks, onDone }: { picks: string[]; setPicks:
   )
 }
 
-/* Lucide icons (the set used across the Circo designs), one per topic. */
+/* Lucide icons (the set used across the Circo designs), one per category. */
 const TOPIC_ICONS: Record<string, string[]> = {
-  'Entertainment & Gossip': ['m17 2-5 5-5-5', 'M4 7h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z'],
-  Communities: ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', 'M22 21v-2a4 4 0 0 0-3-3.87', 'M16 3.13a4 4 0 0 1 0 7.75'],
-  'Food & Cooking': ['M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2', 'M7 2v20', 'M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7'],
-  'Business & Money': ['M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16', 'M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z'],
-  Politics: ['M3 22h18', 'M6 18v-7', 'M10 18v-7', 'M14 18v-7', 'M18 18v-7', 'm12 2 8 5H4z'],
-  'Movie & Drama': ['M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z', 'm6.2 5.3 3.1 3.9', 'm12.4 3.4 3.1 4', 'M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z'],
+  Movie: ['M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z', 'm6.2 5.3 3.1 3.9', 'm12.4 3.4 3.1 4', 'M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z'],
+  'Reality Show': ['m17 2-5 5-5-5', 'M4 7h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z'],
+  'Micro Drama': ['M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z', 'M12 18h.01'],
+  Documentary: ['m16 13 5.22 3.48a.5.5 0 0 0 .78-.42V7.94a.5.5 0 0 0-.76-.42L16 10.5', 'M4 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z'],
+  Masterclass: ['M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z', 'M22 10v6', 'M6 12.5V16a6 3 0 0 0 12 0v-3.5'],
+  Podcast: ['M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z', 'M19 10v2a7 7 0 0 1-14 0v-2', 'M12 19v3'],
   Music: ['M9 18V5l12-2v13', 'M6 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6z', 'M18 13a3 3 0 1 0 0 6 3 3 0 0 0 0-6z'],
-  Comedy: ['M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z', 'M8 14s1.5 2 4 2 4-2 4-2', 'M9 9h.01', 'M15 9h.01'],
-  Documentaries: ['m16 13 5.22 3.48a.5.5 0 0 0 .78-.42V7.94a.5.5 0 0 0-.76-.42L16 10.5', 'M4 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z'],
-  Sports: ['M6 9H4.5a2.5 2.5 0 0 1 0-5H6', 'M18 9h1.5a2.5 2.5 0 0 0 0-5H18', 'M4 22h16', 'M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22', 'M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22', 'M18 2H6v7a6 6 0 0 0 12 0V2Z'],
-  'Kids & Family': ['M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8', 'M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
-  'Tech & Gaming': ['M6 11h4', 'M8 9v4', 'M15 12h.01', 'M18 10h.01', 'M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z'],
+  'Education & Tutorial': ['M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z', 'M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'],
+  Religion: ['M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z'],
 }
 
 function TopicIcon({ topic }: { topic: string }) {
