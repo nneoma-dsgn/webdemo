@@ -75,7 +75,7 @@ export function ComingSoon({ t, when, onReplay }: { t: Title; when: string; onRe
               if (reminders.toggle(t.id)) toast(`We’ll let you know when ${t.name} drops`)
             }}
           >
-            {on ? 'Notifying You' : 'Notify Me'}
+            {on ? 'Reminder Set' : 'Notify Me'}
           </Button>
           <Button
             size="lg"

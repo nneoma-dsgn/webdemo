@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { icons, type Title } from '../data/catalog'
 import { accessLabel } from '../data/viewing'
 import { useMenu } from './Menu'
@@ -49,17 +49,57 @@ function useContextMenu(name: string) {
   }
 }
 
+/* Long press on touch screens (hold still for a moment). The click that follows the release is
+   swallowed so the press doesn't also open the title. */
+const LONG_PRESS_MS = 450
+function useLongPress(onPress: (el: HTMLElement) => void) {
+  const timer = useRef(0)
+  const start = useRef({ x: 0, y: 0 })
+  const fired = useRef(false)
+  const cancel = () => window.clearTimeout(timer.current)
+  return {
+    onTouchStart: (e: React.TouchEvent<HTMLElement>) => {
+      fired.current = false
+      start.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      const el = e.currentTarget
+      timer.current = window.setTimeout(() => {
+        fired.current = true
+        onPress(el)
+      }, LONG_PRESS_MS)
+    },
+    // Scrolling a rail or the page isn't a press.
+    onTouchMove: (e: React.TouchEvent) => {
+      const t = e.touches[0]
+      if (Math.hypot(t.clientX - start.current.x, t.clientY - start.current.y) > 10) cancel()
+    },
+    onTouchEnd: cancel,
+    onTouchCancel: cancel,
+    onClickCapture: (e: React.MouseEvent) => {
+      if (!fired.current) return
+      fired.current = false
+      e.preventDefault()
+      e.stopPropagation()
+    },
+  }
+}
+
 /* Portrait "Show card": 156 x 218 on mobile, scales with --poster-w on web. */
 export function PosterCard({ t, grid, to, menu = true }: { t: Title; grid?: boolean; to?: string; menu?: boolean }) {
   const onContext = useContextMenu(t.name)
   // Rails inside a PreviewProvider (signed-in pages) open the hover preview; grids don't.
   const ctx = usePreview()
   const preview = grid ? null : ctx
+  const longPress = useLongPress((el) => preview?.press(t.id, el))
   return (
     <Tile
       to={to ?? `/watch/${t.id}`}
       className={`card poster${grid ? ' poster--grid' : ''}`}
-      onContextMenu={menu ? onContext : undefined}
+      {...(preview ? longPress : {})}
+      onContextMenu={(e) => {
+        // Touch screens: a long press opens the preview (Android also fires contextmenu for it).
+        if (preview && window.matchMedia('(hover: none)').matches) return e.preventDefault()
+        if (menu) onContext(e)
+      }}
       onMouseEnter={preview ? (e) => preview.hover(t.id, e.currentTarget) : undefined}
       onMouseLeave={preview?.leave}
       onClick={preview?.leave}

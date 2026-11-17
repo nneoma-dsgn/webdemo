@@ -2179,6 +2179,27 @@ body.spot-focus .page--welcome .cta-wrap {
   border-color: var(--bg-light);
 }
 
+/* Opened by a long press (phones): centred on screen over a dimmed page, below menus. */
+.pv.pv--pressed {
+  position: fixed;
+  z-index: 230;
+}
+
+.pv-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  background: rgba(0, 0, 0, 0.6);
+  animation: ui-dialog-in 0.2s ease;
+}
+
+/* Holding a poster opens the preview, not the browser's own link preview or text selection. */
+.poster {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pv {
     transition: none;
@@ -3534,9 +3555,8 @@ body.spot-focus .page--welcome .cta-wrap {
 .vp-access__methods small {
   font-size: var(--fs-caption);
   color: var(--text-300);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Wraps rather than cutting off an amount. */
+  overflow-wrap: anywhere;
 }
 
 /* Paid: a short reveal, then the film plays on its own. Two looks while they are compared
@@ -5483,7 +5503,7 @@ body.spot-focus .page--welcome .cta-wrap {
 }
 
 /* Phones: the balance is one compact row (balance left, Load Balance right), so what you can
-   watch comes first. The button takes the small size; the glow and ring go. */
+   watch comes first. The button takes the small size; the glow stays, the ring goes. */
 @media (max-width: 767px) {
   .lib-a {
     margin-top: calc(var(--nav-h) + var(--space-4));
@@ -5495,7 +5515,6 @@ body.spot-focus .page--welcome .cta-wrap {
     gap: var(--space-4);
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
-    background: var(--surface-1);
     text-align: left;
   }
 

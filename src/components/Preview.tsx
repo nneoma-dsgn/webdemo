@@ -9,9 +9,10 @@ import { savedToast, useSaved } from '../data/saved'
 
 /* Hover preview for poster rails (signed-in only). Resting on a poster opens one card that
    grows out of it: the trailer plays muted on top, and a frosted body tinted with the
-   title's colour carries Watch Now, quick actions and details. One card for the app. */
+   title's colour carries Watch Now, quick actions and details. One card for the app.
+   Phones have no hover, so a long press opens the same card, centred over a dimmed page. */
 
-type Ctx = { hover: (id: string, el: HTMLElement) => void; leave: () => void }
+type Ctx = { hover: (id: string, el: HTMLElement) => void; leave: () => void; press: (id: string, el: HTMLElement) => void }
 const PreviewCtx = createContext<Ctx | null>(null)
 export const usePreview = () => useContext(PreviewCtx)
 
@@ -19,7 +20,8 @@ const OPEN_DELAY_MS = 450
 // While the page is scrolling, posters sliding under the cursor shouldn't open previews.
 const SCROLL_SETTLE_MS = 250
 // `shown` flips after the delay; the card mounts hidden right away so the trailer starts loading early.
-type Open = { id: string; x: number; y: number; w: number; ox: number; oy: number; shown: boolean }
+// `pressed`: opened by a long press, so it sits in the middle of the screen (fixed) over a scrim.
+type Open = { id: string; x: number; y: number; w: number; ox: number; oy: number; shown: boolean; pressed?: boolean }
 
 export function PreviewProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<Open | null>(null)
@@ -51,6 +53,29 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
     openT.current = window.setTimeout(() => setOpen((o) => (o && o.id === id ? { ...o, shown: true } : o)), OPEN_DELAY_MS)
   }, [])
 
+  const press = useCallback((id: string, el: HTMLElement) => {
+    pending.current = null
+    window.clearTimeout(closeT.current)
+    window.clearTimeout(openT.current)
+    const r = el.getBoundingClientRect()
+    const w = Math.min(window.innerWidth - 32, 420)
+    const h = (w * 9) / 16 + 190
+    const x = (window.innerWidth - w) / 2
+    const y = Math.max(16, (window.innerHeight - h) / 2)
+    // Grows out of the poster that was pressed.
+    setOpen({ id, x, y, w, ox: r.left + r.width / 2 - x, oy: r.top + r.height / 2 - y, shown: false, pressed: true })
+    requestAnimationFrame(() => requestAnimationFrame(() => setOpen((o) => (o && o.id === id ? { ...o, shown: true } : o))))
+  }, [])
+
+  const close = useCallback(() => setOpen(null), [])
+
+  useEffect(() => {
+    if (!open?.pressed) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open?.pressed, close])
+
   const leave = useCallback(() => {
     pending.current = null
     window.clearTimeout(openT.current)
@@ -80,9 +105,10 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   }, [hover])
 
   return (
-    <PreviewCtx.Provider value={{ hover, leave }}>
+    <PreviewCtx.Provider value={{ hover, leave, press }}>
       {children}
-      {open && <PreviewCard key={open.id} open={open} onEnter={() => window.clearTimeout(closeT.current)} onLeave={leave} />}
+      {open?.pressed && <div className="pv-scrim" onClick={close} aria-hidden />}
+      {open && <PreviewCard key={open.id} open={open} onEnter={() => window.clearTimeout(closeT.current)} onLeave={open.pressed ? close : leave} />}
     </PreviewCtx.Provider>
   )
 }
@@ -143,10 +169,11 @@ function PreviewCard({ open, onEnter, onLeave }: { open: Open; onEnter: () => vo
 
   return (
     <div
-      className={`pv${open.shown ? ' is-shown' : ''}`}
+      className={`pv${open.pressed ? ' pv--pressed' : ''}${open.shown ? ' is-shown' : ''}`}
       style={{ left: open.x, top: open.y, width: open.w, transformOrigin: `${open.ox}px ${open.oy}px`, ['--tint' as string]: tint }}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
+      // A pressed card stays until it's dismissed; touch devices send stray mouse events.
+      onMouseEnter={open.pressed ? undefined : onEnter}
+      onMouseLeave={open.pressed ? undefined : onLeave}
       role="dialog"
       aria-label={`${t.name} preview`}
     >
