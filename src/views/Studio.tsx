@@ -9,7 +9,7 @@ import { useReminders } from '../data/reminders'
 import { episodesByStudio } from '../data/explore'
 import { EpisodeCard } from './Explore'
 
-/* Web version of the mobile "PROFILE" (studio page). */
+/* Web version of the mobile "PROFILE" (studio page). Each shelf's chevron opens all of it. */
 export default function Studio() {
   const params = useParams<{ id: string }>()
   const s = studios[params?.id ?? '']
@@ -35,22 +35,22 @@ export default function Studio() {
         </div>
       </section>
       <div className="shelves">
-        <Shelf title="Episodes">
+        <Shelf title="Episodes" to={`/studio/${s.id}/episodes`}>
           {eps.map((e) => (
             <EpisodeCard key={e.clip.id} ep={e} />
           ))}
         </Shelf>
-        <Shelf title="Shows">
+        <Shelf title="Shows" to={`/studio/${s.id}/shows`}>
           {mine.filter((x) => titles[x].kind === 'show' && !upcoming(x)).map((x) => (
             <PosterCard key={x} t={titles[x]} />
           ))}
         </Shelf>
-        <Shelf title="Series">
+        <Shelf title="Series" to={`/studio/${s.id}/series`}>
           {mine.filter((x) => titles[x].kind === 'series' && !upcoming(x)).map((x) => (
             <PosterCard key={x} t={titles[x]} />
           ))}
         </Shelf>
-        <Shelf title="Coming to this Studio">
+        <Shelf title="Coming to this Studio" to={`/studio/${s.id}/coming`}>
           {mine.map((x) => upcoming(x)).filter((c): c is NonNullable<typeof c> => !!c).map((c) => (
             <ComingCard
               key={c.id}
